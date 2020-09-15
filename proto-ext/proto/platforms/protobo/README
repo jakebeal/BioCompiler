@@ -1,0 +1,132 @@
+PROTOBO: INSTALLATION & USER GUIDE
+(Last Revision: $Date: 2008-08-12 16:28:20 -0400 (Tue, 12 Aug 2008) $)
+
+This is a guide to Protobo, the ProtoKernel implementation for Topobo,
+the modular robotics system created by Hayes Raffle and Amanda Parkes.
+To learn more about Topobo or acquire Topobo parts, visit
+http://www.topobo.com or email hayes@media.mit.edu
+
+This guide assumes you are familiar with Proto and have a working
+build of the Proto simulator; for more information on these see
+../../man/ and ../README respectively.
+
+Note that Topobo is built around a microcontroller, which brings us
+into the world of embedded devices.  Supporting libraries are
+currently somewhat volatile, and it may take some hacking to get
+things working at any point in time.
+
+
+0. LICENSING
+
+MIT Proto is Copyright (C) 2005-2008, Jonathan Bachrach, Jacob Beal,
+and contributors listed in the AUTHORS file in the MIT Proto
+distribution's top directory.
+
+MIT Proto is distributed under the terms of the GNU General Public
+License, with a linking exception, as described in the file LICENSE in
+the MIT Proto distribution's top directory.
+
+
+1. DEPENDENCIES
+
+Protobo depends on the following applications and libraries:
+* avr-gcc 4.2
+* avr-libc 1.4
+* pySerial 2.4
+
+  Available at: http://pyserial.wiki.sourceforge.net/pySerial 
+  Test that installation has worked by running python and typing
+  "import serial"---if there is no error, then pySerial has (probably)
+  installed correctly.
+
+If all of the dependencies are satisfied, typing 'make clean all' in
+the protobo directory should cause the whole thing to build correctly.
+
+
+2. SYSTEMS
+
+Protobo is intended to run on second-version Topobo parts built around
+the Atmega644 microcontroller.  The build should work on Linux, MacOS
+X, and Windows.
+
+Protobo is currently affirmatively known to work on:
+* MacOS X 10.4
+
+
+3. PLATFORM-SPECIFIC INSTRUCTIONS:
+
+A. MacOS X: avr-gcc and avr-libc are installable packages in fink
+
+B. Debian: avr-gcc and avr-libs are available in packages, but these
+  packages may be long out of date.  Strangely, avr-gcc is in a
+  package called gcc-avr.  To get the most recent version, use the
+  patch scripts available at:
+  http://www.avrfreaks.net/index.php?name=PNphpBB2&file=viewtopic&t=42631
+  You will need to create an account and login in order to see and
+  download the attached files.  If you use the default installation
+  location, you'll also need to add /usr/local/avr/bin to your $PATH
+
+
+4. PROGRAMMING TOPOBO DEVICES
+
+To flash Protobo onto a Topobo device, you will need three things:
+* USB to mini-USB cable: this is used to connect the computer to the
+  Topobo device and can be bought or manufactured by splicing other
+  cables together.
+* shorted mini-USB cable: this is used to trigger the Topobo device
+  into flash mode this can be created by stripping the cable for a
+  mini-USB plug and twisting the green & white data lines together
+* 12V to mini-USB Topobo power supply
+
+Hold the device with the mini-USB ports facing you and the servo on
+the left.  There should be two left-hand ports (near the servo) and
+two right-hand ports opposite them.  First, plug the shorted cable in
+the top-left, the computer cable in the lower-left.  Next, plug the
+power supply into one of the remaining ports.
+
+The LED should flash once right after the device is powered,
+indicating that the device is ready to receive flashes.  Flash the
+current binaries by running "./bl"
+
+While it is in this mode, you can flash it as many times as you want.
+To return it to regular mode, take out the short cable and reboot (by
+power cycling).  Due to power issues, the device will often fail to
+detect the short cable; if this happens, just power cycle it until it
+does detect it.  Protobo detects the short more reliably than the
+original Topobo software, so once you've flashed a device once, it
+should be easier to reflash.
+
+
+5. RUNNING PROTO ON TOPOBO
+
+Currently, programs are only installed by building them directly into
+the code using the following process:
+* Write the program you want to run
+* co to resrc/ and run "./proto [CODE] --instructions"
+* copy the script[] and script_len declarations output by proto 
+  to script.h, replacing the previous versions.
+* reflash the Topobo devices
+
+Protobo does support viral script distribution, so once an appropriate
+forwarder is built and documented, reprogramming will get much easier.
+
+
+6. NOTES & TRICKS
+
+* Protobo (and standard Topobo) communicate over mini-USB cables 
+  using an undocumented non-standard protocol somewhat like i2c
+* The Topobo motor is controlled via (flex angle): the central angle
+  0, with valid angles ranging from -pi/2 to pi/2.  Commands for
+  angles above pi/2 are mapped to pi/2, and commands below -pi/2 are
+  mapped to -pi/2: angles do not wrap.
+* The Topobo button is accessed with (button 0)
+* To test if a kernel routine is being called, add a halt(); to the
+  code.  When the halt() is reached, the LED will flash multicolored
+  and the program will stop running.
+
+
+7. KNOWN BUGS
+
+* actuators aren't returned to neutral values when unactuated
+* (button 0) does not work correctly: use (toggle (button 0)) to get
+  sane behavior

@@ -1,0 +1,46 @@
+(primitive rna1 () boolean :side-effect :grn-motif ((P R+ rna1|boolean value T)))
+(primitive rna2 () boolean :side-effect :grn-motif ((P R+ rna2|boolean value T)))
+(primitive rna3 () boolean :side-effect :grn-motif ((P R+ rna3|boolean value T)))
+(primitive rna4 () boolean :side-effect :grn-motif ((P R+ rna4|boolean value T)))
+(primitive rna5 () boolean :side-effect :grn-motif ((P R+ rna5|boolean value T)))
+(primitive rna6 () boolean :side-effect :grn-motif ((P R+ rna6|boolean value T)))
+(primitive rna7 () boolean :side-effect :grn-motif ((P R+ rna7|boolean value T)))
+(primitive rna8 () boolean :side-effect :grn-motif ((P R+ rna8|boolean value T)))
+(primitive rna9 () boolean :side-effect :grn-motif ((P R+ rna9|boolean value T)))
+(primitive rna10 () boolean :side-effect :grn-motif ((P R+ rna10|boolean value T)))
+
+;; Simple logic circuits, each sensor used only once
+;; 1 sensor examples
+(def c1A () (green (rna1))) ; 1 FU, 0 RP
+(def c1B () (green (not (rna1)))) ; 2 FU, 1 RP
+;; 2 sensor examples
+(def c2A () (green (or (rna1) (not (rna2))))) ; 4 FU, 2 RP
+(def c2B () (green (and (rna1) (rna2)))) ; 5 FU, 4 RP
+;; 3 sensor examples
+(def c3A () (green (or (rna1) (and (rna2) (rna3))))) ; 7 FU, 5 RP
+(def c3B () (green (and (rna1) (or (not (rna2)) (rna3))))) ; 7 FU, 5 RP
+(def c3C () (green (or (rna1) (not (and (rna2) (rna3)))))) ; 8 FU, 6 FP
+;; 4 sensor examples
+(def c4A () (green (and (and (rna1) (not (rna2))) (and (not (rna3)) (not (rna4)))))) ; 10 FU, 9 RP
+(def c4B () (green (and (or (rna1) (rna2)) (or (rna3) (rna4))))) ; 7 FU, 4 RP
+(def c4C () (green (or (not (and (rna1) (rna2))) (not (and (rna3) (rna4)))))) ; 13 FU, 11 RP
+;; 5 sensor examples
+(def c5A () (green (and (not (and (rna1) (rna2))) (and (rna3) (and (rna4) (rna5)))))) ; 16 FU, 15 RP
+(def c5B () (green (and (and (rna1) (not (rna2))) (and (not (rna3)) (and (rna4) (not (rna5))))))) ; 14 FU, 12 RP
+;; 6 sensor examples
+(def c6A () (green (and (and (rna1) (rna2)) (and (and (rna3) (rna4)) (and (rna5) (rna6)))))) ; 21 FU, 20 RP
+(def c6B () (green (and (and (rna1) (rna2)) (and (or (rna3) (rna4)) (and (rna5) (rna6)))))) ; 18 FU, 16 RP
+;; 7 sensor examples
+(def c7A () (green (and (and (and (rna1) (rna2)) (rna3)) (and (and (rna4) (rna5)) (and (rna6) (not (rna7))))))) ; 24 FU, 23 RP
+(def c7B () (green (and (and (and (not (rna1)) (rna2)) (not (rna3))) (and (and (rna4) (rna5)) (not (and (rna6) (rna7))))))) ; 22 FU, 21 RP
+;; 8 sensor examples
+(def c8A () (green (and (and (or (rna1) (rna2)) (and (rna3) (not (rna4)))) (or (and (not (rna5)) (rna6)) (and (not (rna7)) (rna8)))))) ; 20 FU, 17 RP
+(def c8B () (green (and (and (and (rna1) (rna2)) (and (not (rna3)) (rna4))) (and (and (rna5) (rna6)) (and (not (rna7)) (rna8)))))) ; 27 FU, 25 RP
+;; 9 sensor examples
+(def c9A () (green (and (and (and (not (rna1)) (rna2)) (and (rna3) (rna4))) (and (and (not (rna5)) (rna6)) (and (and (rna7) (rna8)) (rna9)))))) ; 31 FU, 30 RP
+(def c9B () (green (and (and (or (rna1) (rna2)) (and (not (rna3)) (not (rna4)))) (and (and (rna5) (not (rna6))) (or (and (rna7) (rna8)) (not (rna9))))))) ; 25 FU, 22 RP
+;; 10 sensor examples
+(def c10A () (green (and (and (and (rna1) (rna2)) (and (not (rna3)) (rna4))) (and (and (rna5) (rna6)) (or (and (rna7) (rna8)) (or (not (rna9)) (rna10))))))) ; 32 FU, 28 RP
+(def c10B () (green (and (and (and (not (rna1)) (not (rna2))) (and (rna3) (not (rna4)))) (and (or (not (rna5)) (not (rna6))) (and (and (rna7) (rna8)) (and (rna9) (rna10))))))) ; 33 FU, 31 RP
+
+;; neop2b "(include "logic.proto") (c1A)"

@@ -1,0 +1,15 @@
+;; Takes a 3-tuple and returns a 3-tuple
+(def hsv2rgb (hsv)
+  (let ((h (1st hsv)) (s (2nd hsv)) (v (3rd hsv)))
+    (let* ((hp (/ (mod h 360) 60)) (i (floor hp)) (f (- hp i)))
+      (let ((p (* v (- 1 s)))
+	    (q (* v (- 1 (* s f))))
+	    (t (* v (- 1 (* s (- 1 f))))))
+	(if (< i 3)
+	  (if (= i 0) (tup v t p)   ; i = 0
+	    (if (= i 1) (tup q v p) ; i = 1
+	      (tup p v t)))         ; i = 2
+	  (if (= i 3) (tup p q v)   ; i = 3
+	    (if (= i 4) (tup t p v) ; i = 4
+	      (tup v p q))))))))    ; i = 5
+

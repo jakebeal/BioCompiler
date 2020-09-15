@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+
+<project default="main">
+
+   <property file="cygwin.properties" />
+   <!-- this will definitely override the setting of time.midnight in init 
+   target so that every build will run tests -->
+   <property name="time.midnight" value="true" />
+   <property environment="env" />
+
+   <target name="main" depends="init,autogen,configure,build,install,test, uninstall">
+     <echo>Ant main target...</echo>
+   </target>
+
+   <target name="build" depends="init,autogen,configure">
+     <echo> Running make.......</echo>
+     <record name="MakeLog.txt" action="start" />
+       <exec dir="${protodir}" executable="${makepath}" failonerror="true" />   
+     <record name="MakeLog.txt" action="stop" />
+     <echo>Finished build</echo>
+   </target>
+
+   <target name="init">
+     <echo>In cygwin build.xml in build_files directory.</echo>
+     <tstamp><format property="TSTAMP" pattern="HHmm" /></tstamp>
+     <condition property="time.midnight">
+       <and>
+         <contains string="${TSTAMP}" substring="000" />
+         <not>
+            <contains string="${TSTAMP}" substring="10" />
+         </not>
+         <not>
+            <contains string="${TSTAMP}" substring="20" />
+         </not>
+       </and>
+     </condition>
+   </target>
+
+   <target name="autogen">
+     <echo>Running autogen.sh.....</echo>
+     <record name="AutogenLog.txt" action="start" />
+        <echo>Running autogen.sh.....</echo>
+        <exec dir="${buildfilesdir}" executable="cmd" failonerror="true">
+           <arg value="/c" />
+           <arg value="bash.bat" />
+           <arg value="${buildfilesdir}/runautogen.sh" />
+           <arg value="${cygprotodir}" />
+        </exec>
+     <record name="AutogenLog.txt" action="stop" />
+   </target>
+
+   <target name="configure" >
+     <echo>Running configure.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${buildfilesdir}" executable="cmd" failonerror="true">
+           <arg value="/c" />
+           <arg value="bash.bat" />
+           <arg line="${buildfilesdir}/runconfigure.sh" />
+           <arg value="${cygprotodir}" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="clean" >
+     <echo>Starting make clean...</echo>
+     <exec dir="${protodir}" executable="${makepath}" failonerror="true" >
+        <arg line="clean" />
+     </exec>
+   </target>
+
+   <target name="test"  if="time.midnight" >
+     <echo>Starting Proto tests.....</echo>
+     <record name="TestLog.txt" action="start" />
+     <exec dir="${protodir}/src/tests" executable="${pythonpath}" >
+        <arg value="prototest.py" />
+        <arg value="--proto" />
+        <arg value="${cygprotodir}/src/proto.exe" />
+        <arg value="--p2b" />
+        <arg value="${cygprotodir}/src/p2b.exe" />
+        <arg value="*.test" />
+     </exec>
+     <record name="TestLog.txt" action="stop" />
+     <exec dir="${protodir}/src/tests" executable="${pythonpath}">
+       <arg value="protoTestOutputFormatter.py" />
+       <arg value="*.RESULTS" />
+     </exec>
+     <antcall target="cleanDump" />
+   </target>
+
+   <target name="cleanDump" >
+      <echo>Cleaning dump files.....</echo>
+      <delete dir="${protodir}/src/tests/dumps" />
+   </target>   
+
+   <target name="install"  >
+     <echo>Starting make install...</echo>
+     <record name="MakeInstallLog.txt" action="start" />
+     <exec dir="${protodir}" executable="${makepath}" failonerror="true">
+        <arg line=" install" />
+     </exec>
+     <record name="MakeInstallLog.txt" action="stop" />
+   </target>
+
+   <target name="uninstall" >
+      <echo>Starting uninstall..</echo>
+      <record name="MakeUninstallLog.txt" action="start" />
+      <exec dir="${protodir}" executable="${makepath}" failonerror="true">
+        <arg line=" uninstall" />
+      </exec>
+      <record name="MakeUninstallLog.txt" action="stop" />
+   </target>
+</project>

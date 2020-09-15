@@ -1,0 +1,14 @@
+;; produces 1 m/s movement to randomly picked waypoints
+
+(def pick-goal (dx dy)
+  (tup (- (rndint dx) (/ dx 2))
+       (- (rndint dy) (/ dy 2))))
+
+(def waypoint-wander (dx dy error)
+  (normalize
+   (- (rep goal 
+       (pick-goal dx dy) 
+       (if (< (vlen (- (coord) goal)) error) (pick-goal dx dy) goal))
+    (coord))))
+
+;; proto -m -v "(mov (waypoint-wander 100 100 2))" -s 1

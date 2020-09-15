@@ -1,0 +1,1 @@
+(def toDegrees (x) (* x (/ 180 pi)))

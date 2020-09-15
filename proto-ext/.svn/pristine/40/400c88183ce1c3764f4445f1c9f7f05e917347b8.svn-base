@@ -1,0 +1,9 @@
+(def spath (src dest d)
+  (let* ((min-id (2nd (min-hood (tup (nbr d) (nbr (mid)))))))
+    (rep ispath
+     0
+     (mux src 1 (any-hood (muxand (= (mid) (nbr min-id)) (nbr ispath)))))))
+
+; NB spath.proto must now be called with a color, eg. (red (spath src2 dest2))
+; Note: spath doesn't actually need dest as an argument, since d is passed in; however, useful for clarity in following code
+; see wire.proto for running instructions

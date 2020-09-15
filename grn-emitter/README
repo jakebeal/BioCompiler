@@ -1,0 +1,15 @@
+This is the TASBE BioCompiler plugin for Proto, release #0.
+
+This project uses GNU autotools, so if you have already installed MIT
+Proto, you should be able to build it by running:
+  `./autogen.sh; ./configure; make; make install'
+
+Test the plugin by changing to the tests directory and running:
+    prototest.py *.test
+
+Visualizing the dotfiles requires GraphViz 2.30 or higher, which
+is when the SBOL visual icons were introduced.
+
+Some configuration notes:
+- if you want to emit without a need for 2A sequences linking proteins,
+  then run BioCompiler with the option '--single-products-only'

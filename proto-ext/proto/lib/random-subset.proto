@@ -1,0 +1,1 @@
+(def random-subset (p) (once (< (rnd 0 1) p)))

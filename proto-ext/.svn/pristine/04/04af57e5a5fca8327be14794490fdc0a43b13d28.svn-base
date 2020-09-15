@@ -1,0 +1,11 @@
+;; (def grad-value (src f)
+;;   (let ((d (gradient src)))
+;;     (rep v f (mux src f (2nd (min-hood (nbr (tup d v)))))))) 
+
+(def grad-value (src f)
+  (let ((d (gradient src)))
+    (letfed ((v f (mux src f (2nd (fold-hood 
+			 	    (fun (r x) (if (< (1st x) (1st r)) x r)) 
+				    (tup inf f)
+				    (tup d v))))))
+      v)))

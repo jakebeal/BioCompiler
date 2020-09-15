@@ -1,0 +1,3 @@
+determine how to run run regression tests on Topobo
+check that floating point division w. exception cases still works on embedded
+  devices (e.g. 1/0 = Inf, 0/0 = NaN)

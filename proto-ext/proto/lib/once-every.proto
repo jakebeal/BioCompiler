@@ -1,0 +1,9 @@
+;; True once every n seconds
+
+(def once-every (n)
+  (letfed ((v (rnd 0 n) (if (> v n) (- n (dt)) (if (> v (dt)) (- v (dt)) n))))
+    (= v n)))
+
+;; proto -l "(green (once-every (if (sense 1) 1 20)))"
+
+

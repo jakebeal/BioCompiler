@@ -1,0 +1,270 @@
+<?xml version="1.0" ?>
+<project default="main">
+
+   <property file="${os.name}.properties" />
+   <property name="proto-dir" location="../proto"/>
+   <property name="test-script-dir" location="${proto-dir}/src/tests/"/>
+   <property name="universal-tests" location="${proto-dir}/src/tests/universal/"/>
+   <property name="paleo-only-tests" location="${proto-dir}/src/tests/paleo-only/"/>
+   <property name="neo-only-tests" location="${proto-dir}/src/tests/neo-only/"/>
+
+   <!-- override for Paleo compiler -DisNeoCompiler=false" -->
+   <property name="isNeoCompiler" value="true"/>
+
+   <!-- the install directory can be overriden on the command line using -Dinstall-dir=<location> -->
+   <property name="install-dir" location="/opt/hudson/jobs/Proto/workspace/bin/"/>
+
+   <property name="removePluginTests" value="false"/>
+ 
+   <target name="main" depends="build,test">
+     <echo>Starting Ant main target...</echo>
+   </target>
+
+   <target name="init">
+     <exec executable="hostname" outputproperty="computer.hostname"/>
+     <echo>Running on host ${computer.hostname}</echo>
+     <condition property="isDante">
+       <equals arg1="${computer.hostname}" arg2="dante"/>
+     </condition>
+     <condition property="isNeo">
+       <equals arg1="${isNeoCompiler}" arg2="true"/>
+     </condition>
+     <condition property="isRemovePluginTests">
+       <equals arg1="${removePluginTests}" arg2="true"/>
+     </condition>
+   </target>  
+
+   <target name="build" depends="install-proto"> </target>
+
+   <target name="clean" depends="clean-proto"> </target>
+
+   <target name="install-proto"  depends="build-proto">
+     <echo>Starting make install for Proto...</echo>
+     <record name="MakeInstallLog.txt" action="start" />
+       <antcall target="install-proto-normal" />
+       <antcall target="install-proto-dante" />        
+     <record name="MakeInstallLog.txt" action="stop" />
+   </target>
+
+  <target name="install-proto-normal" unless="isDante">
+    <echo>Installing Proto for normal machine...</echo>
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+    </exec>
+  </target>
+    
+  <target name="install-proto-dante" if="isDante">
+    <echo>Installing Proto for dante...</echo>
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+  <target name="uninstall-proto" >
+    <echo>Starting uninstall for Proto..</echo>
+    <record name="MakeUninstallLog.txt" action="start" />
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" uninstall" />
+    </exec>
+    <record name="MakeUninstallLog.txt" action="stop" />
+  </target>
+
+
+   <target name="build-proto" depends="init, autogen-proto,configure-proto">
+     <echo> Running make for Proto.......</echo>
+     <record name="MakeLog.txt" action="start" />
+       <exec dir="${proto-dir}" executable="${makepath}" failonerror="true" >
+         <arg line="-j" />
+       </exec>
+     <record name="MakeLog.txt" action="stop" />
+     <echo>Finished build</echo>
+   </target>
+
+   <target name="autogen-proto">
+     <echo>Running autogen.sh for Proto.....</echo>
+     <record name="AutogenLog.txt" action="start" />
+        <echo>${os.name}</echo>
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+           <arg line="./autogen.sh" />
+        </exec>
+     <record name="AutogenLog.txt" action="stop" />
+   </target>
+
+
+   <target name="configure-proto">
+     <echo>Configuring Proto...</echo>
+     <antcall target="configure-proto-paleo" />
+     <antcall target="configure-proto-neo" />        
+   </target>
+
+   <target name="configure-proto-neo" if="isNeo">
+     <echo>Running configure for Neo Proto.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+          <arg line="./configure --prefix=${install-dir} --with-neocompiler ${configureopts}" />
+          <env key="LIBS" value="${extralibs}" />
+          <env key="CFLAGS" value="${cflags}" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="configure-proto-paleo" unless="isNeo">
+     <echo>Running configure for Paleo Proto.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+          <arg line="./configure --prefix=${install-dir} ${configureopts}" />
+          <env key="LIBS" value="${extralibs}" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="clean-proto" >
+     <echo>Starting make clean for Proto...</echo>
+     <exec dir="${proto-dir}" executable="${makepath}" failonerror="true" >
+        <arg line="-j clean" />
+     </exec>
+   </target>
+  
+   <target name="clean-tests" >
+     <echo>Starting make clean-test for Proto/tests</echo>
+     <exec dir="${proto-dir}/src/tests" executable="${makepath}" failonerror="true" >
+        <arg line="-j clean-tests"/>
+     </exec>
+   </target>
+
+   <target name="remove-plugin-test-results" if="isRemovePluginTests">
+     <echo>Removing tests involving plugins</echo>
+     <delete file="${proto-dir}/src/tests/neo-only/xml/plugins.test.xml"/>
+     <delete file="${proto-dir}/src/tests/paleo-only/xml/plugins.test.xml"/>
+     <delete file="${proto-dir}/src/tests/paleo-only/xml/complex.test.xml"/>
+   </target>   
+
+   <target name="test" depends="init, clean-tests">
+     <echo>Starting Proto tests.....</echo>
+     <antcall target="universal-tests" />
+     <antcall target="neo-only-tests" />
+     <antcall target="paleo-only-tests" />
+     <antcall target="remove-plugin-test-results" />
+   </target>
+
+  <target name="universal-tests">
+    <echo>Running universal tests..</echo>
+     <antcall target="test-proto-universal" />
+     <antcall target="test-proto-universal-dante" />
+     <exec dir="${universal-tests}" executable="${pythonpath}" >
+       <arg value="${test-script-dir}/protoTestOutputFormatter.py" />
+       <arg value="*.RESULTS" />
+     </exec>
+     <antcall target="cleanDump-universal" />
+  </target>
+
+  <target name="test-proto-universal" unless="isDante">
+    <echo>Testing Proto with universal tests for normal machine...</echo>
+    <exec dir="${universal-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto${exeExt}" />
+      <arg value="--p2b=${install-dir}/bin/p2b${exeExt}" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="PRINTF_EXPONENT_DIGITS" value="2" />
+    </exec>
+  </target>
+    
+  <target name="test-proto-universal-dante" if="isDante">
+    <echo>Testing Proto with universal tests for dante...</echo>
+    <exec dir="${universal-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto" />
+      <arg value="--p2b=${install-dir}/bin/p2b" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+   <target name="cleanDump-universal" >
+      <echo>Cleaning dump files.....</echo>
+      <delete dir="${universal-tests}/dumps" />
+   </target>
+
+  <target name="paleo-only-tests" unless="isNeo">
+    <echo>Running paleo only tests..</echo>
+     <antcall target="test-paleo-only" />
+     <antcall target="test-paleo-only-dante" />
+     <exec dir="${paleo-only-tests}" executable="${pythonpath}" >
+       <arg value="${test-script-dir}/protoTestOutputFormatter.py" />
+       <arg value="*.RESULTS" />
+     </exec>
+     <antcall target="cleanDump-paleo" />
+  </target>
+
+  <target name="test-paleo-only" unless="isDante">
+    <echo>Testing Proto with paleo only tests for normal machine...</echo>
+    <exec dir="${paleo-only-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto${exeExt}" />
+      <arg value="--p2b=${install-dir}/bin/p2b${exeExt}" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="PRINTF_EXPONENT_DIGITS" value="2" />
+    </exec>
+  </target>
+    
+  <target name="test-paleo-only-dante" if="isDante">
+    <echo>Testing Proto with paleo only tests for dante...</echo>
+    <exec dir="${paleo-only-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto" />
+      <arg value="--p2b=${install-dir}/bin/p2b" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+   <target name="cleanDump-paleo" >
+      <echo>Cleaning dump files.....</echo>
+      <delete dir="${paleo-only-tests}/dumps" />
+   </target>   
+
+  <target name="neo-only-tests" if="isNeo">
+    <echo>Running neo only tests..</echo>
+     <antcall target="test-neo-only" />
+     <antcall target="test-neo-only-dante" />
+     <exec dir="${neo-only-tests}" executable="${pythonpath}" >
+       <arg value="${test-script-dir}/protoTestOutputFormatter.py" />
+       <arg value="*.RESULTS" />
+     </exec>
+     <antcall target="cleanDump-neo" />
+  </target>
+
+  <target name="test-neo-only" unless="isDante">
+    <echo>Testing Proto with neo only tests for normal machine...</echo>
+    <exec dir="${neo-only-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto${exeExt}" />
+      <arg value="--p2b=${install-dir}/bin/p2b${exeExt}" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="PRINTF_EXPONENT_DIGITS" value="2" />
+    </exec>
+  </target>
+    
+  <target name="test-neo-only-dante" if="isDante">
+    <echo>Testing Proto with neo only tests for dante...</echo>
+    <exec dir="${neo-only-tests}" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto" />
+      <arg value="--p2b=${install-dir}/bin/p2b" />
+      <arg value="--demos=${proto-dir}/demos" />
+      <arg value="*.test" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+   <target name="cleanDump-neo" >
+      <echo>Cleaning dump files.....</echo>
+      <delete dir="${neo-only-tests}/dumps" />
+   </target>
+</project>

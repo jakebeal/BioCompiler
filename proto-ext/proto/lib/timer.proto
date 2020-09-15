@@ -1,0 +1,1 @@
+(def timer () (letfed ((t 0 (+ t (dt)))) t))

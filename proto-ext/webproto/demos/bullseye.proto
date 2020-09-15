@@ -1,0 +1,15 @@
+;; http://localhost/tmp/webproto/index.html?radius=15&numDevices=200&stepSize=10&program=%3B%3BBullseye%0A(def%20bullseye%20(src)%0A%20%20%20(let%20((d%20(distance-to%20src)))%0A%20%20%20%20%20%20(if%20(%3C%20d%2015)%0A%20%20%20%20%20%20%20%20%20(red%201)%0A%20%20%20%20%20%20%20%20%20(if%20(%3C%20d%2030)%0A%20%20%20%20%20%20%20%20%20%20%20%20(green%201)%0A%20%20%20%20%20%20%20%20%20%20%20%20(if%20(%3C%20d%2045)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(blue%201)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%200)))))%0A%0A(bullseye%20(sense%201))%0A 
+
+;;Bullseye
+(def bullseye (src)
+     (let ((d (distance-to src)))
+       (if (< d 15)
+         (red 1)
+         (if (< d 30)
+           (green 1)
+           (if (< d 45)
+             (blue 1)
+             0)))))
+
+(bullseye (sense 1))
+

@@ -1,0 +1,8 @@
+;; For use in testing VM optimization, by means of heavy addition
+;; Each iteration is 5K additions
+(def tenbigfn ()
+  (+ (bigfn) (bigfn) (bigfn) (bigfn) (bigfn)
+     (bigfn) (bigfn) (bigfn) (bigfn) (bigfn)))
+(def superbigfn ()
+  (+ (tenbigfn) (tenbigfn) (tenbigfn) (tenbigfn) (tenbigfn)
+     (tenbigfn) (tenbigfn) (tenbigfn) (tenbigfn) (tenbigfn)))

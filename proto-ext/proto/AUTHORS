@@ -1,0 +1,20 @@
+History & Authorship of Proto:
+
+The Proto language was created in partnership by Jonathan Bachrach and
+Jacob Beal.  As they created the language, Jonathan created the first
+implementation of MIT Proto, including the first compiler, kernel,
+simulator, and embedded device implementations.  Since that time, Jake
+and other contributors have built on the work begun by Jonathan.
+
+MIT Proto also includes contributions from (alphabetically):
+
+  Aaron Adler, Geoffrey Bays, Jeff Cleveland, Anna Derbakova, Nelson
+  Elhage, Takeshi Fujiwara, Tony Grue, Tom Hsu, Joshua Horowitz, Kanak
+  Kshetri, Prakash Manghwani, Dustin Mitchell, Omar Mysore, Maciej
+  Pacula, Hayes Raffle, Dany Qumsiyeh, Omari Stephens, Mark Tobenkin,
+  Ray Tomlinson, Kyle Usbeck, Dan Vickery
+
+The Protobo platform code in platforms/protobo/ also includes
+Topobo-related code from (alphabetically):
+
+  Mike Fleder, Limor Fried, Josh Lifton, Laura Yip

@@ -1,0 +1,2638 @@
+////////////////////////////////////////////////////////////////////////////
+// Don't do localization
+$(P2B_ARGS) = --no-localization
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) --test
+is 0 _ foo: Attributes [2]
+is 1 _   CONTEXT: sample:2-5, simple:7-8, wimple:3
+is 2 _   RANDOM: rnd:0
+is 3 _ bar: Attributes [0]
+is 4 _ baz: Attributes [1]
+is 5 _   CONTEXT: sample:2-5, simple:7-8, wimple:3
+is 6 _ (1 (2 3) 4 ((5) 6))
+is 7 _ (quasiquote (this (comma-splice (is (comma really))) (quote splicy)))
+is 8 _ (all here be symbols)
+is 9 _ cmdline:1: Wrapper macro comma is not applied to anything
+is 10 _ cmdline:1: Missing right parenthesis
+is 11 _ Parse failed!
+is 12 _ cmdline:1: Illegal use of reserved character '~'
+is 13 _ Parse failed!
+// unrecognized character shows up differently on different platforms
+is 15 _ Parse failed!
+is 16 _ (all this | is | bar | separated)
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) --internal-tests
+is 0 _ Testing type relations:
+is 1 _ Generic types:
+is 2 _ <Any> > <Any>: TRUE, reverse: TRUE
+is 3 _ <Any> > <Local>: TRUE, reverse: FALSE
+is 4 _ <Any> > <Field <Any>>: TRUE, reverse: FALSE
+is 5 _ <Any> > <Lambda>: TRUE, reverse: FALSE
+is 6 _ <Any> > <Scalar>: TRUE, reverse: FALSE
+is 7 _ <Scalar> > <Number>: FALSE, reverse: TRUE
+is 8 _ <Scalar> > <Field <Any>>: FALSE, reverse: FALSE
+is 9 _ <Vector<Scalar>...> > <Tuple<Any>...>: FALSE, reverse: TRUE
+is 10 _ <Scalar> > <Boolean>: TRUE, reverse: FALSE
+is 11 _ <Scalar> > <Symbol>: FALSE, reverse: FALSE
+is 12 _ <Any> > <Vector<Scalar>...>: TRUE, reverse: FALSE
+is 13 _ <Vector<Scalar>...> > <Number>: FALSE, reverse: TRUE
+is 14 _ <Vector<Scalar>...> > <Boolean>: FALSE, reverse: FALSE
+is 15 _ <Symbol> > <Boolean>: FALSE, reverse: FALSE
+is 16 _ <Symbol> > <Local>: FALSE, reverse: TRUE
+is 17 _ <Field <Any>> > <Local>: FALSE, reverse: FALSE
+is 18 _ <Lambda> > <Local>: FALSE, reverse: TRUE
+is 19 _ <Tuple<Any>...> > <Local>: FALSE, reverse: TRUE
+is 20 _ Literals:
+is 21 _ <Scalar 3> > <Local>: FALSE, reverse: TRUE
+is 22 _ <Scalar 4> > <Scalar 5>: FALSE, reverse: FALSE
+is 23 _ <Scalar 4> > <Boolean>: FALSE, reverse: FALSE
+is 24 _ <Scalar> > <Scalar 3>: TRUE, reverse: FALSE
+is 25 _ <Boolean true> > <Boolean>: FALSE, reverse: TRUE
+is 26 _ <Boolean false> > <Symbol>: FALSE, reverse: FALSE
+is 27 _ <Boolean> > <Boolean false>: TRUE, reverse: FALSE
+is 28 _ <Boolean false> > <Boolean true>: FALSE, reverse: FALSE
+is 29 _ <Boolean false> > <Scalar 1>: FALSE, reverse: FALSE
+is 30 _ <Boolean false> > <Scalar 0>: FALSE, reverse: TRUE
+is 31 _ <Boolean true> > <Scalar 1>: FALSE, reverse: TRUE
+is 32 _ <Boolean true> > <Scalar 0>: FALSE, reverse: FALSE
+is 33 _ <Symbol foo> > <Number>: FALSE, reverse: FALSE
+is 34 _ <Symbol bar> > <Symbol>: FALSE, reverse: TRUE
+is 35 _ <Any> > <Symbol foo>: TRUE, reverse: FALSE
+is 36 _ <Symbol foo> > <Symbol bar>: FALSE, reverse: FALSE
+is 37 _ Tuples:
+is 38 _ <2-Tuple<Scalar 3>,<Symbol>> > <Tuple<Scalar 3>,<Any>,<Field <Any>>...>: FALSE, reverse: TRUE
+is 39 _ <2-Tuple<Scalar 3>,<Symbol>> > <Tuple<Any>...>: FALSE, reverse: TRUE
+is 40 _ <Tuple<Scalar 3>,<Any>,<Field <Any>>...> > <Tuple<Any>...>: FALSE, reverse: TRUE
+is 41 _ <Tuple<Any>...> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: TRUE, reverse: FALSE
+is 42 _ <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: TRUE
+is 43 _ <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: TRUE
+is 44 _ <3-Tuple<Scalar 3>,<Any>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: FALSE
+is 45 _ <2-Tuple<Scalar 3>,<Scalar 4>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: TRUE
+is 46 _ <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: FALSE
+is 47 _ <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>: FALSE, reverse: TRUE
+is 48 _ <3-Tuple<Scalar 3>,<Any>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>: FALSE, reverse: FALSE
+is 49 _ <2-Tuple<Scalar 3>,<Scalar 4>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>: FALSE, reverse: FALSE
+is 50 _ <3-Tuple<Scalar 3>,<Any>,<Scalar 5>> > <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>: TRUE, reverse: FALSE
+is 51 _ <3-Tuple<Scalar 3>,<Any>,<Scalar 5>> > <2-Tuple<Scalar 3>,<Scalar 4>>: FALSE, reverse: FALSE
+is 52 _ <3-Tuple<Scalar 3>,<Any>,<Scalar 5>> > <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>: TRUE, reverse: FALSE
+is 53 _ <Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: TRUE, reverse: TRUE
+is 54 _ <Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>: TRUE, reverse: FALSE
+is 55 _ <Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...> > <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>: TRUE, reverse: FALSE
+is 56 _ <Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...> > <2-Tuple<Scalar 3>,<Scalar 4>>: FALSE, reverse: FALSE
+is 57 _ Vectors:
+is 58 _ <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>> > <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>: FALSE, reverse: TRUE
+is 59 _ <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>> > <2-Tuple<Scalar 3>,<Scalar 4>>: FALSE, reverse: FALSE
+is 60 _ <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>: FALSE, reverse: TRUE
+is 61 _ <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>> > <3-Tuple<Scalar 3>,<Any>,<Scalar 5>>: FALSE, reverse: TRUE
+is 62 _ <Vector<Scalar 3>,<Scalar 4>,<Scalar>...> > <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>>: TRUE, reverse: FALSE
+is 63 _ <Vector<Scalar 3>,<Scalar 4>,<Scalar>...> > <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>: FALSE, reverse: FALSE
+is 64 _ <Vector<Scalar 3>,<Scalar 4>,<Scalar>...> > <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>: FALSE, reverse: TRUE
+is 65 _ Fields:
+is 66 _ <Field <Scalar 3>> > <Field <Any>>: FALSE, reverse: TRUE
+is 67 _ <Field <Scalar 3>> > <Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>: FALSE, reverse: FALSE
+is 68 _ <Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>> > <Field <Any>>: FALSE, reverse: TRUE
+is 69 _ <Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>> > <Field <3-Tuple<Scalar 3>,<Any>,<Scalar 5>>>: FALSE, reverse: TRUE
+is 70 _ Testing least-common-supertype:
+is 71 _ LCS ordered pairs:
+is 72 _ LCS(<Any>,<Field <Scalar 3>>) = <Any>; inverse match = TRUE
+is 73 _ LCS(<Scalar 3>,<Local>) = <Local>; inverse match = TRUE
+is 74 _ LCS(<Number>,<Boolean>) = <Number>; inverse match = TRUE
+is 75 _ LCS cross-class:
+is 76 _ LCS(<Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>,<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>) = <Any>; inverse match = TRUE
+is 77 _ LCS(<Boolean false>,<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>) = <Local>; inverse match = TRUE
+is 78 _ LCS(<Boolean>,<Vector<Scalar>...>) = <Number>; inverse match = TRUE
+is 79 _ LCS(<Boolean true>,<Scalar 5>) = <Scalar>; inverse match = TRUE
+is 80 _ LCS(<Vector<Scalar>...>,<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>) = <Tuple<Local>...>; inverse match = TRUE
+is 81 _ LCS(<Boolean>,<Lambda>) = <Local>; inverse match = TRUE
+is 82 _ LCS(<Vector<Scalar>...>,<Field <Any>>) = <Any>; inverse match = TRUE
+is 83 _ LCS in-class generalization:
+is 84 _ LCS(<Boolean false>,<Boolean true>) = <Boolean>; inverse match = TRUE
+is 85 _ LCS(<Boolean true>,<Scalar 1>) = <Scalar 1>; inverse match = TRUE
+is 86 _ LCS(<Scalar 1>,<Scalar 3>) = <Scalar>; inverse match = TRUE
+is 87 _ LCS(<2-Tuple<Scalar 3>,<Scalar 1>>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>) = <Tuple<Scalar 3>,<Scalar>,<Scalar 5>...>; inverse match = TRUE
+is 88 _ LCS(<Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>,<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>) = <Tuple<Scalar 3>,<Any>,<Scalar 5>,<Scalar>...>; inverse match = TRUE
+is 89 _ LCS(<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>) = <3-Tuple<Scalar 3>,<Local>,<Scalar 5>>; inverse match = TRUE
+is 90 _ LCS(<Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...>,<2-Tuple<Scalar 3>,<Scalar 4>>) = <Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>; inverse match = TRUE
+is 91 _ LCS(<Vector<Scalar 3>,<Scalar 4>,<Scalar>...>,<3-Vector<Scalar 1>,<Scalar 4>,<Scalar 5>>) = <Vector<Scalar>,<Scalar 4>,<Scalar>...>; inverse match = TRUE
+is 92 _ LCS(<3-Vector<Scalar 1>,<Scalar 4>,<Scalar 5>>,<Scalar 3>) = <Number>; inverse match = TRUE
+is 93 _ LCS(<3-Vector<Scalar 1>,<Scalar 4>,<Scalar 5>>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>) = <3-Tuple<Scalar>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 94 _ LCS(<Symbol foo>,<Symbol bar>) = <Symbol>; inverse match = TRUE
+is 95 _ LCS(<Field <Scalar 3>>,<Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>) = <Field <Local>>; inverse match = TRUE
+is 96 _ Testing greatest-common-subtype:
+is 97 _ GCS ordered pairs:
+is 98 _ GCS(<Any>,<Field <Scalar 3>>) = <Field <Scalar 3>>; inverse match = TRUE
+is 99 _ GCS(<Scalar 3>,<Local>) = <Scalar 3>; inverse match = TRUE
+is 100 _ GCS(<Number>,<Boolean>) = <Boolean>; inverse match = TRUE
+is 101 _ GCS cross-class:
+is 102 _ GCS(<Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>,<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>) = NULL; inverse match = TRUE
+is 103 _ GCS(<Vector<Scalar>...>,<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>) = NULL; inverse match = TRUE
+is 104 _ GCS(<Boolean>,<Lambda>) = NULL; inverse match = TRUE
+is 105 _ GCS(<Vector<Scalar>...>,<Field <Any>>) = NULL; inverse match = TRUE
+is 106 _ GCS(<Number>,<Tuple<Any>...>) = <Vector<Scalar>...>; inverse match = TRUE
+is 107 _ GCS(<3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>,<Number>) = NULL; inverse match = TRUE
+is 108 _ GCS(<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>,<Number>) = <3-Vector<Scalar 3>,<Scalar>,<Scalar 5>>; inverse match = TRUE
+is 109 _ GCS in-class specialization:
+is 110 _ GCS(<Boolean false>,<Boolean true>) = NULL; inverse match = TRUE
+is 111 _ GCS(<Boolean true>,<Scalar 1>) = <Boolean true>; inverse match = TRUE
+is 112 _ GCS(<Scalar 1>,<Scalar 3>) = NULL; inverse match = TRUE
+is 113 _ GCS(<2-Tuple<Scalar 3>,<Scalar 4>>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>) = NULL; inverse match = TRUE
+is 114 _ GCS(<2-Tuple<Scalar 3>,<Scalar 4>>,<Tuple<Scalar 3>,<Scalar 4>,<Scalar>...>) = <2-Tuple<Scalar 3>,<Scalar 4>>; inverse match = TRUE
+is 115 _ GCS(<2-Tuple<Scalar 3>,<Scalar 4>>,<Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...>) = NULL; inverse match = TRUE
+is 116 _ GCS(<Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>,<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>) = <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 117 _ GCS(<Tuple<Scalar 3>,<Scalar 4>,<Any>...>,<Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...>) = <Tuple<Scalar 3>,<Scalar 4>,<Scalar>,<Scalar>...>; inverse match = TRUE
+is 118 _ GCS(<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>,<Tuple<Scalar 3>,<Scalar 4>,<Any>...>) = <3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 119 _ GCS(<Tuple<Scalar 3>,<Any>,<Scalar 5>,<Scalar>...>,<Tuple<Scalar 3>,<Scalar 4>,<Any>...>) = <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Scalar>...>; inverse match = TRUE
+is 120 _ GCS(<Tuple<Scalar 3>,<Any>,<Scalar 5>,<Scalar>...>,<Tuple<Scalar 3>,<Any>,<Scalar 5>,<Field <Any>>...>) = NULL; inverse match = TRUE
+is 121 _ GCS(<Tuple<Scalar 3>,<Any>,<Scalar 5>,<Field <Any>>...>,<Tuple<Scalar 3>,<Scalar 4>,<Any>...>) = <Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>,<Field <Any>>...>; inverse match = TRUE
+is 122 _ GCS(<Vector<Scalar 3>,<Scalar 4>,<Scalar>...>,<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>) = <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 123 _ GCS(<3-Tuple<Scalar 3>,<Any>,<Scalar 5>>,<Vector<Scalar 3>,<Scalar 4>,<Scalar>...>) = <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 124 _ GCS(<Vector<Scalar 3>,<Scalar 4>,<Scalar>...>,<3-Vector<Scalar>,<Scalar 4>,<Scalar 5>>) = <3-Vector<Scalar 3>,<Scalar 4>,<Scalar 5>>; inverse match = TRUE
+is 125 _ GCS(<Symbol foo>,<Symbol bar>) = NULL; inverse match = TRUE
+is 126 _ GCS(<Field <3-Tuple<Scalar 3>,<Any>,<Scalar 5>>>,<Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>) = <Field <3-Tuple<Scalar 3>,<3-Tuple<Scalar 3>,<Scalar 4>,<Scalar 5>>,<Scalar 5>>>; inverse match = TRUE
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall '(+ ,) zeros 3 4, `)'
+is 0 _ command-line:1: Wrapper macro comma is not applied to anything
+is 1 _ command-line:1: Missing right parenthesis
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// int scalar
+test: $(P2B) -CDall '3'
+is 0 _ Amorphous Mediums:
+is 1 _ [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3> OUTPUT
+is 6 _ Amorphous Mediums:
+is 7 _   [Medium: Alfa = root]
+is 8 _ Fields:
+is 9 _   Bravo: Alfa --> <Scalar 3> OUTPUT
+is 10 _ Operator Instances:
+is 11 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// negative float scalar
+test: $(P2B) -CDanalyzed '-1.7'
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar -1.7> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar -1.7>] --> Bravo<Scalar -1.7> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// scientific notation
+test: $(P2B) -CDanalyzed "0.09e-4"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 9e-06> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 9e-06>] --> Bravo<Scalar 9e-06> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// integer addition
+test: $(P2B) -CDall "(+ 3 4)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 3>
+is 5 _   Delta: Alfa --> <Scalar 4>
+is 6 _ Operator Instances:
+is 7 _   Charlie<Scalar 3>, Delta<Scalar 4> --> [+] --> Bravo<Number> OUTPUT
+is 8 _   [Lit: <Scalar 3>] --> Charlie<Scalar 3>
+is 9 _   [Lit: <Scalar 4>] --> Delta<Scalar 4>
+is 10 _ Amorphous Mediums:
+is 11 _   [Medium: Alfa = root]
+is 12 _ Fields:
+is 13 _   Echo: Alfa --> <Scalar 7> OUTPUT
+is 14 _ Operator Instances:
+is 15 _   [Lit: <Scalar 7>] --> Echo<Scalar 7> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// error - undefined function
+test: $(P2B) -CDall "(foo 3 4)" 
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Couldn't find definition of Operator foo
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - not an operator
+test: $(P2B) -CDall "(2 3 4)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: 2 is not an Operator
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - must name function params
+test: $(P2B) "(def foo () (def xy (tuple) 3)) (foo)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Function parameters must be named: tuple
+is 2 _ command-line:1 Error: Function has no content
+is 3 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// Operator annotation:
+// With side-effect annotation, sin call is preserved; without, is optimized out
+test: $(P2B) "(annotate sin :side-effect) (all (sin (mid)) 3)" -CDanalyzed
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar>
+is 4 _   Charlie: Alfa --> <Scalar>
+is 5 _   Delta: Alfa --> <Scalar 3> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   Charlie<Scalar> --> [sin] --> Bravo<Scalar>
+is 8 _   [mid] --> Charlie<Scalar>
+is 9 _   [Lit: <Scalar 3>] --> Delta<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// no side-effect gets optimized-out
+test: $(P2B) "(all (sin (mid)) 3)" -CDanalyzed
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// annotation
+test: $(P2B) "(annotate or :foo) (or 1 2)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Can't annotate 'or': not a primitive
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// chain addition
+test: $(P2B) -CDall "(+ 1 (+ (+ 2 3) (+ 4)) 5)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 1>
+is 5 _   Delta: Alfa --> <Number>
+is 6 _   Echo: Alfa --> <Number>
+is 7 _   Foxtrot: Alfa --> <Scalar 2>
+is 8 _   Golf: Alfa --> <Scalar 3>
+is 9 _   Hotel: Alfa --> <Number>
+is 10 _   India: Alfa --> <Scalar 4>
+is 11 _   Juliet: Alfa --> <Scalar 5>
+is 12 _ Operator Instances:
+is 13 _   Charlie<Scalar 1>, Delta<Number>, Juliet<Scalar 5> --> [+] --> Bravo<Number> OUTPUT
+is 14 _   [Lit: <Scalar 1>] --> Charlie<Scalar 1>
+is 15 _   Echo<Number>, Hotel<Number> --> [+] --> Delta<Number>
+is 16 _   Foxtrot<Scalar 2>, Golf<Scalar 3> --> [+] --> Echo<Number>
+is 17 _   [Lit: <Scalar 2>] --> Foxtrot<Scalar 2>
+is 18 _   [Lit: <Scalar 3>] --> Golf<Scalar 3>
+is 19 _   India<Scalar 4> --> [+] --> Hotel<Number>
+is 20 _   [Lit: <Scalar 4>] --> India<Scalar 4>
+is 21 _   [Lit: <Scalar 5>] --> Juliet<Scalar 5>
+is 22 _ Amorphous Mediums:
+is 23 _   [Medium: Alfa = root]
+is 24 _ Fields:
+is 25 _   Kilo: Alfa --> <Scalar 15> OUTPUT
+is 26 _ Operator Instances:
+is 27 _   [Lit: <Scalar 15>] --> Kilo<Scalar 15> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// simple let
+test: $(P2B) -CDall "(let ((x 3) (y 4)) (+ x y))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3>
+is 4 _   Charlie: Alfa --> <Scalar 4>
+is 5 _   Delta: Alfa --> <Number> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3>
+is 8 _   [Lit: <Scalar 4>] --> Charlie<Scalar 4>
+is 9 _   Bravo<Scalar 3>, Charlie<Scalar 4> --> [+] --> Delta<Number> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// implicit all in let
+test: $(P2B) -CDall "(let () 2 3 4)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 2>
+is 4 _   Charlie: Alfa --> <Scalar 3>
+is 5 _   Delta: Alfa --> <Scalar 4> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   [Lit: <Scalar 2>] --> Bravo<Scalar 2>
+is 8 _   [Lit: <Scalar 3>] --> Charlie<Scalar 3>
+is 9 _   [Lit: <Scalar 4>] --> Delta<Scalar 4> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// error - malformed let statements
+test: $(P2B) -CDall "(let (a (3 4) (() 5) (b 6 7)) x)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Malformed let statement: a
+is 2 _ command-line:1 Error: Malformed let statement: (3 4)
+is 3 _ command-line:1 Error: Malformed let statement: (() 5)
+is 4 _ command-line:1 Error: Malformed let statement: (b 6 7)
+is 5 _ command-line:1 Error: Couldn't find definition of x
+is 6 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - malformed let
+test: $(P2B) -CDall "(let ((x 3)))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Malformed let statement: (let ((x 3)))
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - malformed let
+test: $(P2B) -CDall "(let 2 3)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Malformed let statement: (let 2 3)
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// nested lets
+test: $(P2B) -CDall "(let ((x 5)) (let ((y 2)) (+ x x y)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 5>
+is 4 _   Charlie: Alfa --> <Scalar 2>
+is 5 _   Delta: Alfa --> <Number> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   [Lit: <Scalar 5>] --> Bravo<Scalar 5>
+is 8 _   [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 9 _   Bravo<Scalar 5>, Bravo<Scalar 5>, Charlie<Scalar 2> --> [+] --> Delta<Number> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// optimize-out restrict
+test: $(P2B) -CDall "(restrict (+ 3 4) 1)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _ Fields:
+is 4 _   Charlie: Alfa --> <Scalar 1>
+is 5 _   Delta: Bravo --> <Number> OUTPUT
+is 6 _   Echo: Bravo --> <Scalar 3>
+is 7 _   Foxtrot: Bravo --> <Scalar 4>
+is 8 _ Operator Instances:
+is 9 _   [Lit: <Scalar 1>] --> Charlie<Scalar 1>
+is 10 _   Echo<Scalar 3>, Foxtrot<Scalar 4> --> [+] --> Delta<Number> OUTPUT
+is 11 _   [Lit: <Scalar 3>] --> Echo<Scalar 3>
+is 12 _   [Lit: <Scalar 4>] --> Foxtrot<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(let ((x 3)) (restrict x 0))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _ Fields:
+is 4 _   Delta: Alfa --> <Scalar 3>
+is 5 _   Charlie: Alfa --> <Scalar 0>
+is 6 _   Echo: Bravo --> <Any> OUTPUT
+is 7 _ Operator Instances:
+is 8 _   [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 9 _   [Lit: <Scalar 0>] --> Charlie<Scalar 0>
+is 10 _   Delta<Scalar 3>, Charlie<Scalar 0> --> [restrict] --> Echo<Any> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// def for literals
+test: $(P2B) -CDall "(def x 3) (+ x 4)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3>
+is 4 _   Charlie: Alfa --> <Number> OUTPUT
+is 5 _   Delta: Alfa --> <Scalar 4>
+is 6 _ Operator Instances:
+is 7 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3>
+is 8 _   Bravo<Scalar 3>, Delta<Scalar 4> --> [+] --> Charlie<Number> OUTPUT
+is 9 _   [Lit: <Scalar 4>] --> Delta<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+// simplification of apply
+test: $(P2B) -CDall "(apply * (apply + 3 4) (mid))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <ANY> OUTPUT
+is 4 _   Charlie: Alfa --> <Lambda [*]>
+is 5 _   Delta: Alfa --> <ANY>
+is 6 _   Echo: Alfa --> <Lambda [+]>
+is 7 _   Foxtrot: Alfa --> <Scalar 3>
+is 8 _   Golf: Alfa --> <Scalar 4>
+is 9 _   Hotel: Alfa --> <Scalar>
+is 10 _ Operator Instances:
+is 11 _   Charlie<Lambda [*]>, Delta<ANY>, Hotel<Scalar> --> [apply] --> Bravo<ANY> OUTPUT
+is 12 _   [Lit: <Lambda [*]>] --> Charlie<Lambda [*]>
+is 13 _   Echo<Lambda [+]>, Foxtrot<Scalar 3>, Golf<Scalar 4> --> [apply] --> Delta<ANY>
+is 14 _   [Lit: <Lambda [+]>] --> Echo<Lambda [+]>
+is 15 _   [Lit: <Scalar 3>] --> Foxtrot<Scalar 3>
+is 16 _   [Lit: <Scalar 4>] --> Golf<Scalar 4>
+is 17 _   [mid] --> Hotel<Scalar>
+is 18 _ Amorphous Mediums:
+is 19 _   [Medium: Alfa = root]
+is 20 _ Fields:
+is 21 _   Hotel: Alfa --> <Scalar>
+is 22 _   India: Alfa --> <Scalar> OUTPUT
+is 23 _   Juliet: Alfa --> <Scalar 7>
+is 24 _ Operator Instances:
+is 25 _   [mid] --> Hotel<Scalar>
+is 26 _   Juliet<Scalar 7>, Hotel<Scalar> --> [*] --> India<Scalar> OUTPUT
+is 27 _   [Lit: <Scalar 7>] --> Juliet<Scalar 7>
+
+////////////////////////////////////////////////////////////////////////////
+// lambda execution
+test: $(P2B) -CDall "((lambda () (+ 2 3)))"
+is 0 _ Function: lambda~4 [Signature:  --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Number> OUTPUT
+is 5 _     Charlie: Alfa --> <Scalar 2>
+is 6 _     Delta: Alfa --> <Scalar 3>
+is 7 _   Operator Instances:
+is 8 _     Charlie<Scalar 2>, Delta<Scalar 3> --> [+] --> Bravo<Number> OUTPUT
+is 9 _     [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 10 _     [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Any> OUTPUT
+is 15 _ Operator Instances:
+is 16 _   [Fun: lambda~4] --> Foxtrot<Any> OUTPUT
+is 17 _ Amorphous Mediums:
+is 18 _   [Medium: Echo = root]
+is 19 _ Fields:
+is 20 _   Golf: Echo --> <Scalar 5> OUTPUT
+is 21 _ Operator Instances:
+is 22 _   [Lit: <Scalar 5>] --> Golf<Scalar 5> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// parameter typing
+test: $(P2B) -CDall "(def double (x|scalar) (+ x x)) (double (double 3))" --function-inlining-threshold 0
+is 0 _ Function: double [Signature: <Scalar> --> <Any>] called 2 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Number> OUTPUT
+is 6 _   Operator Instances:
+is 7 _     [Parameter 0: x] --> Bravo<Scalar>
+is 8 _     Bravo<Scalar>, Bravo<Scalar> --> [+] --> Charlie<Number> OUTPUT
+is 9 _ Amorphous Mediums:
+is 10 _   [Medium: Delta = root]
+is 11 _ Fields:
+is 12 _   Echo: Delta --> <Any> OUTPUT
+is 13 _   Foxtrot: Delta --> <Any>
+is 14 _   Golf: Delta --> <Scalar 3>
+is 15 _ Operator Instances:
+is 16 _   Foxtrot<Any> --> [Fun: double] --> Echo<Any> OUTPUT
+is 17 _   Golf<Scalar 3> --> [Fun: double] --> Foxtrot<Any>
+is 18 _   [Lit: <Scalar 3>] --> Golf<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// optional parameters
+test: $(P2B) -CDall "(def froz (x &optional y) (+ x (mid))) (- (froz) (froz 1 2 3) (sin 2 3))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Called [Fun: froz] with 0 arguments; it requires from 1 to 2
+is 2 _ command-line:1 Error: Called [Fun: froz] with 3 arguments; it requires from 1 to 2
+is 3 _ command-line:1 Error: Called [sin] with 2 arguments; it requires exactly 1
+is 4 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(def fooloop (y) (+ y (restrict (fooloop (+ y -1)) (> y 0) ))) (fooloop 3)" --function-inlining-threshold 2
+is 0 _ Function: fooloop [Signature: <Any> --> <Any>] called 2 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _     [Medium: Bravo = Alfa | Charlie]
+is 4 _   Fields:
+is 5 _     Delta: Alfa --> <Any>
+is 6 _     Echo: Alfa --> <Number> OUTPUT
+is 7 _     Charlie: Alfa --> <Boolean>
+is 8 _     Foxtrot: Alfa --> <Scalar 0>
+is 9 _     Golf: Bravo --> <Any>
+is 10 _     Hotel: Bravo --> <Number>
+is 11 _     India: Bravo --> <Any>
+is 12 _     Juliet: Bravo --> <Scalar -1>
+is 13 _   Operator Instances:
+is 14 _     [Parameter 0: y] --> Delta<Any>
+is 15 _     Delta<Any>, Golf<Any> --> [+] --> Echo<Number> OUTPUT
+is 16 _     Delta<Any>, Foxtrot<Scalar 0> --> [>] --> Charlie<Boolean>
+is 17 _     [Lit: <Scalar 0>] --> Foxtrot<Scalar 0>
+is 18 _     Hotel<Number> --> [Fun: fooloop] --> Golf<Any>
+is 19 _     India<Any>, Juliet<Scalar -1> --> [+] --> Hotel<Number>
+is 20 _     Delta<Any>, Charlie<Boolean> --> [restrict] --> India<Any>
+is 21 _     [Lit: <Scalar -1>] --> Juliet<Scalar -1>
+is 22 _ Amorphous Mediums:
+is 23 _   [Medium: Kilo = root]
+is 24 _ Fields:
+is 25 _   Lima: Kilo --> <Any> OUTPUT
+is 26 _   Mike: Kilo --> <Scalar 3>
+is 27 _ Operator Instances:
+is 28 _   Mike<Scalar 3> --> [Fun: fooloop] --> Lima<Any> OUTPUT
+is 29 _   [Lit: <Scalar 3>] --> Mike<Scalar 3>
+is 30 _ Function: fooloop [Signature: <Any> --> <Number>] called 2 times
+
+////////////////////////////////////////////////////////////////////////////
+// error - cannot bind, already bound
+test: $(P2B) -CDall "(let ((x 3) (x 4)) x)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Cannot bind 'x': already bound
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// function overriding
+test: $(P2B) -CDall "(def foo 3) (def foo 4) foo"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3>
+is 4 _   Charlie: Alfa --> <Scalar 4> OUTPUT
+is 5 _ Operator Instances:
+is 6 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3>
+is 7 _   [Lit: <Scalar 4>] --> Charlie<Scalar 4> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// error - reserved symbols
+test: $(P2B) -CDall "(let ((restrict 3) (all 4) (let 5)) 6)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Cannot bind 'restrict': symbol is reserved
+is 2 _ command-line:1 Error: Cannot bind 'all': symbol is reserved
+is 3 _ command-line:1 Error: Cannot bind 'let': symbol is reserved
+is 4 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - cannot bind, already bound
+test: $(P2B) -CDall "(lambda (y y) y)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Cannot bind 'y': already bound
+is 2 _ command-line:1 Error: Cannot bind 'y': already bound
+is 3 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - invalid parameter
+test: $(P2B) -CDall "(lambda (x 3) 4)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Function parameters must be named: 3
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - lambda syntax
+test: $(P2B) -CDall "(lambda x 4)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Signature not a list: x
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// error - invalid parameter
+test: $(P2B) -CDall "(lambda (&rest x y) 4)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: No signature past '&rest' variable: (&rest x y)
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// special scalars
+test: $(P2B) -CDall "(+ NaN -Inf inf pi e)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar nan>
+is 5 _   Delta: Alfa --> <Scalar -inf>
+is 6 _   Echo: Alfa --> <Scalar inf>
+is 7 _   Foxtrot: Alfa --> <Scalar 3.14159>
+is 8 _   Golf: Alfa --> <Scalar 2.71828>
+is 9 _ Operator Instances:
+is 10 _   Charlie<Scalar nan>, Delta<Scalar -inf>, Echo<Scalar inf>, Foxtrot<Scalar 3.14159>, Golf<Scalar 2.71828> --> [+] --> Bravo<Number> OUTPUT
+is 11 _   [Lit: <Scalar nan>] --> Charlie<Scalar nan>
+is 12 _   [Lit: <Scalar -inf>] --> Delta<Scalar -inf>
+is 13 _   [Lit: <Scalar inf>] --> Echo<Scalar inf>
+is 14 _   [Lit: <Scalar 3.14159>] --> Foxtrot<Scalar 3.14159>
+is 15 _   [Lit: <Scalar 2.71828>] --> Golf<Scalar 2.71828>
+is 16 _ Amorphous Mediums:
+is 17 _   [Medium: Alfa = root]
+is 18 _ Fields:
+is 19 _   Hotel: Alfa --> <Scalar nan> OUTPUT
+is 20 _ Operator Instances:
+is 21 _   [Lit: <Scalar nan>] --> Hotel<Scalar nan> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// xor
+test: $(P2B) -CDall "(xor true false)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Boolean false>
+is 4 _   Charlie: Alfa --> <Local> OUTPUT
+is 5 _   Delta: Alfa --> <Boolean true>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _ Operator Instances:
+is 8 _   [Lit: <Boolean false>] --> Bravo<Boolean false>
+is 9 _   Delta<Boolean true>, Echo<Boolean>, Bravo<Boolean false> --> [mux] --> Charlie<Local> OUTPUT
+is 10 _   [Lit: <Boolean true>] --> Delta<Boolean true>
+is 11 _   Bravo<Boolean false> --> [not] --> Echo<Boolean>
+is 12 _ Amorphous Mediums:
+is 13 _   [Medium: Alfa = root]
+is 14 _ Fields:
+is 15 _   Foxtrot: Alfa --> <Boolean true> OUTPUT
+is 16 _ Operator Instances:
+is 17 _   [Lit: <Boolean true>] --> Foxtrot<Boolean true> OUTPUT
+is 18 _ Stopping before localization
+
+////////////////////////////////////////////////////////////////////////////
+// Make sure that extra function calls are ignored by "relevant" count
+test: $(P2B) "(def foo () (mid)) (def bar () (* (foo) (foo))) (foo)" -CDanalyzed --function-inlining-threshold 0
+is 0 _ Function: foo [Signature:  --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _   Operator Instances:
+is 6 _     [mid] --> Bravo<Scalar> OUTPUT
+is 7 _ Amorphous Mediums:
+is 8 _   [Medium: Charlie = root]
+is 9 _ Fields:
+is 10 _   Delta: Charlie --> <Scalar> OUTPUT
+is 11 _ Operator Instances:
+is 12 _   [Fun: foo] --> Delta<Scalar> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// error - let does not work like let*
+test: $(P2B) -CDall "(let ((a 3) (b (+ a 1)) (c (+ a b))) c)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Couldn't find definition of a
+is 2 _ command-line:1 Error: Couldn't find definition of a
+is 3 _ command-line:1 Error: Couldn't find definition of b
+is 4 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// let* allows previously defined literals
+test: $(P2B) -CDall "(let* ((a 3) (b (+ a 1)) (c (+ a b))) c)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3>
+is 4 _   Charlie: Alfa --> <Number>
+is 5 _   Delta: Alfa --> <Scalar 1>
+is 6 _   Echo: Alfa --> <Number> OUTPUT
+is 7 _ Operator Instances:
+is 8 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3>
+is 9 _   Bravo<Scalar 3>, Delta<Scalar 1> --> [+] --> Charlie<Number>
+is 10 _   [Lit: <Scalar 1>] --> Delta<Scalar 1>
+is 11 _   Bravo<Scalar 3>, Charlie<Number> --> [+] --> Echo<Number> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// macro
+test: $(P2B) -CDall "(macro foo (x y) (+ ,x ,y ,x)) (foo 3 4)" 
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 3>
+is 5 _   Delta: Alfa --> <Scalar 4>
+is 6 _   Echo: Alfa --> <Scalar 3>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Scalar 3>, Delta<Scalar 4>, Echo<Scalar 3> --> [+] --> Bravo<Number> OUTPUT
+is 9 _   [Lit: <Scalar 3>] --> Charlie<Scalar 3>
+is 10 _   [Lit: <Scalar 4>] --> Delta<Scalar 4>
+is 11 _   [Lit: <Scalar 3>] --> Echo<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// error - undefined SExpr
+test: $(P2B) -CDall "(macro foo (x y) (+ ,x ,y ,z)) (foo 3 4)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Couldn't find definition of SExpr z
+is 2 _ command-line:1 Error: Macro expansion failed on (foo 3 4)
+is 3 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(macro foo (x) (+ 2 ,@x)) (foo (4 5))" 
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 2>
+is 5 _   Delta: Alfa --> <Scalar 4>
+is 6 _   Echo: Alfa --> <Scalar 5>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Scalar 2>, Delta<Scalar 4>, Echo<Scalar 5> --> [+] --> Bravo<Number> OUTPUT
+is 9 _   [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 10 _   [Lit: <Scalar 4>] --> Delta<Scalar 4>
+is 11 _   [Lit: <Scalar 5>] --> Echo<Scalar 5>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(macro foo (x) (let ((?x ,x)) (+ ?x ?x))) (foo 3)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3>
+is 4 _   Charlie: Alfa --> <Number> OUTPUT
+is 5 _ Operator Instances:
+is 6 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3>
+is 7 _   Bravo<Scalar 3>, Bravo<Scalar 3> --> [+] --> Charlie<Number> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// if construct
+test: $(P2B) -CDall "(if 2 3 4)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Scalar 2>
+is 6 _   Foxtrot: Alfa --> <Local> OUTPUT
+is 7 _   Golf: Bravo --> <Scalar 3>
+is 8 _   Echo: Alfa --> <Boolean>
+is 9 _   Hotel: Delta --> <Scalar 4>
+is 10 _ Operator Instances:
+is 11 _   [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 12 _   Charlie<Scalar 2>, Golf<Scalar 3>, Hotel<Scalar 4> --> [mux] --> Foxtrot<Local> OUTPUT
+is 13 _   [Lit: <Scalar 3>] --> Golf<Scalar 3>
+is 14 _   Charlie<Scalar 2> --> [not] --> Echo<Boolean>
+is 15 _   [Lit: <Scalar 4>] --> Hotel<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(macro addpi (x) (+ ,@x pi)) (macro dup2 (x) (addpi (,x ,x))) (dup2 5)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 5>
+is 5 _   Delta: Alfa --> <Scalar 5>
+is 6 _   Echo: Alfa --> <Scalar 3.14159>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Scalar 5>, Delta<Scalar 5>, Echo<Scalar 3.14159> --> [+] --> Bravo<Number> OUTPUT
+is 9 _   [Lit: <Scalar 5>] --> Charlie<Scalar 5>
+is 10 _   [Lit: <Scalar 5>] --> Delta<Scalar 5>
+is 11 _   [Lit: <Scalar 3.14159>] --> Echo<Scalar 3.14159>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(macro addx (x) (lambda (y) (+ ,x y))) ((addx 4) 5)"
+is 0 _ Function: lambda~4 [Signature: <Any> --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Any>
+is 5 _     Charlie: Alfa --> <Number> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar 4>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: y] --> Bravo<Any>
+is 9 _     Delta<Scalar 4>, Bravo<Any> --> [+] --> Charlie<Number> OUTPUT
+is 10 _     [Lit: <Scalar 4>] --> Delta<Scalar 4>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Any> OUTPUT
+is 15 _   Golf: Echo --> <Scalar 5>
+is 16 _ Operator Instances:
+is 17 _   Golf<Scalar 5> --> [Fun: lambda~4] --> Foxtrot<Any> OUTPUT
+is 18 _   [Lit: <Scalar 5>] --> Golf<Scalar 5>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDall "(primitive foo (zip|((baz) bar)) zap|zog)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Compound type must start with symbol: ((baz) bar)
+is 2 _ command-line:1 Error: Unknown type zog
+is 3 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// Error - This checks ability to have no content to output & arg parsing
+test: $(P2B) -CDall "(primitive foo (args) arg2)"
+is 0 _ Error during interpretation:
+is 1 _  Error: Program has no content.
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// Error - checks that fields cannot have non-local types
+test: $(P2B) -CDall "(primitive foo ((field (field scalar))) scalar)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Field type must have a local subtype
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// Error - checks handling of malformed type constraints
+test: $(P2B) "(primitive zog (any) any :type-constraints foo) (primitive foo (field) any :type-constraints (bluff)) (foo (zog 3))"
+is 0 _ Error during analysis:
+is 1 _ command-line:1 Error: Expected type constraint to be a list: bluff
+is 2 _ command-line:1 Error: Empty type constraint
+is 3 _ command-line:1 Error: Expected type constraint to be a list: bluff
+is 4 _ command-line:1 Error: Empty type constraint
+is 5 _ command-line:1 Error: Expected type constraint set to be a list: foo
+is 6 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// Creating field
+test: $(P2B) -CDall "(nbr 3)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Field <Any>> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar 3>
+is 5 _ Operator Instances:
+is 6 _   Charlie<Scalar 3> --> [nbr] --> Bravo<Field <Any>> OUTPUT
+is 7 _   [Lit: <Scalar 3>] --> Charlie<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// Letfed construct
+test: $(P2B) -CDall "(letfed ((x 3 (+ x y 1)) (y 2 (* x 3))) (- x y))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Local>
+is 8 _   Golf: Alfa --> <Local>
+is 9 _   Hotel: Bravo --> <Scalar 3>
+is 10 _   India: Delta --> <Local>
+is 11 _   Juliet: Alfa --> <Local>
+is 12 _   Kilo: Bravo --> <Scalar 2>
+is 13 _   Lima: Delta --> <Number>
+is 14 _   Mike: Delta --> <Scalar 1>
+is 15 _   November: Delta --> <Number>
+is 16 _   Oscar: Delta --> <Scalar 3>
+is 17 _   Papa: Alfa --> <Number> OUTPUT
+is 18 _ Operator Instances:
+is 19 _   [dchange] --> Charlie<Boolean>
+is 20 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 21 _   Golf<Local> --> [delay] --> Foxtrot<Local>
+is 22 _   Charlie<Boolean>, Hotel<Scalar 3>, Lima<Number> --> [mux] --> Golf<Local>
+is 23 _   [Lit: <Scalar 3>] --> Hotel<Scalar 3>
+is 24 _   Juliet<Local> --> [delay] --> India<Local>
+is 25 _   Charlie<Boolean>, Kilo<Scalar 2>, November<Number> --> [mux] --> Juliet<Local>
+is 26 _   [Lit: <Scalar 2>] --> Kilo<Scalar 2>
+is 27 _   Foxtrot<Local>, India<Local>, Mike<Scalar 1> --> [+] --> Lima<Number>
+is 28 _   [Lit: <Scalar 1>] --> Mike<Scalar 1>
+is 29 _   Foxtrot<Local>, Oscar<Scalar 3> --> [*] --> November<Number>
+is 30 _   [Lit: <Scalar 3>] --> Oscar<Scalar 3>
+is 31 _   Golf<Local>, Juliet<Local> --> [-] --> Papa<Number> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// Rep construct (timer)
+test: $(P2B) -CDall "(rep t 0 (+ t (dt)))"
+is 0 _ Amorphous Mediums:
+is 1 _  [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Local>
+is 8 _   Golf: Alfa --> <Local> OUTPUT
+is 9 _   Hotel: Bravo --> <Scalar 0>
+is 10 _   India: Delta --> <Number>
+is 11 _   Juliet: Delta --> <Scalar>
+is 12 _ Operator Instances:
+is 13 _   [dchange] --> Charlie<Boolean>
+is 14 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 15 _   Golf<Local> --> [delay] --> Foxtrot<Local>
+is 16 _   Charlie<Boolean>, Hotel<Scalar 0>, India<Number> --> [mux] --> Golf<Local> OUTPUT
+is 17 _   [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 18 _   Foxtrot<Local>, Juliet<Scalar> --> [+] --> India<Number>
+is 19 _   [dt] --> Juliet<Scalar>
+is 20 _ Amorphous Mediums:
+is 21 _   [Medium: Alfa = root]
+is 22 _   [Medium: Bravo = Alfa | Charlie]
+is 23 _   [Medium: Delta = Alfa | Echo]
+is 24 _ Fields:
+is 25 _   Charlie: Alfa --> <Boolean>
+is 26 _   Echo: Alfa --> <Boolean>
+is 27 _   Foxtrot: Delta --> <Scalar>
+is 28 _   Golf: Alfa --> <Scalar> OUTPUT
+is 29 _   Hotel: Bravo --> <Scalar 0>
+is 30 _   India: Delta --> <Scalar>
+is 31 _   Juliet: Delta --> <Scalar>
+is 32 _ Operator Instances:
+is 33 _   [dchange] --> Charlie<Boolean>
+is 34 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 35 _   Golf<Scalar> --> [delay] --> Foxtrot<Scalar>
+is 36 _   Charlie<Boolean>, Hotel<Scalar 0>, India<Scalar> --> [mux] --> Golf<Scalar> OUTPUT
+is 37 _   [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 38 _   Foxtrot<Scalar>, Juliet<Scalar> --> [+] --> India<Scalar>
+is 39 _   [dt] --> Juliet<Scalar>
+
+////////////////////////////////////////////////////////////////////////////
+// summary function, type coersion, and operator field-ification
+test: $(P2B) -CDall "(min-hood (+ 1 (nbr 2)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Number> OUTPUT
+is 4 _   Charlie: Alfa --> <Number>
+is 5 _   Delta: Alfa --> <Scalar 1>
+is 6 _   Echo: Alfa --> <Field <Any>>
+is 7 _   Foxtrot: Alfa --> <Scalar 2>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Number> --> [min-hood] --> Bravo<Number> OUTPUT
+is 10 _   Delta<Scalar 1>, Echo<Field <Any>> --> [+] --> Charlie<Number>
+is 11 _   [Lit: <Scalar 1>] --> Delta<Scalar 1>
+is 12 _   Foxtrot<Scalar 2> --> [nbr] --> Echo<Field <Any>>
+is 13 _   [Lit: <Scalar 2>] --> Foxtrot<Scalar 2>
+is 14 _ Amorphous Mediums:
+is 15 _   [Medium: Alfa = root]
+is 16 _ Fields:
+is 17 _   Golf: Alfa --> <Scalar 3> OUTPUT
+is 18 _ Operator Instances:
+is 19 _   [Lit: <Scalar 3>] --> Golf<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// Testing function call resolving on path; also inlining
+test: $(P2B) -CDall "(timer)"
+is 0 _ Function: timer [Signature:  --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _     [Medium: Bravo = Alfa | Charlie]
+is 4 _     [Medium: Delta = Alfa | Echo]
+is 5 _   Fields:
+is 6 _     Charlie: Alfa --> <Boolean>
+is 7 _     Echo: Alfa --> <Boolean>
+is 8 _     Foxtrot: Delta --> <Local>
+is 9 _     Golf: Alfa --> <Local> OUTPUT
+is 10 _     Hotel: Bravo --> <Scalar 0>
+is 11 _     India: Delta --> <Number>
+is 12 _     Juliet: Delta --> <Scalar>
+is 13 _   Operator Instances:
+is 14 _     [dchange] --> Charlie<Boolean>
+is 15 _     Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 16 _     Golf<Local> --> [delay] --> Foxtrot<Local>
+is 17 _     Charlie<Boolean>, Hotel<Scalar 0>, India<Number> --> [mux] --> Golf<Local> OUTPUT
+is 18 _     [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 19 _     Foxtrot<Local>, Juliet<Scalar> --> [+] --> India<Number>
+is 20 _     [dt] --> Juliet<Scalar>
+is 21 _ Amorphous Mediums:
+is 22 _   [Medium: Kilo = root]
+is 23 _ Fields:
+is 24 _   Lima: Kilo --> <Any> OUTPUT
+is 25 _ Operator Instances:
+is 26 _   [Fun: timer] --> Lima<Any> OUTPUT
+is 27 _ Amorphous Mediums:
+is 28 _   [Medium: Kilo = root]
+is 29 _   [Medium: Mike = Kilo | November]
+is 30 _   [Medium: Oscar = Kilo | Papa]
+is 31 _ Fields:
+is 32 _   November: Kilo --> <Boolean>
+is 33 _   Papa: Kilo --> <Boolean>
+is 34 _   Quebec: Kilo --> <Scalar> OUTPUT
+is 35 _   Romeo: Mike --> <Scalar 0>
+is 36 _   Sierra: Oscar --> <Scalar>
+is 37 _   Tango: Oscar --> <Scalar>
+is 38 _   Uniform: Oscar --> <Scalar>
+is 39 _ Operator Instances:
+is 40 _   [dchange] --> November<Boolean>
+is 41 _   November<Boolean> --> [not] --> Papa<Boolean>
+is 42 _   November<Boolean>, Romeo<Scalar 0>, Tango<Scalar> --> [mux] --> Quebec<Scalar> OUTPUT
+is 43 _   [Lit: <Scalar 0>] --> Romeo<Scalar 0>
+is 44 _   Quebec<Scalar> --> [delay] --> Sierra<Scalar>
+is 45 _   Sierra<Scalar>, Uniform<Scalar> --> [+] --> Tango<Scalar>
+is 46 _   [dt] --> Uniform<Scalar>
+
+////////////////////////////////////////////////////////////////////////////
+// Tuple length
+test: $(P2B) -CDall "(len (tup 3 4))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Tuple<Any>...>
+is 5 _   Delta: Alfa --> <Scalar 3>
+is 6 _   Echo: Alfa --> <Scalar 4>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Tuple<Any>...> --> [len] --> Bravo<Scalar> OUTPUT
+is 9 _   Delta<Scalar 3>, Echo<Scalar 4> --> [tup] --> Charlie<Tuple<Any>...>
+is 10 _  [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 11 _  [Lit: <Scalar 4>] --> Echo<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+// primitive returning a vector of an unknown-number of literals
+test: $(P2B) -CDall "(primitive tupzer ((tuple 3 any)) (vector &rest 4)) (tupzer (tup 3 (nbr 5)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Vector<Scalar 4>...> OUTPUT
+is 4 _   Charlie: Alfa --> <Tuple<Any>...>
+is 5 _   Delta: Alfa --> <Scalar 3>
+is 6 _   Echo: Alfa --> <Field <Any>>
+is 7 _   Foxtrot: Alfa --> <Scalar 5>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Tuple<Any>...> --> [tupzer] --> Bravo<Vector<Scalar 4>...> OUTPUT
+is 10 _   Delta<Scalar 3>, Echo<Field <Any>> --> [tup] --> Charlie<Tuple<Any>...>
+is 11 _   [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 12 _   Foxtrot<Scalar 5> --> [nbr] --> Echo<Field <Any>>
+is 13 _   [Lit: <Scalar 5>] --> Foxtrot<Scalar 5>
+
+////////////////////////////////////////////////////////////////////////////
+// error - vectors can only contain scalars
+test: $(P2B) -CDall "(primitive tupzer ((tuple 3 any)) (vector &rest number)) (tupzer (tup 3 (nbr 5)))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Vectors must contain only scalars
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// primitive returns a lambda
+test: $(P2B) -CDall "(primitive ltest () (lambda (scalar &rest field) local)) (sin (apply (ltest) 2))" --no-analysis
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Any>
+is 5 _   Delta: Alfa --> <Lambda [Op[Signature: <Scalar> &rest <Field <Any>> --> <Local>]]>
+is 6 _   Echo: Alfa --> <Scalar 2>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Any> --> [sin] --> Bravo<Scalar> OUTPUT
+is 9 _   Delta<Lambda [Op[Signature: <Scalar> &rest <Field <Any>> --> <Local>]]>, Echo<Scalar 2> --> [apply] --> Charlie<Any>
+is 10 _   [ltest] --> Delta<Lambda [Op[Signature: <Scalar> &rest <Field <Any>> --> <Local>]]>
+is 11 _   [Lit: <Scalar 2>] --> Echo<Scalar 2>
+is 12 _ Stopping before analysis
+
+////////////////////////////////////////////////////////////////////////////
+// letfed updating a tuple
+test: $(P2B) -CDall "(letfed (((tup a b) (tup 7 8) (tup (+ a 1) (* b a)))) (pow a b))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Local>
+is 8 _   Golf: Alfa --> <Local>
+is 9 _   Hotel: Bravo --> <Tuple<Any>...>
+is 10 _   India: Bravo --> <Scalar 7>
+is 11 _   Juliet: Bravo --> <Scalar 8>
+is 12 _   Kilo: Delta --> <Any>
+is 13 _   Lima: Delta --> <Scalar 0>
+is 14 _   Mike: Delta --> <Any>
+is 15 _   November: Delta --> <Scalar 1>
+is 16 _   Oscar: Delta --> <Tuple<Any>...>
+is 17 _   Papa: Delta --> <Number>
+is 18 _   Quebec: Delta --> <Scalar 1>
+is 19 _   Romeo: Delta --> <Number>
+is 20 _   Sierra: Alfa --> <Any>
+is 21 _   Tango: Alfa --> <Scalar 0>
+is 22 _   Uniform: Alfa --> <Any>
+is 23 _   Victor: Alfa --> <Scalar 1>
+is 24 _   Whiskey: Alfa --> <Scalar> OUTPUT
+is 25 _ Operator Instances:
+is 26 _   [dchange] --> Charlie<Boolean>
+is 27 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 28 _   Golf<Local> --> [delay] --> Foxtrot<Local>
+is 29 _   Charlie<Boolean>, Hotel<Tuple<Any>...>, Oscar<Tuple<Any>...> --> [mux] --> Golf<Local>
+is 30 _   India<Scalar 7>, Juliet<Scalar 8> --> [tup] --> Hotel<Tuple<Any>...>
+is 31 _   [Lit: <Scalar 7>] --> India<Scalar 7>
+is 32 _   [Lit: <Scalar 8>] --> Juliet<Scalar 8>
+is 33 _   Foxtrot<Local>, Lima<Scalar 0> --> [elt] --> Kilo<Any>
+is 34 _   [Lit: <Scalar 0>] --> Lima<Scalar 0>
+is 35 _   Foxtrot<Local>, November<Scalar 1> --> [elt] --> Mike<Any>
+is 36 _   [Lit: <Scalar 1>] --> November<Scalar 1>
+is 37 _   Papa<Number>, Romeo<Number> --> [tup] --> Oscar<Tuple<Any>...>
+is 38 _   Kilo<Any>, Quebec<Scalar 1> --> [+] --> Papa<Number>
+is 39 _   [Lit: <Scalar 1>] --> Quebec<Scalar 1>
+is 40 _   Mike<Any>, Kilo<Any> --> [*] --> Romeo<Number>
+is 41 _   Golf<Local>, Tango<Scalar 0> --> [elt] --> Sierra<Any>
+is 42 _   [Lit: <Scalar 0>] --> Tango<Scalar 0>
+is 43 _   Golf<Local>, Victor<Scalar 1> --> [elt] --> Uniform<Any>
+is 44 _   [Lit: <Scalar 1>] --> Victor<Scalar 1>
+is 45 _   Sierra<Any>, Uniform<Any> --> [pow] --> Whiskey<Scalar> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// letfed updating a tuple of tuples
+test: $(P2B) -CDall "(letfed (((tup (tup a b) c) (tup (tup 2 3) 4) (tup (tup a c) b))) c)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Local>
+is 8 _   Golf: Alfa --> <Local>
+is 9 _   Hotel: Bravo --> <Tuple<Any>...>
+is 10 _   India: Bravo --> <Tuple<Any>...>
+is 11 _   Juliet: Bravo --> <Scalar 2>
+is 12 _   Kilo: Bravo --> <Scalar 3>
+is 13 _   Lima: Bravo --> <Scalar 4>
+is 14 _   Mike: Delta --> <Any>
+is 15 _   November: Delta --> <Scalar 0>
+is 16 _   Oscar: Delta --> <Any>
+is 17 _   Papa: Delta --> <Scalar 0>
+is 18 _   Quebec: Delta --> <Any>
+is 19 _   Romeo: Delta --> <Scalar 1>
+is 20 _   Sierra: Delta --> <Any>
+is 21 _   Tango: Delta --> <Scalar 1>
+is 22 _   Uniform: Delta --> <Tuple<Any>...>
+is 23 _   Victor: Delta --> <Tuple<Any>...>
+is 24 _   Whiskey: Alfa --> <Any>
+is 25 _   Xray: Alfa --> <Scalar 0>
+is 26 _   Yankee: Alfa --> <Any>
+is 27 _   Zulu: Alfa --> <Scalar 0>
+is 28 _   Plural: Alfa --> <Any>
+is 29 _   Beak: Alfa --> <Scalar 1>
+is 30 _   Pronunciation: Alfa --> <Any> OUTPUT
+is 31 _   Sow: Alfa --> <Scalar 1>
+is 32 _ Operator Instances:
+is 33 _   [dchange] --> Charlie<Boolean>
+is 34 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 35 _   Golf<Local> --> [delay] --> Foxtrot<Local>
+is 36 _   Charlie<Boolean>, Hotel<Tuple<Any>...>, Uniform<Tuple<Any>...> --> [mux] --> Golf<Local>
+is 37 _   India<Tuple<Any>...>, Lima<Scalar 4> --> [tup] --> Hotel<Tuple<Any>...>
+is 38 _   Juliet<Scalar 2>, Kilo<Scalar 3> --> [tup] --> India<Tuple<Any>...>
+is 39 _   [Lit: <Scalar 2>] --> Juliet<Scalar 2>
+is 40 _   [Lit: <Scalar 3>] --> Kilo<Scalar 3>
+is 41 _   [Lit: <Scalar 4>] --> Lima<Scalar 4>
+is 42 _   Foxtrot<Local>, November<Scalar 0> --> [elt] --> Mike<Any>
+is 43 _   [Lit: <Scalar 0>] --> November<Scalar 0>
+is 44 _   Mike<Any>, Papa<Scalar 0> --> [elt] --> Oscar<Any>
+is 45 _   [Lit: <Scalar 0>] --> Papa<Scalar 0>
+is 46 _   Mike<Any>, Romeo<Scalar 1> --> [elt] --> Quebec<Any>
+is 47 _   [Lit: <Scalar 1>] --> Romeo<Scalar 1>
+is 48 _   Foxtrot<Local>, Tango<Scalar 1> --> [elt] --> Sierra<Any>
+is 49 _   [Lit: <Scalar 1>] --> Tango<Scalar 1>
+is 50 _   Victor<Tuple<Any>...>, Quebec<Any> --> [tup] --> Uniform<Tuple<Any>...>
+is 51 _   Oscar<Any>, Sierra<Any> --> [tup] --> Victor<Tuple<Any>...>
+is 52 _   Golf<Local>, Xray<Scalar 0> --> [elt] --> Whiskey<Any>
+is 53 _   [Lit: <Scalar 0>] --> Xray<Scalar 0>
+is 54 _   Whiskey<Any>, Zulu<Scalar 0> --> [elt] --> Yankee<Any>
+is 55 _   [Lit: <Scalar 0>] --> Zulu<Scalar 0>
+is 56 _   Whiskey<Any>, Beak<Scalar 1> --> [elt] --> Plural<Any>
+is 57 _   [Lit: <Scalar 1>] --> Beak<Scalar 1>
+is 58 _   Golf<Local>, Sow<Scalar 1> --> [elt] --> Pronunciation<Any> OUTPUT
+is 59 _   [Lit: <Scalar 1>] --> Sow<Scalar 1>
+
+////////////////////////////////////////////////////////////////////////////
+// setting time interval (set-dt)
+test: $(P2B) -CDanalyzed "(set-dt (restrict (all (probe (all 3) 1)) 2))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _ Fields:
+is 4 _   Delta: Alfa --> <Scalar 3> OUTPUT
+is 5 _   Charlie: Alfa --> <Scalar 2>
+is 6 _   Echo: Bravo --> <Scalar 3>
+is 7 _   Foxtrot: Bravo --> <Scalar 3>
+is 8 _   Golf: Bravo --> <Scalar 1>
+is 9 _ Operator Instances:
+is 10 _   Echo<Scalar 3> --> [set-dt] --> Delta<Scalar 3> OUTPUT
+is 11 _   [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 12 _   Foxtrot<Scalar 3>, Golf<Scalar 1> --> [probe] --> Echo<Scalar 3>
+is 13 _   [Lit: <Scalar 3>] --> Foxtrot<Scalar 3>
+is 14 _   [Lit: <Scalar 1>] --> Golf<Scalar 1>
+
+////////////////////////////////////////////////////////////////////////////
+// Tuple division
+test: $(P2B) -CDanalyzed "(/ (/ (tup 3 4) 5) (rnd 0 1))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <2-Vector<Scalar>,<Scalar>> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar>
+is 5 _   Delta: Alfa --> <Scalar 0>
+is 6 _   Echo: Alfa --> <Scalar 1>
+is 7 _   Foxtrot: Alfa --> <2-Vector<Scalar 0.6>,<Scalar 0.8>>
+is 8 _ Operator Instances:
+is 9 _   Foxtrot<2-Vector<Scalar 0.6>,<Scalar 0.8>>, Charlie<Scalar> --> [/] --> Bravo<2-Vector<Scalar>,<Scalar>> OUTPUT
+is 10 _   Delta<Scalar 0>, Echo<Scalar 1> --> [rnd] --> Charlie<Scalar>
+is 11 _   [Lit: <Scalar 0>] --> Delta<Scalar 0>
+is 12 _   [Lit: <Scalar 1>] --> Echo<Scalar 1>
+is 13 _   [Lit: <2-Vector<Scalar 0.6>,<Scalar 0.8>>] --> Foxtrot<2-Vector<Scalar 0.6>,<Scalar 0.8>>
+
+////////////////////////////////////////////////////////////////////////////
+// Pull an item out of a tuple
+test: $(P2B) -CDanalyzed "(elt (tup 3 4) 0)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 3> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// error - elt wrong number of args
+test: $(P2B) -CDanalyzed "(elt 7)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Called [elt] with 1 arguments; it requires exactly 2
+is 2 _ Compilation failed.
+
+////////////////////////////////////////////////////////////////////////////
+// pointwise math done by the compiler
+test: $(P2B) -CDanalyzed "(+ 2 (sqrt 3) 4 (> 5 6))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 7.73205> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 7.73205>] --> Bravo<Scalar 7.73205> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// type coersion to a tuple and comparison of tuples
+test: $(P2B) -CDanalyzed "(> (tup 1 0 0 -4) 1)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Boolean false> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Boolean false>] --> Bravo<Boolean false> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// compiler can pull values out of a tuple, only the ones that it knows about
+test: $(P2B) -CDanalyzed "(elt '(3 (1 val) 5) (elt '(2 2 2) (rnd 1 2)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 5> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 5>] --> Bravo<Scalar 5> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDanalyzed "(rep x 3 (elt (tup x 7) 0))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Scalar>
+is 8 _   Golf: Alfa --> <Scalar> OUTPUT
+is 9 _   Hotel: Bravo --> <Scalar 3>
+is 10 _   India: Delta --> <Scalar>
+is 11 _   Juliet: Delta --> <2-Vector<Scalar>,<Scalar 7>>
+is 12 _   Kilo: Delta --> <Scalar 7>
+is 13 _   Lima: Delta --> <Scalar 0>
+is 14 _ Operator Instances:
+is 15 _   [dchange] --> Charlie<Boolean>
+is 16 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 17 _   Golf<Scalar> --> [delay] --> Foxtrot<Scalar>
+is 18 _   Charlie<Boolean>, Hotel<Scalar 3>, India<Scalar> --> [mux] --> Golf<Scalar> OUTPUT
+is 19 _   [Lit: <Scalar 3>] --> Hotel<Scalar 3>
+is 20 _   Juliet<2-Vector<Scalar>,<Scalar 7>>, Lima<Scalar 0> --> [elt] --> India<Scalar>
+is 21 _   Foxtrot<Scalar>, Kilo<Scalar 7> --> [tup] --> Juliet<2-Vector<Scalar>,<Scalar 7>>
+is 22 _   [Lit: <Scalar 7>] --> Kilo<Scalar 7>
+is 23 _   [Lit: <Scalar 0>] --> Lima<Scalar 0>
+
+////////////////////////////////////////////////////////////////////////////
+// Test all-folding
+test: $(P2B) -CDanalyzed "(all 1 (all (set-dt 2) (all 3)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 2>
+is 4 _   Charlie: Alfa --> <Scalar 2>
+is 5 _   Delta: Alfa --> <Scalar 3> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   Charlie<Scalar 2> --> [set-dt] --> Bravo<Scalar 2>
+is 8 _   [Lit: <Scalar 2>] --> Charlie<Scalar 2>
+is 9 _   [Lit: <Scalar 3>] --> Delta<Scalar 3> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// Test dead-code elimination
+test: $(P2B) -CDanalyzed "(let ((x (* 7 (mov '(2 3))))) 4)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <2-Vector<Scalar 2>,<Scalar 3>>
+is 4 _   Charlie: Alfa --> <2-Vector<Scalar 2>,<Scalar 3>>
+is 5 _   Delta: Alfa --> <Scalar 4> OUTPUT
+is 6 _ Operator Instances:
+is 7 _   Charlie<2-Vector<Scalar 2>,<Scalar 3>> --> [mov] --> Bravo<2-Vector<Scalar 2>,<Scalar 3>>
+is 8 _   [Lit: <2-Vector<Scalar 2>,<Scalar 3>>] --> Charlie<2-Vector<Scalar 2>,<Scalar 3>>
+is 9 _   [Lit: <Scalar 4>] --> Delta<Scalar 4> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// Test unused space elimination
+test: $(P2B) -CDanalyzed "(if 1 2 2)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 2> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 2>] --> Bravo<Scalar 2> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// Basic funcall handling & simplification:
+test: $(P2B) -CDanalyzed "(muxand true false)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Boolean false> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Boolean false>] --> Bravo<Boolean false> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// funcall usage tracking:
+test: $(P2B) -CDanalyzed "(def foo () (mid)) (def bar (x) (+ 3 x)) (nbr (tup foo bar (tup foo)))"
+is 0 _ Function: foo [Signature:  --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _   Operator Instances:
+is 6 _     [mid] --> Bravo<Scalar> OUTPUT
+is 7 _ Function: bar [Signature: <Any> --> <number>] called 1 times
+is 8 _   Amorphous Mediums:
+is 9 _     [Medium: Charlie = root]
+is 10 _   Fields:
+is 11 _     Delta: Charlie --> <Number>
+is 12 _     Echo: Charlie --> <Number> OUTPUT
+is 13 _     Foxtrot: Charlie --> <Scalar 3>
+is 14 _   Operator Instances:
+is 15 _     [Parameter 0: x] --> Delta<Number>
+is 16 _     Foxtrot<Scalar 3>, Delta<Number> --> [+] --> Echo<Number> OUTPUT
+is 17 _     [Lit: <Scalar 3>] --> Foxtrot<Scalar 3>
+is 18 _ Amorphous Mediums:
+is 19 _   [Medium: Golf = root]
+is 20 _ Fields:
+is 21 _   Hotel: Golf --> <Field <3-Tuple<Lambda [Fun: foo]>,<Lambda [Fun: bar]>,<1-Tuple<Lambda [Fun: foo]>>>> OUTPUT
+is 22 _ Operator Instances:
+is 23 _   [Lit: <Field <3-Tuple<Lambda [Fun: foo]>,<Lambda [Fun: bar]>,<1-Tuple<Lambda [Fun: foo]>>>>] --> Hotel<Field <3-Tuple<Lambda [Fun: foo]>,<Lambda [Fun: bar]>,<1-Tuple<Lambda [Fun: foo]>>>> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// funcall propagation & backpropagation
+test: $(P2B) -CDanalyzed "(+ ((lambda (x) 2) 4) ((lambda (x y) (mux (dt) x y)) 3 3))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 5> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 5>] --> Bravo<Scalar 5> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// letfed w. multiple statements, some of which are pruned
+test: $(P2B) -CDanalyzed "(letfed ((x 0 (- 1 x))) (set-dt x) 2 (- x 3))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Charlie: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Boolean>
+is 7 _   Foxtrot: Delta --> <Scalar>
+is 8 _   Golf: Alfa --> <Scalar>
+is 9 _   Hotel: Bravo --> <Scalar 0>
+is 10 _   India: Delta --> <Scalar>
+is 11 _   Juliet: Delta --> <Scalar 1>
+is 12 _   Kilo: Alfa --> <Scalar>
+is 13 _   Lima: Alfa --> <Scalar> OUTPUT
+is 14 _   Mike: Alfa --> <Scalar 3>
+is 15 _ Operator Instances:
+is 16 _   [dchange] --> Charlie<Boolean>
+is 17 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 18 _   Golf<Scalar> --> [delay] --> Foxtrot<Scalar>
+is 19 _   Charlie<Boolean>, Hotel<Scalar 0>, India<Scalar> --> [mux] --> Golf<Scalar>
+is 20 _   [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 21 _   Juliet<Scalar 1>, Foxtrot<Scalar> --> [-] --> India<Scalar>
+is 22 _   [Lit: <Scalar 1>] --> Juliet<Scalar 1>
+is 23 _   Golf<Scalar> --> [set-dt] --> Kilo<Scalar>
+is 24 _   Golf<Scalar>, Mike<Scalar 3> --> [-] --> Lima<Scalar> OUTPUT
+is 25 _   [Lit: <Scalar 3>] --> Mike<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// Testing propagation in & out of funcall
+test: $(P2B) -CDanalyzed "((lambda (x) (set-dt x)) 5)" --function-inlining-threshold 0
+is 0 _ Function: lambda~4 [Signature: <Any> --> <Scalar 5>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar 5> OUTPUT
+is 5 _     Charlie: Alfa --> <Scalar 5>
+is 6 _   Operator Instances:
+is 7 _     Charlie<Scalar 5> --> [set-dt] --> Bravo<Scalar 5> OUTPUT
+is 8 _     [Lit: <Scalar 5>] --> Charlie<Scalar 5>
+is 9 _ Amorphous Mediums:
+is 10 _   [Medium: Delta = root]
+is 11 _ Fields:
+is 12 _   Echo: Delta --> <Scalar 5> OUTPUT
+is 13 _   Foxtrot: Delta --> <Scalar 5>
+is 14 _ Operator Instances:
+is 15 _   Foxtrot<Scalar 5> --> [Fun: lambda~4] --> Echo<Scalar 5> OUTPUT
+is 16 _   [Lit: <Scalar 5>] --> Foxtrot<Scalar 5>
+
+////////////////////////////////////////////////////////////////////////////
+// should end up with 1 timer call
+test: $(P2B) -CDanalyzed "(all (timer) (timer))" --function-inlining-threshold 0
+is 0 _  Function: timer [Signature:  --> <Scalar>] called 1 times
+is 21 _ Amorphous Mediums:
+is 22 _   [Medium: Kilo = root]
+is 23 _ Fields:
+is 24 _   Lima: Kilo --> <Scalar> OUTPUT
+is 25 _ Operator Instances:
+is 26 _   [Fun: timer] --> Lima<Scalar> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// multiple arguments to DIV
+test: $(P2B) -CDanalyzed "(/ 2 3 4)"
+is 5 _   [Lit: <Scalar 0.166667>] --> Bravo<Scalar 0.166667> OUTPUT
+is 6 _ Stopping before localization
+
+////////////////////////////////////////////////////////////////////////////
+// conditional optimization: both branches return the same thing
+test: $(P2B) -CDanalyzed "(if (rnd 0 1) (if true 3 5) (if (mid) 3 3))"
+is 5 _   [Lit: <Scalar 3>] --> Bravo<Scalar 3> OUTPUT
+is 6 _ Stopping before localization
+
+////////////////////////////////////////////////////////////////////////////
+// promotion of pointwise to field ops
+test: $(P2B) -CDanalyzed "(sin (nbr 3))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Field <Scalar 0.14112>> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Field <Scalar 0.14112>>] --> Bravo<Field <Scalar 0.14112>> OUTPUT
+is 6 _ Stopping before localization
+
+////////////////////////////////////////////////////////////////////////////
+// compiler optimization for neighborhood computation
+test: $(P2B) -CDanalyzed "(min-hood (sin (nbr 3)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar 0.14112> OUTPUT
+is 4 _ Operator Instances:
+is 5 _   [Lit: <Scalar 0.14112>] --> Bravo<Scalar 0.14112> OUTPUT
+is 6 _ Stopping before localization
+
+////////////////////////////////////////////////////////////////////////////
+// Do localization, but not emission
+$(P2B_ARGS) = --no-emission
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+// Function inlining
+test: $(P2B) -CDanalyzed "(def foo (x) (+ 1 x)) (def bar (x y) (* x y)) (bar (foo (foo (mid))) (bar (foo (mid)) (foo 3)))" --function-inlining-threshold -1
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar>
+is 4 _   Charlie: Alfa --> <Scalar>
+is 5 _   Delta: Alfa --> <Scalar> OUTPUT
+is 6 _   Echo: Alfa --> <Scalar>
+is 7 _   Foxtrot: Alfa --> <Scalar 1>
+is 8 _   Golf: Alfa --> <Scalar>
+is 9 _   Hotel: Alfa --> <Scalar 1>
+is 10 _   India: Alfa --> <Scalar>
+is 11 _   Juliet: Alfa --> <Scalar>
+is 12 _   Kilo: Alfa --> <Scalar 1>
+is 13 _   Lima: Alfa --> <Scalar 4>
+is 14 _ Operator Instances:
+is 15 _   [mid] --> Bravo<Scalar>
+is 16 _   [mid] --> Charlie<Scalar>
+is 17 _   Echo<Scalar>, India<Scalar> --> [*] --> Delta<Scalar> OUTPUT
+is 18 _   Foxtrot<Scalar 1>, Golf<Scalar> --> [+] --> Echo<Scalar>
+is 19 _   [Lit: <Scalar 1>] --> Foxtrot<Scalar 1>
+is 20 _   Hotel<Scalar 1>, Bravo<Scalar> --> [+] --> Golf<Scalar>
+is 21 _   [Lit: <Scalar 1>] --> Hotel<Scalar 1>
+is 22 _   Juliet<Scalar>, Lima<Scalar 4> --> [*] --> India<Scalar>
+is 23 _   Kilo<Scalar 1>, Charlie<Scalar> --> [+] --> Juliet<Scalar>
+is 24 _   [Lit: <Scalar 1>] --> Kilo<Scalar 1>
+is 25 _   [Lit: <Scalar 4>] --> Lima<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+// Test nested inlining
+test: $(P2B) -CDanalyzed "(def foo (x) (sqrt x)) (def bar (x) (+ (foo x) (foo x))) (def qux (x) (* (foo x) (bar x) (foo x))) (qux (mid))" --function-inlining-threshold -1
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar>
+is 4 _   Charlie: Alfa --> <Scalar> OUTPUT
+is 5 _   Delta: Alfa --> <Scalar>
+is 6 _   Echo: Alfa --> <Scalar>
+is 7 _   Foxtrot: Alfa --> <Scalar>
+is 8 _   Golf: Alfa --> <Scalar>
+is 9 _   Hotel: Alfa --> <Scalar>
+is 10 _ Operator Instances:
+is 11 _   [mid] --> Bravo<Scalar>
+is 12 _   Delta<Scalar>, Echo<Scalar>, Hotel<Scalar> --> [*] --> Charlie<Scalar> OUTPUT
+is 13 _   Bravo<Scalar> --> [sqrt] --> Delta<Scalar>
+is 14 _   Foxtrot<Scalar>, Golf<Scalar> --> [+] --> Echo<Scalar>
+is 15 _   Bravo<Scalar> --> [sqrt] --> Foxtrot<Scalar>
+is 16 _   Bravo<Scalar> --> [sqrt] --> Golf<Scalar>
+is 17 _   Bravo<Scalar> --> [sqrt] --> Hotel<Scalar>
+
+////////////////////////////////////////////////////////////////////////////
+// make sure restrictions happen on cross-domain boundaries
+test: $(P2B) -CDanalyzed "(let ((x (+ (mid) 1))) (if (rnd 0 1) x 3))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Foxtrot: Alfa --> <Scalar>
+is 6 _   Golf: Alfa --> <Scalar>
+is 7 _   Hotel: Alfa --> <Scalar 1>
+is 8 _   Charlie: Alfa --> <Scalar>
+is 9 _   India: Alfa --> <Scalar 0>
+is 10 _   Juliet: Alfa --> <Scalar 1>
+is 11 _   Kilo: Alfa --> <Scalar> OUTPUT
+is 12 _   Lima: Bravo --> <Scalar>
+is 13 _   Echo: Alfa --> <Boolean>
+is 14 _   Mike: Delta --> <Scalar 3>
+is 15 _ Operator Instances:
+is 16 _   Golf<Scalar>, Hotel<Scalar 1> --> [+] --> Foxtrot<Scalar>
+is 17 _   [mid] --> Golf<Scalar>
+is 18 _   [Lit: <Scalar 1>] --> Hotel<Scalar 1>
+is 19 _   India<Scalar 0>, Juliet<Scalar 1> --> [rnd] --> Charlie<Scalar>
+is 20 _   [Lit: <Scalar 0>] --> India<Scalar 0>
+is 21 _   [Lit: <Scalar 1>] --> Juliet<Scalar 1>
+is 22 _   Charlie<Scalar>, Lima<Scalar>, Mike<Scalar 3> --> [mux] --> Kilo<Scalar> OUTPUT
+is 23 _   Foxtrot<Scalar>, Charlie<Scalar> --> [restrict] --> Lima<Scalar>
+is 24 _   Charlie<Scalar> --> [not] --> Echo<Boolean>
+is 25 _   [Lit: <Scalar 3>] --> Mike<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// references in lambdas to external variables
+test: $(P2B) -CDinterpreted -CDanalyzed "(let ((x (+ (mid) 1))) ((lambda (y) (* x y)) 3))"
+is 0 _ Function: lambda~4 [Signature: <Any> --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Any>
+is 5 _     Charlie: Alfa --> <Number> OUTPUT
+is 6 _     Delta: Alfa --> <Any>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: y] --> Bravo<Any>
+is 9 _     Delta<Any>, Bravo<Any> --> [*] --> Charlie<Number> OUTPUT
+is 10 _     Echo<Number> --> [restrict] --> Delta<Any>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Foxtrot = root]
+is 13 _ Fields:
+is 14 _   Echo: Foxtrot --> <Number>
+is 15 _   Golf: Foxtrot --> <Scalar>
+is 16 _   Hotel: Foxtrot --> <Scalar 1>
+is 17 _   India: Foxtrot --> <Any> OUTPUT
+is 18 _   Juliet: Foxtrot --> <Scalar 3>
+is 19 _ Operator Instances:
+is 20 _   Golf<Scalar>, Hotel<Scalar 1> --> [+] --> Echo<Number>
+is 21 _   [mid] --> Golf<Scalar>
+is 22 _   [Lit: <Scalar 1>] --> Hotel<Scalar 1>
+is 23 _   Juliet<Scalar 3> --> [Fun: lambda~4] --> India<Any> OUTPUT
+is 24 _   [Lit: <Scalar 3>] --> Juliet<Scalar 3>
+is 25 _ Amorphous Mediums:
+is 26 _   [Medium: Foxtrot = root]
+is 27 _ Fields:
+is 28 _   Echo: Foxtrot --> <Scalar>
+is 29 _   Golf: Foxtrot --> <Scalar>
+is 30 _   Hotel: Foxtrot --> <Scalar 1>
+is 31 _   Kilo: Foxtrot --> <Scalar> OUTPUT
+is 32 _   Lima: Foxtrot --> <Scalar 3>
+is 33 _ Operator Instances:
+is 34 _   Golf<Scalar>, Hotel<Scalar 1> --> [+] --> Echo<Scalar>
+is 35 _   [mid] --> Golf<Scalar>
+is 36 _   [Lit: <Scalar 1>] --> Hotel<Scalar 1>
+is 37 _   Echo<Scalar>, Lima<Scalar 3> --> [*] --> Kilo<Scalar> OUTPUT
+is 38 _   [Lit: <Scalar 3>] --> Lima<Scalar 3>
+
+////////////////////////////////////////////////////////////////////////////
+// Function bare references
+test: $(P2B) -CDinterpreted "(let ((x (mid))) (apply (fun () x)))"
+is 0 _ Function: lambda~4 [Signature:  --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Any> OUTPUT
+is 5 _   Operator Instances:
+is 6 _     Charlie<Scalar> --> [restrict] --> Bravo<Any> OUTPUT
+is 7 _ Amorphous Mediums:
+is 8 _   [Medium: Delta = root]
+is 9 _ Fields:
+is 10 _   Charlie: Delta --> <Scalar>
+is 11 _   Echo: Delta --> <Any> OUTPUT
+is 12 _   Foxtrot: Delta --> <Lambda [Fun: lambda~4]>
+is 13 _ Operator Instances:
+is 14 _   [mid] --> Charlie<Scalar>
+is 15 _   Foxtrot<Lambda [Fun: lambda~4]> --> [apply] --> Echo<Any> OUTPUT
+is 16 _   [Lit: <Lambda [Fun: lambda~4]>] --> Foxtrot<Lambda [Fun: lambda~4]>
+
+////////////////////////////////////////////////////////////////////////////
+// Reference from within branch
+test: $(P2B) -CDanalyzed "(let ((x (speed))) (if (mid) (+ x 3) 4))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Foxtrot: Alfa --> <Scalar>
+is 6 _   Charlie: Alfa --> <Scalar>
+is 7 _   Golf: Alfa --> <Scalar> OUTPUT
+is 8 _   Hotel: Bravo --> <Scalar>
+is 9 _   India: Bravo --> <Scalar>
+is 10 _   Juliet: Bravo --> <Scalar 3>
+is 11 _   Echo: Alfa --> <Boolean>
+is 12 _   Kilo: Delta --> <Scalar 4>
+is 13 _ Operator Instances:
+is 14 _   [speed] --> Foxtrot<Scalar>
+is 15 _   [mid] --> Charlie<Scalar>
+is 16 _   Charlie<Scalar>, Hotel<Scalar>, Kilo<Scalar 4> --> [mux] --> Golf<Scalar> OUTPUT
+is 17 _   India<Scalar>, Juliet<Scalar 3> --> [+] --> Hotel<Scalar>
+is 18 _   Foxtrot<Scalar>, Charlie<Scalar> --> [restrict] --> India<Scalar>
+is 19 _   [Lit: <Scalar 3>] --> Juliet<Scalar 3>
+is 20 _   Charlie<Scalar> --> [not] --> Echo<Boolean>
+is 21 _   [Lit: <Scalar 4>] --> Kilo<Scalar 4>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDinterpreted -CDanalyzed "(let ((m (mid))) (apply (fun (x) (if m 2 m)) 3))"
+is 0 _ Function: lambda~4 [Signature: <Any> --> <Any>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _     [Medium: Bravo = Alfa | Charlie]
+is 4 _     [Medium: Delta = Alfa | Echo]
+is 5 _   Fields:
+is 6 _     Foxtrot: Alfa --> <Any>
+is 7 _     Charlie: Alfa --> <Any>
+is 8 _     Golf: Alfa --> <Local> OUTPUT
+is 9 _     Hotel: Bravo --> <Scalar 2>
+is 10 _    Echo: Alfa --> <Boolean>
+is 11 _    India: Delta --> <Any>
+is 12 _   Operator Instances:
+is 13 _     [Parameter 0: x] --> Foxtrot<Any>
+is 14 _     Juliet<Scalar> --> [restrict] --> Charlie<Any>
+is 15 _     Charlie<Any>, Hotel<Scalar 2>, India<Any> --> [mux] --> Golf<Local> OUTPUT
+is 16 _     [Lit: <Scalar 2>] --> Hotel<Scalar 2>
+is 17 _     Charlie<Any> --> [not] --> Echo<Boolean>
+is 18 _     Juliet<Scalar>, Echo<Boolean> --> [restrict] --> India<Any>
+is 19 _ Amorphous Mediums:
+is 20 _   [Medium: Kilo = root]
+is 21 _ Fields:
+is 22 _   Juliet: Kilo --> <Scalar>
+is 23 _   Lima: Kilo --> <Any> OUTPUT
+is 24 _   Mike: Kilo --> <Lambda [Fun: lambda~4]>
+is 25 _   November: Kilo --> <Scalar 3>
+is 26 _ Operator Instances:
+is 27 _   [mid] --> Juliet<Scalar>
+is 28 _   Mike<Lambda [Fun: lambda~4]>, November<Scalar 3> --> [apply] --> Lima<Any> OUTPUT
+is 29 _   [Lit: <Lambda [Fun: lambda~4]>] --> Mike<Lambda [Fun: lambda~4]>
+is 30 _   [Lit: <Scalar 3>] --> November<Scalar 3>
+is 31 _ Amorphous Mediums:
+is 32 _   [Medium: Kilo = root]
+is 33 _   [Medium: Oscar = Kilo | Juliet]
+is 34 _   [Medium: Papa = Kilo | Quebec]
+is 35 _ Fields:
+is 36 _   Juliet: Kilo --> <Scalar>
+is 37 _   Romeo: Kilo --> <Scalar> OUTPUT
+is 38 _   Quebec: Kilo --> <Boolean>
+is 39 _   Sierra: Oscar --> <Scalar 2>
+is 40 _   Tango: Papa --> <Scalar>
+is 41 _ Operator Instances:
+is 42 _   [mid] --> Juliet<Scalar>
+is 43 _   Juliet<Scalar>, Sierra<Scalar 2>, Tango<Scalar> --> [mux] --> Romeo<Scalar> OUTPUT
+is 44 _   Juliet<Scalar> --> [not] --> Quebec<Boolean>
+is 45 _   [Lit: <Scalar 2>] --> Sierra<Scalar 2>
+is 46 _   Juliet<Scalar>, Quebec<Boolean> --> [restrict] --> Tango<Scalar>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDanalyzed "(def foo (x) (+ x (mid))) (apply foo (- (mid) 1))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar>
+is 4 _   Charlie: Alfa --> <Scalar>
+is 5 _   Delta: Alfa --> <Scalar 1>
+is 6 _   Echo: Alfa --> <Scalar> OUTPUT
+is 7 _   Foxtrot: Alfa --> <Scalar>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Scalar>, Delta<Scalar 1> --> [-] --> Bravo<Scalar>
+is 10 _   [mid] --> Charlie<Scalar>
+is 11 _   [Lit: <Scalar 1>] --> Delta<Scalar 1>
+is 12 _   Bravo<Scalar>, Foxtrot<Scalar> --> [+] --> Echo<Scalar> OUTPUT
+is 13 _   [mid] --> Foxtrot<Scalar>
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDinterpreted -CDanalyzed "(apply / '(8 12) 2 3)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Any> OUTPUT
+is 4 _   Charlie: Alfa --> <Lambda [/]>
+is 5 _   Delta: Alfa --> <2-Vector<Scalar 8>,<Scalar 12>>
+is 6 _   Echo: Alfa --> <Scalar 2>
+is 7 _   Foxtrot: Alfa --> <Scalar 3>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Lambda [/]>, Delta<2-Vector<Scalar 8>,<Scalar 12>>, Echo<Scalar 2>, Foxtrot<Scalar 3> --> [apply] --> Bravo<Any> OUTPUT
+is 10 _   [Lit: <Lambda [/]>] --> Charlie<Lambda [/]>
+is 11 _   [Lit: <2-Vector<Scalar 8>,<Scalar 12>>] --> Delta<2-Vector<Scalar 8>,<Scalar 12>>
+is 12 _   [Lit: <Scalar 2>] --> Echo<Scalar 2>
+is 13 _   [Lit: <Scalar 3>] --> Foxtrot<Scalar 3>
+is 14 _ Amorphous Mediums:
+is 15 _   [Medium: Alfa = root]
+is 16 _ Fields:
+is 17 _   Golf: Alfa --> <2-Vector<Scalar 1.33333>,<Scalar 2>> OUTPUT
+is 18 _ Operator Instances:
+is 19 _   [Lit: <2-Vector<Scalar 1.33333>,<Scalar 2>>] --> Golf<2-Vector<Scalar 1.33333>,<Scalar 2>> OUTPUT
+
+////////////////////////////////////////////////////////////////////////////
+// NEIGHORHOOD OPERATIONS
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+// Simple neighborhood:
+test: $(P2B) -CDanalyzed -CDlocalized "(max-hood (nbr (= (mid) 0)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Boolean> OUTPUT
+is 4 _   Charlie: Alfa --> <Field <Boolean>>
+is 5 _   Delta: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Scalar>
+is 7 _   Foxtrot: Alfa --> <Scalar 0>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Field <Boolean>> --> [max-hood] --> Bravo<Boolean> OUTPUT
+is 10 _   Delta<Boolean> --> [nbr] --> Charlie<Field <Boolean>>
+is 11 _   Echo<Scalar>, Foxtrot<Scalar 0> --> [=] --> Delta<Boolean>
+is 12 _   [mid] --> Echo<Scalar>
+is 13 _   [Lit: <Scalar 0>] --> Foxtrot<Scalar 0>
+is 14 _ Function: Hood~6 [Signature: <Boolean> --> <Boolean>] called 1 times
+is 15 _   Amorphous Mediums:
+is 16 _     [Medium: Golf = root]
+is 17 _   Fields:
+is 18 _     Hotel: Golf --> <Boolean> OUTPUT
+is 19 _   Operator Instances:
+is 20 _     [Parameter 0: arg~5] --> Hotel<Boolean> OUTPUT
+is 21 _ Amorphous Mediums:
+is 22 _   [Medium: Alfa = root]
+is 23 _ Fields:
+is 24 _   Delta: Alfa --> <Boolean>
+is 25 _   Echo: Alfa --> <Scalar>
+is 26 _   Foxtrot: Alfa --> <Scalar 0>
+is 27 _   India: Alfa --> <Boolean> OUTPUT
+is 28 _   Juliet: Alfa --> <Lambda [max]>
+is 29 _   Kilo: Alfa --> <Lambda [Fun: Hood~6]>
+is 30 _ Operator Instances:
+is 31 _   Echo<Scalar>, Foxtrot<Scalar 0> --> [=] --> Delta<Boolean>
+is 32 _   [mid] --> Echo<Scalar>
+is 33 _   [Lit: <Scalar 0>] --> Foxtrot<Scalar 0>
+is 34 _   Juliet<Lambda [max]>, Kilo<Lambda [Fun: Hood~6]>, Delta<Boolean> --> [fold-hood-plus] --> India<Boolean> OUTPUT
+is 35 _   [Lit: <Lambda [max]>] --> Juliet<Lambda [max]>
+is 36 _   [Lit: <Lambda [Fun: Hood~6]>] --> Kilo<Lambda [Fun: Hood~6]>
+is 37 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDlocalized "(any-hood (sin (nbr (mid))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _   Operator Instances:
+is 7 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 8 _     Bravo<Scalar> --> [sin] --> Charlie<Scalar> OUTPUT
+is 9 _ Amorphous Mediums:
+is 10 _   [Medium: Delta = root]
+is 11 _ Fields:
+is 12 _   Echo: Delta --> <Scalar>
+is 13 _   Foxtrot: Delta --> <Scalar> OUTPUT
+is 14 _   Golf: Delta --> <Lambda [max]>
+is 15 _   Hotel: Delta --> <Lambda [Fun: Hood~6]>
+is 16 _ Operator Instances:
+is 17 _   [mid] --> Echo<Scalar>
+is 18 _   Golf<Lambda [max]>, Hotel<Lambda [Fun: Hood~6]>, Echo<Scalar> --> [fold-hood-plus] --> Foxtrot<Scalar> OUTPUT
+is 19 _   [Lit: <Lambda [max]>] --> Golf<Lambda [max]>
+is 20 _   [Lit: <Lambda [Fun: Hood~6]>] --> Hotel<Lambda [Fun: Hood~6]>
+is 21 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Basic neighborhood localization test:
+test: $(P2B) -CDlocalized "(all-hood (+ 2 (nbr (mid))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar 2>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar 2>, Bravo<Scalar> --> [+] --> Charlie<Scalar> OUTPUT
+is 10 _     [Lit: <Scalar 2>] --> Delta<Scalar 2>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Scalar>
+is 15 _   Golf: Echo --> <Scalar> OUTPUT
+is 16 _   Hotel: Echo --> <Lambda [min]>
+is 17 _   India: Echo --> <Lambda [Fun: Hood~6]>
+is 18 _ Operator Instances:
+is 19 _   [mid] --> Foxtrot<Scalar>
+is 20 _   Hotel<Lambda [min]>, India<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Golf<Scalar> OUTPUT
+is 21 _   [Lit: <Lambda [min]>] --> Hotel<Lambda [min]>
+is 22 _   [Lit: <Lambda [Fun: Hood~6]>] --> India<Lambda [Fun: Hood~6]>
+is 23 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDlocalized "(min-hood (+ (nbr-range) (nbr (mid))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar>, Bravo<Scalar> --> [+] --> Charlie<Scalar> OUTPUT
+is 10 _     [nbr-range] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Scalar>
+is 15 _   Golf: Echo --> <Scalar> OUTPUT
+is 16 _   Hotel: Echo --> <Lambda [min]>
+is 17 _   India: Echo --> <Lambda [Fun: Hood~6]>
+is 18 _ Operator Instances:
+is 19 _   [mid] --> Foxtrot<Scalar>
+is 20 _   Hotel<Lambda [min]>, India<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Golf<Scalar> OUTPUT
+is 21 _   [Lit: <Lambda [min]>] --> Hotel<Lambda [min]>
+is 22 _   [Lit: <Lambda [Fun: Hood~6]>] --> India<Lambda [Fun: Hood~6]>
+is 23 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test zero exports:
+test: $(P2B) -CDlocalized "(int-hood (nbr-range))"
+is 0 _ Function: Hood~5 [Signature: <Scalar 0> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar>
+is 6 _     Delta: Alfa --> <Scalar> OUTPUT
+is 7 _   Operator Instances:
+is 8 _     [nbr-range] --> Bravo<Scalar>
+is 9 _     [infinitesimal] --> Charlie<Scalar>
+is 10 _     Charlie<Scalar>, Bravo<Scalar> --> [*] --> Delta<Scalar> OUTPUT
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Scalar 0>
+is 15 _   Golf: Echo --> <Scalar> OUTPUT
+is 16 _   Hotel: Echo --> <Lambda [+]>
+is 17 _   India: Echo --> <Lambda [Fun: Hood~5]>
+is 18 _ Operator Instances:
+is 19 _   [Lit: <Scalar 0>] --> Foxtrot<Scalar 0>
+is 20 _   Hotel<Lambda [+]>, India<Lambda [Fun: Hood~5]>, Foxtrot<Scalar 0> --> [fold-hood-plus] --> Golf<Scalar> OUTPUT
+is 21 _   [Lit: <Lambda [+]>] --> Hotel<Lambda [+]>
+is 22 _   [Lit: <Lambda [Fun: Hood~5]>] --> India<Lambda [Fun: Hood~5]>
+is 23 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// insertion of "local" ops
+test: $(P2B) -CDanalyzed -CDlocalized "(int-hood 1)"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Field <Scalar 1>>
+is 5 _ Operator Instances:
+is 6 _   Charlie<Field <Scalar 1>> --> [int-hood] --> Bravo<Scalar> OUTPUT
+is 7 _   [Lit: <Field <Scalar 1>>] --> Charlie<Field <Scalar 1>>
+is 8 _ Function: Hood~5 [Signature: <Scalar 0> --> <Scalar>] called 1 times
+is 9 _   Amorphous Mediums:
+is 10 _     [Medium: Delta = root]
+is 11 _   Fields:
+is 12 _     Echo: Delta --> <Scalar 1>
+is 13 _     Foxtrot: Delta --> <Scalar>
+is 14 _     Golf: Delta --> <Scalar> OUTPUT
+is 15 _   Operator Instances:
+is 16 _     [Lit: <Scalar 1>] --> Echo<Scalar 1>
+is 17 _     [infinitesimal] --> Foxtrot<Scalar>
+is 18 _     Foxtrot<Scalar>, Echo<Scalar 1> --> [*] --> Golf<Scalar> OUTPUT
+is 19 _ Amorphous Mediums:
+is 20 _   [Medium: Alfa = root]
+is 21 _ Fields:
+is 22 _   Hotel: Alfa --> <Scalar 0>
+is 23 _   India: Alfa --> <Scalar> OUTPUT
+is 24 _   Juliet: Alfa --> <Lambda [+]>
+is 25 _   Kilo: Alfa --> <Lambda [Fun: Hood~5]>
+is 26 _ Operator Instances:
+is 27 _   [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 28 _   Juliet<Lambda [+]>, Kilo<Lambda [Fun: Hood~5]>, Hotel<Scalar 0> --> [fold-hood-plus] --> India<Scalar> OUTPUT
+is 29 _   [Lit: <Lambda [+]>] --> Juliet<Lambda [+]>
+is 30 _   [Lit: <Lambda [Fun: Hood~5]>] --> Kilo<Lambda [Fun: Hood~5]>
+is 31 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDanalyzed -CDlocalized "(min-hood (+ (nbr-range) (nbr (mid))))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Field <Scalar>>
+is 5 _   Delta: Alfa --> <Field <Scalar>>
+is 6 _   Echo: Alfa --> <Field <Scalar>>
+is 7 _   Foxtrot: Alfa --> <Scalar>
+is 8 _ Operator Instances:
+is 9 _   Charlie<Field <Scalar>> --> [min-hood] --> Bravo<Scalar> OUTPUT
+is 10 _   Delta<Field <Scalar>>, Echo<Field <Scalar>> --> [Field~~+] --> Charlie<Field <Scalar>>
+is 11 _   [nbr-range] --> Delta<Field <Scalar>>
+is 12 _   Foxtrot<Scalar> --> [nbr] --> Echo<Field <Scalar>>
+is 13 _   [mid] --> Foxtrot<Scalar>
+is 14 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 15 _   Amorphous Mediums:
+is 16 _     [Medium: Golf = root]
+is 17 _   Fields:
+is 18 _     Hotel: Golf --> <Scalar>
+is 19 _     India: Golf --> <Scalar> OUTPUT
+is 20 _     Juliet: Golf --> <Scalar>
+is 21 _   Operator Instances:
+is 22 _     [Parameter 0: arg~5] --> Hotel<Scalar>
+is 23 _     Juliet<Scalar>, Hotel<Scalar> --> [+] --> India<Scalar> OUTPUT
+is 24 _     [nbr-range] --> Juliet<Scalar>
+is 25 _ Amorphous Mediums:
+is 26 _   [Medium: Alfa = root]
+is 27 _ Fields:
+is 28 _   Foxtrot: Alfa --> <Scalar>
+is 29 _   Kilo: Alfa --> <Scalar> OUTPUT
+is 30 _   Lima: Alfa --> <Lambda [min]>
+is 31 _   Mike: Alfa --> <Lambda [Fun: Hood~6]>
+is 32 _ Operator Instances:
+is 33 _   [mid] --> Foxtrot<Scalar>
+is 34 _   Lima<Lambda [min]>, Mike<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Kilo<Scalar> OUTPUT
+is 35 _   [Lit: <Lambda [min]>] --> Lima<Lambda [min]>
+is 36 _   [Lit: <Lambda [Fun: Hood~6]>] --> Mike<Lambda [Fun: Hood~6]>
+is 37 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDanalyzed -CDlocalized "(max-hood (* (mid) (+ (nbr (speed)) 1)))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Field <Scalar>>
+is 5 _   Delta: Alfa --> <Field <Scalar>>
+is 6 _   Echo: Alfa --> <Field <Scalar>>
+is 7 _   Foxtrot: Alfa --> <Scalar>
+is 8 _   Golf: Alfa --> <Field <Scalar>>
+is 9 _   Hotel: Alfa --> <Field <Scalar 1>>
+is 10 _ Operator Instances:
+is 11 _   Charlie<Field <Scalar>> --> [max-hood] --> Bravo<Scalar> OUTPUT
+is 12 _   Golf<Field <Scalar>>, Delta<Field <Scalar>> --> [Field~~*] --> Charlie<Field <Scalar>>
+is 13 _   Echo<Field <Scalar>>, Hotel<Field <Scalar 1>> --> [Field~~+] --> Delta<Field <Scalar>>
+is 14 _   Foxtrot<Scalar> --> [nbr] --> Echo<Field <Scalar>>
+is 15 _   [speed] --> Foxtrot<Scalar>
+is 16 _   [Field~~mid] --> Golf<Field <Scalar>>
+is 17 _   [Lit: <Field <Scalar 1>>] --> Hotel<Field <Scalar 1>>
+is 18 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 19 _   Amorphous Mediums:
+is 20 _     [Medium: India = root]
+is 21 _   Fields:
+is 22 _     Juliet: India --> <Scalar>
+is 23 _     Kilo: India --> <Scalar> OUTPUT
+is 24 _     Lima: India --> <Scalar>
+is 25 _     Mike: India --> <Scalar>
+is 26 _     November: India --> <Scalar 1>
+is 27 _   Operator Instances:
+is 28 _     [Parameter 0: arg~5] --> Juliet<Scalar>
+is 29 _     Mike<Scalar>, Lima<Scalar> --> [*] --> Kilo<Scalar> OUTPUT
+is 30 _     Juliet<Scalar>, November<Scalar 1> --> [+] --> Lima<Scalar>
+is 31 _     [mid] --> Mike<Scalar>
+is 32 _     [Lit: <Scalar 1>] --> November<Scalar 1>
+is 33 _ Amorphous Mediums:
+is 34 _   [Medium: Alfa = root]
+is 35 _ Fields:
+is 36 _   Foxtrot: Alfa --> <Scalar>
+is 37 _   Oscar: Alfa --> <Scalar> OUTPUT
+is 38 _   Papa: Alfa --> <Lambda [max]>
+is 39 _   Quebec: Alfa --> <Lambda [Fun: Hood~6]>
+is 40 _ Operator Instances:
+is 41 _   [speed] --> Foxtrot<Scalar>
+is 42 _   Papa<Lambda [max]>, Quebec<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Oscar<Scalar> OUTPUT
+is 43 _   [Lit: <Lambda [max]>] --> Papa<Lambda [max]>
+is 44 _   [Lit: <Lambda [Fun: Hood~6]>] --> Quebec<Lambda [Fun: Hood~6]>
+is 45 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test multi-use fields:
+test: $(P2B) -CDlocalized "(let ((x (+ 2 (nbr (mid))))) (+ (min-hood (+ x x)) (max-hood x)))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar>
+is 6 _     Delta: Alfa --> <Scalar> OUTPUT
+is 7 _     Echo: Alfa --> <Scalar 2>
+is 8 _   Operator Instances:
+is 9 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 10 _     Echo<Scalar 2>, Bravo<Scalar> --> [+] --> Charlie<Scalar>
+is 11 _     Charlie<Scalar>, Charlie<Scalar> --> [+] --> Delta<Scalar> OUTPUT
+is 12 _     [Lit: <Scalar 2>] --> Echo<Scalar 2>
+is 13 _ Function: Hood~9 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 14 _   Amorphous Mediums:
+is 15 _     [Medium: Foxtrot = root]
+is 16 _   Fields:
+is 17 _     Golf: Foxtrot --> <Scalar>
+is 18 _     Hotel: Foxtrot --> <Scalar> OUTPUT
+is 19 _     India: Foxtrot --> <Scalar 2>
+is 20 _   Operator Instances:
+is 21 _     [Parameter 0: arg~8] --> Golf<Scalar>
+is 22 _     India<Scalar 2>, Golf<Scalar> --> [+] --> Hotel<Scalar> OUTPUT
+is 23 _     [Lit: <Scalar 2>] --> India<Scalar 2>
+is 24 _ Amorphous Mediums:
+is 25 _   [Medium: Juliet = root]
+is 26 _ Fields:
+is 27 _   Kilo: Juliet --> <Scalar>
+is 28 _   Lima: Juliet --> <Scalar> OUTPUT
+is 29 _   Mike: Juliet --> <Scalar>
+is 30 _   November: Juliet --> <Lambda [min]>
+is 31 _   Oscar: Juliet --> <Lambda [Fun: Hood~6]>
+is 32 _   Papa: Juliet --> <Scalar>
+is 33 _   Quebec: Juliet --> <Lambda [max]>
+is 34 _   Romeo: Juliet --> <Lambda [Fun: Hood~9]>
+is 35 _ Operator Instances:
+is 36 _   [mid] --> Kilo<Scalar>
+is 37 _   Mike<Scalar>, Papa<Scalar> --> [+] --> Lima<Scalar> OUTPUT
+is 38 _   November<Lambda [min]>, Oscar<Lambda [Fun: Hood~6]>, Kilo<Scalar> --> [fold-hood-plus] --> Mike<Scalar>
+is 39 _   [Lit: <Lambda [min]>] --> November<Lambda [min]>
+is 40 _   [Lit: <Lambda [Fun: Hood~6]>] --> Oscar<Lambda [Fun: Hood~6]>
+is 41 _   Quebec<Lambda [max]>, Romeo<Lambda [Fun: Hood~9]>, Kilo<Scalar> --> [fold-hood-plus] --> Papa<Scalar>
+is 42 _   [Lit: <Lambda [max]>] --> Quebec<Lambda [max]>
+is 43 _   [Lit: <Lambda [Fun: Hood~9]>] --> Romeo<Lambda [Fun: Hood~9]>
+is 44 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Neighborhood variables:
+test: $(P2B) -CDlocalized "(let ((x (mid))) (+ x (min-hood (+ x (nbr x)))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar>, Bravo<Scalar> --> [+] --> Charlie<Scalar> OUTPUT
+is 10 _     [mid] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Scalar>
+is 15 _   Golf: Echo --> <Scalar> OUTPUT
+is 16 _   Hotel: Echo --> <Scalar>
+is 17 _   India: Echo --> <Lambda [min]>
+is 18 _   Juliet: Echo --> <Lambda [Fun: Hood~6]>
+is 19 _ Operator Instances:
+is 20 _   [mid] --> Foxtrot<Scalar>
+is 21 _   Foxtrot<Scalar>, Hotel<Scalar> --> [+] --> Golf<Scalar> OUTPUT
+is 22 _   India<Lambda [min]>, Juliet<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Hotel<Scalar>
+is 23 _   [Lit: <Lambda [min]>] --> India<Lambda [min]>
+is 24 _   [Lit: <Lambda [Fun: Hood~6]>] --> Juliet<Lambda [Fun: Hood~6]>
+is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Neighborhood variables: 
+test: $(P2B) -CDlocalized "(let ((x (+ 2 (mid)))) (+ x (min-hood (+ x (nbr x)))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar>, Bravo<Scalar> --> [+] --> Charlie<Scalar> OUTPUT
+is 10 _     Echo<Scalar> --> [reference] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Foxtrot = root]
+is 13 _ Fields:
+is 14 _   Echo: Foxtrot --> <Scalar>
+is 15 _   Golf: Foxtrot --> <Scalar 2>
+is 16 _   Hotel: Foxtrot --> <Scalar>
+is 17 _   India: Foxtrot --> <Scalar> OUTPUT
+is 18 _   Juliet: Foxtrot --> <Scalar>
+is 19 _   Kilo: Foxtrot --> <Lambda [min]>
+is 20 _   Lima: Foxtrot --> <Lambda [Fun: Hood~6]>
+is 21 _ Operator Instances:
+is 22 _   Golf<Scalar 2>, Hotel<Scalar> --> [+] --> Echo<Scalar>
+is 23 _   [Lit: <Scalar 2>] --> Golf<Scalar 2>
+is 24 _   [mid] --> Hotel<Scalar>
+is 25 _   Echo<Scalar>, Juliet<Scalar> --> [+] --> India<Scalar> OUTPUT
+is 26 _   Kilo<Lambda [min]>, Lima<Lambda [Fun: Hood~6]>, Echo<Scalar> --> [fold-hood-plus] --> Juliet<Scalar>
+is 27 _   [Lit: <Lambda [min]>] --> Kilo<Lambda [min]>
+is 28 _   [Lit: <Lambda [Fun: Hood~6]>] --> Lima<Lambda [Fun: Hood~6]>
+is 29 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test handling of AMs within hood expression
+test: $(P2B) -CDanalyzed "(sum-hood (if (mid) 5 7))" --no-localization
+is 0 _ Error during analysis:
+is 1 _ Error: Cannot restrict (if) inside a neighborhood operation ([sum-hood])
+
+////////////////////////////////////////////////////////////////////////////
+// Test handling of AMs within hood expression, also no-content summary
+test: $(P2B) -CDanalyzed -CDlocalized "(sum-hood (mux (mid) 5 7))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Scalar> OUTPUT
+is 4 _   Charlie: Alfa --> <Scalar>
+is 5 _   Delta: Alfa --> <Scalar>
+is 6 _   Echo: Alfa --> <Scalar 5>
+is 7 _   Foxtrot: Alfa --> <Scalar 7>
+is 8 _   Golf: Alfa --> <Field <Scalar>>
+is 9 _ Operator Instances:
+is 10 _   Golf<Field <Scalar>> --> [sum-hood] --> Bravo<Scalar> OUTPUT
+is 11 _   Delta<Scalar>, Echo<Scalar 5>, Foxtrot<Scalar 7> --> [mux] --> Charlie<Scalar>
+is 12 _   [mid] --> Delta<Scalar>
+is 13 _   [Lit: <Scalar 5>] --> Echo<Scalar 5>
+is 14 _   [Lit: <Scalar 7>] --> Foxtrot<Scalar 7>
+is 15 _   Charlie<Scalar> --> [local] --> Golf<Field <Scalar>>
+is 16 _ Function: Hood~5 [Signature: <Scalar 0> --> <Scalar>] called 1 times
+is 17 _   Amorphous Mediums:
+is 18 _     [Medium: Hotel = root]
+is 19 _   Fields:
+is 20 _     India: Hotel --> <Scalar> OUTPUT
+is 21 _   Operator Instances:
+is 22 _     Charlie<Scalar> --> [reference] --> India<Scalar> OUTPUT
+is 23 _ Amorphous Mediums:
+is 24 _   [Medium: Alfa = root]
+is 25 _ Fields:
+is 26 _   Charlie: Alfa --> <Scalar>
+is 27 _   Delta: Alfa --> <Scalar>
+is 28 _   Echo: Alfa --> <Scalar 5>
+is 29 _   Foxtrot: Alfa --> <Scalar 7>
+is 30 _   Juliet: Alfa --> <Scalar 0>
+is 31 _   Kilo: Alfa --> <Scalar> OUTPUT
+is 32 _   Lima: Alfa --> <Lambda [+]>
+is 33 _   Mike: Alfa --> <Lambda [Fun: Hood~5]>
+is 34 _ Operator Instances:
+is 35 _   Delta<Scalar>, Echo<Scalar 5>, Foxtrot<Scalar 7> --> [mux] --> Charlie<Scalar>
+is 36 _   [mid] --> Delta<Scalar>
+is 37 _   [Lit: <Scalar 5>] --> Echo<Scalar 5>
+is 38 _   [Lit: <Scalar 7>] --> Foxtrot<Scalar 7>
+is 39 _   [Lit: <Scalar 0>] --> Juliet<Scalar 0>
+is 40 _   Lima<Lambda [+]>, Mike<Lambda [Fun: Hood~5]>, Juliet<Scalar 0> --> [fold-hood-plus] --> Kilo<Scalar> OUTPUT
+is 41 _   [Lit: <Lambda [+]>] --> Lima<Lambda [+]>
+is 42 _   [Lit: <Lambda [Fun: Hood~5]>] --> Mike<Lambda [Fun: Hood~5]>
+is 43 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDlocalized "(sum-hood (+ (nbr 1) (mux (mid) 5 7)))"
+is 0 _ Function: Hood~5 [Signature: <Scalar 0> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _     Charlie: Alfa --> <Scalar 1>
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     Charlie<Scalar 1>, Delta<Scalar> --> [+] --> Bravo<Scalar> OUTPUT
+is 9 _     [Lit: <Scalar 1>] --> Charlie<Scalar 1>
+is 10 _     Echo<Scalar> --> [reference] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Foxtrot = root]
+is 13 _ Fields:
+is 14 _   Echo: Foxtrot --> <Scalar>
+is 15 _   Golf: Foxtrot --> <Scalar>
+is 16 _   Hotel: Foxtrot --> <Scalar 5>
+is 17 _   India: Foxtrot --> <Scalar 7>
+is 18 _   Juliet: Foxtrot --> <Scalar 0>
+is 19 _   Kilo: Foxtrot --> <Scalar> OUTPUT
+is 20 _   Lima: Foxtrot --> <Lambda [+]>
+is 21 _   Mike: Foxtrot --> <Lambda [Fun: Hood~5]>
+is 22 _ Operator Instances:
+is 23 _   Golf<Scalar>, Hotel<Scalar 5>, India<Scalar 7> --> [mux] --> Echo<Scalar>
+is 24 _   [mid] --> Golf<Scalar>
+is 25 _   [Lit: <Scalar 5>] --> Hotel<Scalar 5>
+is 26 _   [Lit: <Scalar 7>] --> India<Scalar 7>
+is 27 _   [Lit: <Scalar 0>] --> Juliet<Scalar 0>
+is 28 _   Lima<Lambda [+]>, Mike<Lambda [Fun: Hood~5]>, Juliet<Scalar 0> --> [fold-hood-plus] --> Kilo<Scalar> OUTPUT
+is 29 _   [Lit: <Lambda [+]>] --> Lima<Lambda [+]>
+is 30 _   [Lit: <Lambda [Fun: Hood~5]>] --> Mike<Lambda [Fun: Hood~5]>
+is 31 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDanalyzed -CDlocalized "(let ((x (nbr (mid)))) (if (> (mid) 3) (any-hood x) 0))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Foxtrot: Alfa --> <Field <Scalar>>
+is 6 _   Golf: Alfa --> <Scalar>
+is 7 _   Charlie: Alfa --> <Boolean>
+is 8 _   Hotel: Alfa --> <Scalar>
+is 9 _   India: Alfa --> <Scalar 3>
+is 10 _   Juliet: Alfa --> <Scalar> OUTPUT
+is 11 _   Kilo: Bravo --> <Boolean>
+is 12 _   Lima: Bravo --> <Field <Scalar>>
+is 13 _   Echo: Alfa --> <Boolean>
+is 14 _   Mike: Delta --> <Scalar 0>
+is 15 _ Operator Instances:
+is 16 _   Golf<Scalar> --> [nbr] --> Foxtrot<Field <Scalar>>
+is 17 _   [mid] --> Golf<Scalar>
+is 18 _   Hotel<Scalar>, India<Scalar 3> --> [>] --> Charlie<Boolean>
+is 19 _   [mid] --> Hotel<Scalar>
+is 20 _   [Lit: <Scalar 3>] --> India<Scalar 3>
+is 21 _   Charlie<Boolean>, Kilo<Boolean>, Mike<Scalar 0> --> [mux] --> Juliet<Scalar> OUTPUT
+is 22 _   Lima<Field <Scalar>> --> [any-hood] --> Kilo<Boolean>
+is 23 _   Foxtrot<Field <Scalar>>, Charlie<Boolean> --> [restrict] --> Lima<Field <Scalar>>
+is 24 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 25 _   [Lit: <Scalar 0>] --> Mike<Scalar 0>
+is 26 _ Function: Hood~7 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 27 _   Amorphous Mediums:
+is 28 _     [Medium: November = root]
+is 29 _   Fields:
+is 30 _     Oscar: November --> <Scalar> OUTPUT
+is 31 _   Operator Instances:
+is 32 _     [Parameter 0: arg~6] --> Oscar<Scalar> OUTPUT
+is 33 _ Function: TrueBranch~8 [Signature:  --> <Scalar>] called 1 times
+is 34 _   Amorphous Mediums:
+is 35 _     [Medium: Papa = root]
+is 36 _   Fields:
+is 37 _     Quebec: Papa --> <Scalar>
+is 38 _     Romeo: Papa --> <Scalar> OUTPUT
+is 39 _     Sierra: Papa --> <Lambda [max]>
+is 40 _     Tango: Papa --> <Lambda [Fun: Hood~7]>
+is 41 _   Operator Instances:
+is 42 _     Golf<Scalar> --> [reference] --> Quebec<Scalar>
+is 43 _     Sierra<Lambda [max]>, Tango<Lambda [Fun: Hood~7]>, Quebec<Scalar> --> [fold-hood-plus] --> Romeo<Scalar> OUTPUT
+is 44 _     [Lit: <Lambda [max]>] --> Sierra<Lambda [max]>
+is 45 _     [Lit: <Lambda [Fun: Hood~7]>] --> Tango<Lambda [Fun: Hood~7]>
+is 46 _ Function: FalseBranch~9 [Signature:  --> <Scalar 0>] called 1 times
+is 47 _   Amorphous Mediums:
+is 48 _     [Medium: Uniform = root]
+is 49 _   Fields:
+is 50 _     Victor: Uniform --> <Scalar 0> OUTPUT
+is 51 _   Operator Instances:
+is 52 _     [Lit: <Scalar 0>] --> Victor<Scalar 0> OUTPUT
+is 53 _ Amorphous Mediums:
+is 54 _   [Medium: Alfa = root]
+is 55 _ Fields:
+is 56 _   Golf: Alfa --> <Scalar>
+is 57 _   Charlie: Alfa --> <Boolean>
+is 58 _   Hotel: Alfa --> <Scalar>
+is 59 _   India: Alfa --> <Scalar 3>
+is 60 _   Whiskey: Alfa --> <Scalar> OUTPUT
+is 61 _   Xray: Alfa --> <Lambda [Fun: TrueBranch~8]>
+is 62 _   Yankee: Alfa --> <Lambda [Fun: FalseBranch~9]>
+is 63 _ Operator Instances:
+is 64 _   [mid] --> Golf<Scalar>
+is 65 _   Hotel<Scalar>, India<Scalar 3> --> [>] --> Charlie<Boolean>
+is 66 _   [mid] --> Hotel<Scalar>
+is 67 _   [Lit: <Scalar 3>] --> India<Scalar 3>
+is 68 _   Charlie<Boolean>, Xray<Lambda [Fun: TrueBranch~8]>, Yankee<Lambda [Fun: FalseBranch~9]> --> [branch] --> Whiskey<Scalar> OUTPUT
+is 69 _   [Lit: <Lambda [Fun: TrueBranch~8]>] --> Xray<Lambda [Fun: TrueBranch~8]>
+is 70 _   [Lit: <Lambda [Fun: FalseBranch~9]>] --> Yankee<Lambda [Fun: FalseBranch~9]>
+is 71 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Same as prior test, except one branch includes a function call
+test: $(P2B) -CDanalyzed -CDlocalized "(let ((x (nbr (mid)))) (if (> (mid) 3) (all (def foo () (any-hood x)) (foo)) 0))"
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _   [Medium: Bravo = Alfa | Charlie]
+is 3 _   [Medium: Delta = Alfa | Echo]
+is 4 _ Fields:
+is 5 _   Foxtrot: Alfa --> <Field <Scalar>>
+is 6 _   Golf: Alfa --> <Scalar>
+is 7 _   Charlie: Alfa --> <Boolean>
+is 8 _   Hotel: Alfa --> <Scalar>
+is 9 _   India: Alfa --> <Scalar 3>
+is 10 _   Juliet: Alfa --> <Scalar> OUTPUT
+is 11 _   Echo: Alfa --> <Boolean>
+is 12 _   Kilo: Delta --> <Scalar 0>
+is 13 _   Lima: Bravo --> <Boolean>
+is 14 _   Mike: Bravo --> <Field <Scalar>>
+is 15 _ Operator Instances:
+is 16 _   Golf<Scalar> --> [nbr] --> Foxtrot<Field <Scalar>>
+is 17 _   [mid] --> Golf<Scalar>
+is 18 _   Hotel<Scalar>, India<Scalar 3> --> [>] --> Charlie<Boolean>
+is 19 _   [mid] --> Hotel<Scalar>
+is 20 _   [Lit: <Scalar 3>] --> India<Scalar 3>
+is 21 _   Charlie<Boolean>, Lima<Boolean>, Kilo<Scalar 0> --> [mux] --> Juliet<Scalar> OUTPUT
+is 22 _   Charlie<Boolean> --> [not] --> Echo<Boolean>
+is 23 _   [Lit: <Scalar 0>] --> Kilo<Scalar 0>
+is 24 _   Mike<Field <Scalar>> --> [any-hood] --> Lima<Boolean>
+is 25 _   Foxtrot<Field <Scalar>>, Charlie<Boolean> --> [restrict] --> Mike<Field <Scalar>>
+// Skip localized version, which is equivalent to prior test
+is 71 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDlocalized "(sum-hood (mux (nbr (mid)) 5 7))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar 5>
+is 7 _     Echo: Alfa --> <Scalar 7>
+is 8 _   Operator Instances:
+is 9 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 10 _     Bravo<Scalar>, Delta<Scalar 5>, Echo<Scalar 7> --> [mux] --> Charlie<Scalar> OUTPUT
+is 11 _     [Lit: <Scalar 5>] --> Delta<Scalar 5>
+is 12 _     [Lit: <Scalar 7>] --> Echo<Scalar 7>
+is 13 _ Amorphous Mediums:
+is 14 _   [Medium: Foxtrot = root]
+is 15 _ Fields:
+is 16 _   Golf: Foxtrot --> <Scalar>
+is 17 _   Hotel: Foxtrot --> <Scalar> OUTPUT
+is 18 _   India: Foxtrot --> <Lambda [+]>
+is 19 _   Juliet: Foxtrot --> <Lambda [Fun: Hood~6]>
+is 20 _ Operator Instances:
+is 21 _   [mid] --> Golf<Scalar>
+is 22 _   India<Lambda [+]>, Juliet<Lambda [Fun: Hood~6]>, Golf<Scalar> --> [fold-hood-plus] --> Hotel<Scalar> OUTPUT
+is 23 _   [Lit: <Lambda [+]>] --> India<Lambda [+]>
+is 24 _   [Lit: <Lambda [Fun: Hood~6]>] --> Juliet<Lambda [Fun: Hood~6]>
+is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test locals
+test: $(P2B) -CDlocalized "(let ((x (mid))) (max-hood (- x (nbr x))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar>, Bravo<Scalar> --> [-] --> Charlie<Scalar> OUTPUT
+is 10 _     [mid] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Echo = root]
+is 13 _ Fields:
+is 14 _   Foxtrot: Echo --> <Scalar>
+is 15 _   Golf: Echo --> <Scalar> OUTPUT
+is 16 _   Hotel: Echo --> <Lambda [max]>
+is 17 _   India: Echo --> <Lambda [Fun: Hood~6]>
+is 18 _ Operator Instances:
+is 19 _   [mid] --> Foxtrot<Scalar>
+is 20 _   Hotel<Lambda [max]>, India<Lambda [Fun: Hood~6]>, Foxtrot<Scalar> --> [fold-hood-plus] --> Golf<Scalar> OUTPUT
+is 21 _   [Lit: <Lambda [max]>] --> Hotel<Lambda [max]>
+is 22 _   [Lit: <Lambda [Fun: Hood~6]>] --> India<Lambda [Fun: Hood~6]>
+is 23 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Mixing local and exported
+test: $(P2B) -CDlocalized "(min-hood+ (* (+ (mid) 1) (nbr (mid))))"
+is 0 _ Function: Hood~7 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _     Echo: Alfa --> <Scalar inf>
+is 8 _     Foxtrot: Alfa --> <Boolean>
+is 9 _     Golf: Alfa --> <Scalar>
+is 10 _     Hotel: Alfa --> <Scalar 0>
+is 11 _     India: Alfa --> <Scalar>
+is 12 _   Operator Instances:
+is 13 _     [Parameter 0: arg~6] --> Bravo<Scalar>
+is 14 _     Foxtrot<Boolean>, Echo<Scalar inf>, Delta<Scalar> --> [mux] --> Charlie<Scalar> OUTPUT
+is 15 _     India<Scalar>, Bravo<Scalar> --> [*] --> Delta<Scalar>
+is 16 _     [Lit: <Scalar inf>] --> Echo<Scalar inf>
+is 17 _     Golf<Scalar>, Hotel<Scalar 0> --> [=] --> Foxtrot<Boolean>
+is 18 _     [nbr-range] --> Golf<Scalar>
+is 19 _     [Lit: <Scalar 0>] --> Hotel<Scalar 0>
+is 20 _     Juliet<Scalar> --> [reference] --> India<Scalar>
+is 21 _ Amorphous Mediums:
+is 22 _   [Medium: Kilo = root]
+is 23 _ Fields:
+is 24 _   Juliet: Kilo --> <Scalar>
+is 25 _   Lima: Kilo --> <Scalar>
+is 26 _   Mike: Kilo --> <Scalar 1>
+is 27 _   November: Kilo --> <Scalar>
+is 28 _   Oscar: Kilo --> <Scalar> OUTPUT
+is 29 _   Papa: Kilo --> <Lambda [min]>
+is 30 _   Quebec: Kilo --> <Lambda [Fun: Hood~7]>
+is 31 _ Operator Instances:
+is 32 _   Lima<Scalar>, Mike<Scalar 1> --> [+] --> Juliet<Scalar>
+is 33 _   [mid] --> Lima<Scalar>
+is 34 _   [Lit: <Scalar 1>] --> Mike<Scalar 1>
+is 35 _   [mid] --> November<Scalar>
+is 36 _   Papa<Lambda [min]>, Quebec<Lambda [Fun: Hood~7]>, November<Scalar> --> [fold-hood-plus] --> Oscar<Scalar> OUTPUT
+is 37 _   [Lit: <Lambda [min]>] --> Papa<Lambda [min]>
+is 38 _   [Lit: <Lambda [Fun: Hood~7]>] --> Quebec<Lambda [Fun: Hood~7]>
+is 39 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Mixing local and exported
+test: $(P2B) -CDlocalized "(let ((x (+ 2 (mid)))) (+ x (min-hood (+ (+ 1 x) (nbr x)))))"
+is 0 _ Function: Hood~6 [Signature: <Scalar> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar>
+is 5 _     Charlie: Alfa --> <Scalar> OUTPUT
+is 6 _     Delta: Alfa --> <Scalar>
+is 7 _   Operator Instances:
+is 8 _     [Parameter 0: arg~5] --> Bravo<Scalar>
+is 9 _     Delta<Scalar>, Bravo<Scalar> --> [+] --> Charlie<Scalar> OUTPUT
+is 10 _     Echo<Scalar> --> [reference] --> Delta<Scalar>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Foxtrot = root]
+is 13 _ Fields:
+is 14 _   Golf: Foxtrot --> <Scalar>
+is 15 _   Hotel: Foxtrot --> <Scalar 2>
+is 16 _   India: Foxtrot --> <Scalar>
+is 17 _   Juliet: Foxtrot --> <Scalar> OUTPUT
+is 18 _   Echo: Foxtrot --> <Scalar>
+is 19 _   Kilo: Foxtrot --> <Scalar 1>
+is 20 _   Lima: Foxtrot --> <Scalar>
+is 21 _   Mike: Foxtrot --> <Lambda [min]>
+is 22 _   November: Foxtrot --> <Lambda [Fun: Hood~6]>
+is 23 _ Operator Instances:
+is 24 _   Hotel<Scalar 2>, India<Scalar> --> [+] --> Golf<Scalar>
+is 25 _   [Lit: <Scalar 2>] --> Hotel<Scalar 2>
+is 26 _   [mid] --> India<Scalar>
+is 27 _   Golf<Scalar>, Lima<Scalar> --> [+] --> Juliet<Scalar> OUTPUT
+is 28 _   Kilo<Scalar 1>, Golf<Scalar> --> [+] --> Echo<Scalar>
+is 29 _   [Lit: <Scalar 1>] --> Kilo<Scalar 1>
+is 30 _   Mike<Lambda [min]>, November<Lambda [Fun: Hood~6]>, Golf<Scalar> --> [fold-hood-plus] --> Lima<Scalar>
+is 31 _   [Lit: <Lambda [min]>] --> Mike<Lambda [min]>
+is 32 _   [Lit: <Lambda [Fun: Hood~6]>] --> November<Lambda [Fun: Hood~6]>
+is 33 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test localization cache:
+//test: $(P2B) -CDlocalized "(def rangesum (x) (+ x (nbr-range))) (* (min-hood (rangesum (mid))) (max-hood (rangesum (speed))))" --function-inlining-threshold 0
+//is 0 _ TEST IS CURRENTLY FAILING
+// COMPILER INTERNAL ERROR: No locals should be found in an extracted hood function
+//is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Local variables and a common-subexpression export:
+test: $(P2B) -CDlocalized "(any-hood (or (= (nbr (mid)) 0) (= (nbr (mid)) 1)))"
+is 0 _ Error during analysis:
+is 1 _  Error: Cannot restrict (if) inside a neighborhood operation ([mux])
+
+////////////////////////////////////////////////////////////////////////////
+// Local variables and a common-subexpression export:
+test: $(P2B) -CDlocalized "(any-hood (muxor (= (nbr (mid)) 0) (= (nbr (mid)) 1)))"
+is 0 _ Function: Hood~8 [Signature: <2-Vector<Scalar>,<Scalar>> --> <Boolean>] called 1 times
+is 1 _  Amorphous Mediums:
+is 2 _    [Medium: Alfa = root]
+is 3 _  Fields:
+is 4 _    Bravo: Alfa --> <Boolean>
+is 5 _    Charlie: Alfa --> <Boolean>
+is 6 _	  Delta: Alfa --> <Scalar 0>
+is 7 _    Echo: Alfa --> <Scalar 1>
+is 8 _    Foxtrot: Alfa --> <Boolean> OUTPUT
+is 9 _    Golf: Alfa --> <2-Vector<Scalar>,<Scalar>>
+is 10 _    Hotel: Alfa --> <Scalar>
+is 11 _    India: Alfa --> <Scalar 0>
+is 12 _    Juliet: Alfa --> <Scalar>
+is 13 _    Kilo: Alfa --> <Scalar 1>
+is 14 _  Operator Instances:
+is 15 _    Hotel<Scalar>, Delta<Scalar 0> --> [=] --> Bravo<Boolean>
+is 16 _    Juliet<Scalar>, Echo<Scalar 1> --> [=] --> Charlie<Boolean>
+is 17 _    [Lit: <Scalar 0>] --> Delta<Scalar 0>
+is 18 _    [Lit: <Scalar 1>] --> Echo<Scalar 1>
+is 19 _    Bravo<Boolean>, Bravo<Boolean>, Charlie<Boolean> --> [mux] --> Foxtrot<Boolean> OUTPUT
+is 20 _    [Parameter 0: tuparg~9] --> Golf<2-Vector<Scalar>,<Scalar>>
+is 21 _    Golf<2-Vector<Scalar>,<Scalar>>, India<Scalar 0> --> [elt] --> Hotel<Scalar>
+is 22 _    [Lit: <Scalar 0>] --> India<Scalar 0>
+is 23 _    Golf<2-Vector<Scalar>,<Scalar>>, Kilo<Scalar 1> --> [elt] --> Juliet<Scalar>
+is 24 _    [Lit: <Scalar 1>] --> Kilo<Scalar 1>
+is 25 _ Amorphous Mediums:
+is 26 _  [Medium: Lima = root]
+is 27 _ Fields:
+is 28 _   Mike: Lima --> <Scalar>
+is 29 _   November: Lima --> <Scalar>
+is 30 _   Oscar: Lima --> <2-Vector<Scalar>,<Scalar>>
+is 31 _   Papa: Lima --> <Boolean> OUTPUT
+is 32 _   Quebec: Lima --> <Lambda [max]>
+is 33 _   Romeo: Lima --> <Lambda [Fun: Hood~8]>
+is 34 _ Operator Instances:
+is 35 _   [mid] --> Mike<Scalar>
+is 36 _   [mid] --> November<Scalar>
+is 37 _	  Mike<Scalar>, November<Scalar> --> [tup] --> Oscar<2-Vector<Scalar>,<Scalar>>
+is 38 _   Quebec<Lambda [max]>, Romeo<Lambda [Fun: Hood~8]>, Oscar<2-Vector<Scalar>,<Scalar>> --> [fold-hood-plus] --> Papa<Boolean> OUTPUT
+is 39 _   [Lit: <Lambda [max]>] --> Quebec<Lambda [max]>
+is 40 _   [Lit: <Lambda [Fun: Hood~8]>] --> Romeo<Lambda [Fun: Hood~8]>
+is 41 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Multiple exports (turned into a tuple)
+test: $(P2B) -CDlocalized "(min-hood (+ (* 3 (nbr (mid))) (nbr (- (mid) 2))))"
+is 0 _ Function: Hood~7 [Signature: <2-Vector<Scalar>,<Scalar>> --> <Scalar>] called 1 times
+is 1 _  Amorphous Mediums:
+is 2 _    [Medium: Alfa = root]
+is 3 _  Fields:
+is 4 _    Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _     Charlie: Alfa --> <Scalar>
+is 6 _     Delta: Alfa --> <Scalar 3>
+is 7 _     Echo: Alfa --> <2-Vector<Scalar>,<Scalar>>
+is 8 _     Foxtrot: Alfa --> <Scalar>
+is 9 _     Golf: Alfa --> <Scalar 0>
+is 10 _     Hotel: Alfa --> <Scalar>
+is 11 _     India: Alfa --> <Scalar 1>
+is 12 _   Operator Instances:
+is 13 _     Charlie<Scalar>, Foxtrot<Scalar> --> [+] --> Bravo<Scalar> OUTPUT
+is 14 _     Delta<Scalar 3>, Hotel<Scalar> --> [*] --> Charlie<Scalar>
+is 15 _     [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 16 _     [Parameter 0: tuparg~8] --> Echo<2-Vector<Scalar>,<Scalar>>
+is 17 _     Echo<2-Vector<Scalar>,<Scalar>>, Golf<Scalar 0> --> [elt] --> Foxtrot<Scalar>
+is 18 _     [Lit: <Scalar 0>] --> Golf<Scalar 0>
+is 19 _     Echo<2-Vector<Scalar>,<Scalar>>, India<Scalar 1> --> [elt] --> Hotel<Scalar>
+is 20 _     [Lit: <Scalar 1>] --> India<Scalar 1>
+is 21 _ Amorphous Mediums:
+is 22 _   [Medium: Juliet = root]
+is 23 _ Fields:
+is 24 _   Kilo: Juliet --> <Scalar>
+is 25 _   Lima: Juliet --> <Scalar>
+is 26 _   Mike: Juliet --> <Scalar>
+is 27 _   November: Juliet --> <Scalar 2>
+is 28 _   Oscar: Juliet --> <2-Vector<Scalar>,<Scalar>>
+is 29 _   Papa: Juliet --> <Scalar> OUTPUT
+is 30 _   Quebec: Juliet --> <Lambda [min]>
+is 31 _   Romeo: Juliet --> <Lambda [Fun: Hood~7]>
+is 32 _ Operator Instances:
+is 33 _  [mid] --> Kilo<Scalar>
+is 34 _   Mike<Scalar>, November<Scalar 2> --> [-] --> Lima<Scalar>
+is 35 _   [mid] --> Mike<Scalar>
+is 36 _   [Lit: <Scalar 2>] --> November<Scalar 2>
+is 37 _   Lima<Scalar>, Kilo<Scalar> --> [tup] --> Oscar<2-Vector<Scalar>,<Scalar>>
+is 38 _   Quebec<Lambda [min]>, Romeo<Lambda [Fun: Hood~7]>, Oscar<2-Vector<Scalar>,<Scalar>> --> [fold-hood-plus] --> Papa<Scalar> OUTPUT
+is 39 _   [Lit: <Lambda [min]>] --> Quebec<Lambda [min]>
+is 40 _   [Lit: <Lambda [Fun: Hood~7]>] --> Romeo<Lambda [Fun: Hood~7]>
+is 41 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Test multi-use exports, tuplized exports
+test: $(P2B) -CDlocalized "(let ((x (nbr (mid))) (y (speed))) (any-hood (+ x x (nbr y) (nbr y))))"
+is 0 _ Function: Hood~7 [Signature: <2-Vector<Scalar>,<Scalar>> --> <Scalar>] called 1 times
+is 1 _  Amorphous Mediums:
+is 2 _    [Medium: Alfa = root]
+is 3 _  Fields:
+is 4 _    Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _    Charlie: Alfa --> <2-Vector<Scalar>,<Scalar>>
+is 6 _    Delta: Alfa --> <Scalar>
+is 7 _    Echo: Alfa --> <Scalar 0>
+is 8 _    Foxtrot: Alfa --> <Scalar>
+is 9 _    Golf: Alfa --> <Scalar 1>
+is 10 _  Operator Instances:
+is 11 _    Delta<Scalar>, Delta<Scalar>, Foxtrot<Scalar>, Foxtrot<Scalar> --> [+] --> Bravo<Scalar> OUTPUT
+is 12 _    [Parameter 0: tuparg~8] --> Charlie<2-Vector<Scalar>,<Scalar>>
+is 13 _    Charlie<2-Vector<Scalar>,<Scalar>>, Echo<Scalar 0> --> [elt] --> Delta<Scalar>
+is 14 _    [Lit: <Scalar 0>] --> Echo<Scalar 0>
+is 15 _    Charlie<2-Vector<Scalar>,<Scalar>>, Golf<Scalar 1> --> [elt] --> Foxtrot<Scalar>
+is 16 _    [Lit: <Scalar 1>] --> Golf<Scalar 1>
+is 17 _ Amorphous Mediums:
+is 18 _   [Medium: Hotel = root]
+is 19 _ Fields:
+is 20 _   India: Hotel --> <Scalar>
+is 21 _   Juliet: Hotel --> <Scalar>
+is 22 _   Kilo: Hotel --> <2-Vector<Scalar>,<Scalar>>
+is 23 _   Lima: Hotel --> <Scalar> OUTPUT
+is 24 _   Mike: Hotel --> <Lambda [max]>
+is 25 _   November: Hotel --> <Lambda [Fun: Hood~7]>
+is 26 _ Operator Instances:
+is 27 _   [mid] --> India<Scalar>
+is 28 _   [speed] --> Juliet<Scalar>
+is 29 _   India<Scalar>, Juliet<Scalar> --> [tup] --> Kilo<2-Vector<Scalar>,<Scalar>>
+is 30 _   Mike<Lambda [max]>, November<Lambda [Fun: Hood~7]>, Kilo<2-Vector<Scalar>,<Scalar>> --> [fold-hood-plus] --> Lima<Scalar> OUTPUT
+is 31 _   [Lit: <Lambda [max]>] --> Mike<Lambda [max]>
+is 32 _   [Lit: <Lambda [Fun: Hood~7]>] --> November<Lambda [Fun: Hood~7]>
+is 33 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Tuple operations within a neighborhood
+test: $(P2B) -CDlocalized "(max-hood (tup (tup (nbr (mid)) 2) 3))"
+//is 0 _ TEST IS CURRENTLY FAILING
+// Constraint violation
+// Error: Type constraint (= (inputs folder) (tupof (unlit (output processor)) (unlit (output processor)))) violated: 
+/// <Tuple<Number>...> vs. <2-Tuple<2-Tuple<2-Tuple<Field <Scalar>>,<Scalar>>,<Scalar>>,<2-Tuple<2-Tuple<Field <Scalar>>,<Scalar>>,<Scalar>>>
+//is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// Using fold-hood directly:
+test: $(P2B) -CDlocalized "(fold-hood + 0 (mid))"
+//is 0 _ TEST IS CURRENTLY FAILING
+// COMPILER INTERNAL ERROR: Fold operand is not a lambda!
+//is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// How to handle nbr references	within subfunctions?
+test: $(P2B) -CDlocalized "(def r+x (x) (+ x (nbr-range))) (min-hood (r+x (mid)))" --function-inlining-threshold 0
+//is 0 _ TEST IS CURRENTLY FAILING
+// COMPILER INTERNAL ERROR: No locals should be found in an extracted hood function
+//is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+test: $(P2B) -CDlocalized "(def r+x (x) (+ x (nbr-range))) (min-hood (r+x (nbr (mid))))" --function-inlining-threshold 0
+//is 0 _ TEST IS CURRENTLY FAILING
+// DFG Error: type conflict for [Parameter 0: x] --> Alfa<Number>
+//is 25 _ Stopping before emission
+
+////////////////////////////////////////////////////////////////////////////
+// check pointwise computation allowing raising of compound op to field
+// demonstrate that space, time ops can't be raised to field ops
+// test scalar/vector-1 conversion
+
+////////////////////////////////////////////////////////////////////////////
+// For later:
+// Get "(rep x 3 (elt (tup x 7) 0))" to realize that it's got a constant output of 3
+// test: $(P2B) -CDall "(def addz (a b &optional (c 3)) (+ a b c)) (addz 1 2)"
+
+////////////////////////////////////////////////////////////////////////////
+// test: $(P2B) -CDanalyzed "(def foo (&rest x) (apply + x)) (+ (foo (mid) 3 4) (foo 1 5))" --function-inlining-threshold 0

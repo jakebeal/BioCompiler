@@ -1,0 +1,7 @@
+(defop ? leds scalar scalar)
+(defop ? red scalar scalar)
+(defop ? green scalar scalar)
+(defop ? blue scalar scalar)
+(defop ? rgb (vector 3) (vector 3))
+(defop ? hsv (vector 3) (vector 3))
+(defop ? sense scalar scalar)

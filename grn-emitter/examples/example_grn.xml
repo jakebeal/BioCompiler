@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Sample GRN for (green (not (red (aTc)))) -->
+<GeneticRegulatoryNetwork xmlns="urn:clothocad.org:grn:">
+  <!-- TetR constitutive production for aTc detector -->
+  <FeatureSequence>
+    <item index="0">    
+      <Feature>
+	<Family name="promoter">
+	  <designAnnotation>
+	    <DataType logicalType="boolean" logicalValue="true"/>
+	  </designAnnotation>
+	</Family>
+      </Feature>
+    </item>
+    <item index="1">    
+      <Feature>
+	<Family name="CodingSequence">
+	  <product>
+	    <ChemicalSpecies uid="TetR">
+	      <designAnnotation>
+		<DataType logicalType="boolean" logicalValue="true"/>
+	      </designAnnotation>
+	      <property>
+		<Family name="TetR"/>
+	      </property>
+	    </ChemicalSpecies>
+	  </product>
+	</Family>
+      </Feature>
+    </item>
+    <item index="2">    
+      <Feature>
+	<Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <!-- TetR/aTc reaction -->
+  <RegulatoryReaction>
+    <substrate>
+      <ChemicalSpecies uid="TetR"/>
+    </substrate>
+    <regulatedBy repression="true">
+      <ChemicalSpecies uid="aTc">
+	<designAnnotation>
+	  <DataType logicalType="boolean"/>
+	</designAnnotation>
+      </ChemicalSpecies>
+    </regulatedBy>
+  </RegulatoryReaction>
+  
+  <!-- aTc detection, red actuator -->
+  <FeatureSequence>
+    <item index="0">    
+      <Feature>
+	<Family name="promoter">
+	  <designAnnotation>
+	    <DataType logicalType="boolean"/>
+	  </designAnnotation>
+	  <regulatedBy repression="true">
+	    <ChemicalSpecies uid="TetR"/>
+	  </regulatedBy>
+	</Family>
+      </Feature>
+    </item>
+    <item index="1">    
+      <Feature>
+	<Family name="CodingSequence">
+	  <product>
+	    <ChemicalSpecies uid="Bravo">
+	      <designAnnotation>
+		<DataType logicalType="boolean"/>
+	      </designAnnotation>
+	    </ChemicalSpecies>
+	  </product>
+	</Family>
+      </Feature>
+    </item>
+    <item index="2">    
+      <Feature>
+	<Family name="CodingSequence">
+	  <product>
+	    <ChemicalSpecies uid="RFP">
+	      <designAnnotation>
+		<DataType logicalType="boolean"/>
+	      </designAnnotation>
+	      <property>
+		<Family name="RFP"/>
+	      </property>
+	    </ChemicalSpecies>
+	  </product>
+	</Family>
+      </Feature>
+    </item>
+    <item index="3">    
+      <Feature>
+	<Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <!-- inverter to green actuator -->
+  <FeatureSequence>
+    <item index="0">    
+      <Feature>
+	<Family name="promoter">
+	  <designAnnotation>
+	    <DataType logicalType="boolean"/>
+	  </designAnnotation>
+	  <regulatedBy repression="true">
+	    <ChemicalSpecies uid="Bravo"/>
+	  </regulatedBy>
+	</Family>
+      </Feature>
+    </item>
+    <item index="1">    
+      <Feature>
+	<Family name="CodingSequence">
+	  <product>
+	    <ChemicalSpecies uid="GFP">
+	      <designAnnotation>
+		<DataType logicalType="boolean"/>
+	      </designAnnotation>
+	      <property>
+		<Family name="GFP"/>
+	      </property>
+	    </ChemicalSpecies>
+	  </product>
+	</Family>
+      </Feature>
+    </item>
+    <item index="2">    
+      <Feature>
+	<Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+</GeneticRegulatoryNetwork>

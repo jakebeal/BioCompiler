@@ -1,0 +1,1 @@
+(def gradcast (src f) (grad-value src f))

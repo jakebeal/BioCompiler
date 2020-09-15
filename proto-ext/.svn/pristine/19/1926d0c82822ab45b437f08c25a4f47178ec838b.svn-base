@@ -1,0 +1,32 @@
+This project contains a simple example of how to build a plugin for
+MIT Proto.  This is intended to serve as a template, aiding you in
+developing your own plugins, so it is released in the public domain.
+For full documentation on plugins and how to build them, see your
+Proto developer manual.
+
+This example project uses GNU autotools, so if you have already
+installed MIT Proto, you should be able to build it by running:
+  `./autogen.sh; ./configure; make; make install'
+
+Test the plugin by running:
+  proto -DD foo-dist -l -TM foo-time -L foo-layer "(green (+ (foo (sense 1)) (rep t 0 (+ 0.1 t))))"
+This should result in a spiral (foo-dist) of green dots shooting up,
+with farther dots rising faster (foo-time).  If you turn on (sense 1),
+the dots will jump up and down (foo-layer)
+
+
+Key files in this directory:
+  Makefile.am			Declaration of the project
+  ExampleDistribution.h/.cpp	Example of a distribution for scattering devices
+  ExampleTimeModel.h/.cpp	Example of a clock implementation
+  ExampleLayer.h/.cpp		Example of a simulator & kernel extension
+  ExamplePlugin.h/.cpp		Plugin containing names and glue code for
+  				using the distribution, clock, and extension
+  autogen.sh			Processes Makefile.am, setting up project 
+  				to be ready for building
+  configure.ac			Project description used by autogen.sh
+
+Note that building the project will create a large number of
+automatically generated or copied files.  Most of these should not be
+included in any distribution of your plugin; see the GNU autotools
+documentation for more details.

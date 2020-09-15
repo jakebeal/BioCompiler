@@ -1,0 +1,7 @@
+Release 1:
+- Improved optimization, feedback loops
+- Emission of visualization of GraphViz
+- Emission of extended SBOL
+
+Release 0:
+- This is the initial release of the TASBE BioCompiler

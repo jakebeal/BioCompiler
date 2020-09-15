@@ -1,0 +1,9 @@
+#undef MIT_COMPATIBILITY
+#define MIT_COMPATIBILITY MIT_ONLY
+
+#define IF_16 IF16
+#define JMP_16 JMP16
+#include <instructions.def>
+#undef JMP_16
+#undef IF_16
+

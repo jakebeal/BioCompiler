@@ -1,0 +1,154 @@
+$(P2B_ARGS) = -EM grn --grn-out stdout --cellular-platform ecoli-platform
+
+test: $(P2B) "(green (aTc))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][TetR - type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 3 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 4 _ End of Genetic Regulatory Network
+is 5 _ <?xml version="1.0"?>
+is 6 _ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+is 7 _   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+is 8 _   xmlns:so="http://purl.obolibrary.org/obo/"
+is 9 _   xmlns:s="http://sbols.org/v1#"
+is 10 _   xmlns:grn="urn:bbn.com:tasbe:grn">
+is 11 _ <s:Collection rdf:about="SHORT/col/GeneticRegulatoryNetwork">
+is 12 _   <!-- Genetic regulatory network for Proto: (green (aTc)) -->
+//is 13 _   <!-- Produced by BioCompiler version XX -->
+is 14 _   <s:displayId>GeneticRegulatoryNetwork</s:displayId>
+//is 15 _   
+is 16 _   <!-- Transcriptional Units -->
+is 17 _   <s:component>
+is 18 _     <s:DnaComponent rdf:about="SHORT/part/FunctionalUnit_1">
+is 19 _       <s:displayId>FunctionalUnit_1</s:displayId>
+is 20 _       <s:annotation>
+is 21 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_2">
+is 22 _           <s:precedes rdf:resource="SHORT/anot/an_4"/>
+is 23 _           <s:subComponent>
+is 24 _             <s:DnaComponent rdf:about="part_1">
+is 25 _               <s:displayId>part_1</s:displayId>
+is 26 _               <s:name>Promoter 1</s:name>
+is 27 _               <grn:design>
+is 28 _                 <grn:DataType grn:logicalType="boolean" grn:logicalValue="true"/>
+is 29 _               </grn:design>
+is 30 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000167"/>
+is 31 _               <grn:regulation>
+is 32 _                 <grn:regulatedBy grn:repression="true">
+is 33 _                   <grn:ChemicalSpecies grn:uid="TetR">
+is 34 _                     <grn:design>
+is 35 _                       <grn:DataType grn:logicalType="boolean"/>
+is 36 _                     </grn:design>
+is 37 _                     <grn:property>
+is 38 _                       <grn:Family grn:name="TetR"/>
+is 39 _                     </grn:property>
+is 40 _                   </grn:ChemicalSpecies>
+is 41 _                 </grn:regulatedBy>
+is 42 _               </grn:regulation>
+is 43 _             </s:DnaComponent>
+is 44 _           </s:subComponent>
+is 45 _         </s:SequenceAnnotation>
+is 46 _       </s:annotation>
+is 47 _       <s:annotation>
+is 48 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_4">
+is 49 _           <s:precedes rdf:resource="SHORT/anot/an_6"/>
+is 50 _           <s:subComponent>
+is 51 _             <s:DnaComponent rdf:about="part_3">
+is 52 _               <s:displayId>part_3</s:displayId>
+is 53 _               <s:name>GFP CDS</s:name>
+is 54 _               <grn:regulation>
+is 55 _                 <grn:product>
+is 56 _                   <grn:ChemicalSpecies grn:uid="GFP">
+is 57 _                     <grn:design>
+is 58 _                       <grn:DataType grn:logicalType="boolean"/>
+is 59 _                     </grn:design>
+is 60 _                     <grn:property>
+is 61 _                       <grn:Family grn:name="GFP"/>
+is 62 _                     </grn:property>
+is 63 _                   </grn:ChemicalSpecies>
+is 64 _                 </grn:product>
+is 65 _               </grn:regulation>
+is 66 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000316"/>
+is 67 _             </s:DnaComponent>
+is 68 _           </s:subComponent>
+is 69 _         </s:SequenceAnnotation>
+is 70 _       </s:annotation>
+is 71 _       <s:annotation>
+is 72 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_6">
+is 73 _           <s:subComponent>
+is 74 _             <s:DnaComponent rdf:about="part_5">
+is 75 _               <s:displayId>part_5</s:displayId>
+is 76 _               <s:name>Terminator 5</s:name>
+is 77 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000141"/>
+is 78 _             </s:DnaComponent>
+is 79 _           </s:subComponent>
+is 80 _         </s:SequenceAnnotation>
+is 81 _       </s:annotation>
+is 82 _     </s:DnaComponent>
+is 83 _   </s:component>
+//is 84 _   
+is 85 _   <s:component>
+is 86 _     <s:DnaComponent rdf:about="SHORT/part/FunctionalUnit_2">
+is 87 _       <s:displayId>FunctionalUnit_2</s:displayId>
+is 88 _       <s:annotation>
+is 89 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_8">
+is 90 _           <s:precedes rdf:resource="SHORT/anot/an_10"/>
+is 91 _           <s:subComponent>
+is 92 _             <s:DnaComponent rdf:about="part_7">
+is 93 _               <s:displayId>part_7</s:displayId>
+is 94 _               <s:name>Promoter 7</s:name>
+is 95 _               <grn:design>
+is 96 _                 <grn:DataType grn:logicalType="boolean" grn:logicalValue="true"/>
+is 97 _               </grn:design>
+is 98 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000167"/>
+is 99 _             </s:DnaComponent>
+is 100 _           </s:subComponent>
+is 101 _         </s:SequenceAnnotation>
+is 102 _       </s:annotation>
+is 103 _       <s:annotation>
+is 104 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_10">
+is 105 _           <s:precedes rdf:resource="SHORT/anot/an_12"/>
+is 106 _           <s:subComponent>
+is 107 _             <s:DnaComponent rdf:about="part_9">
+is 108 _               <s:displayId>part_9</s:displayId>
+is 109 _               <s:name>TetR CDS</s:name>
+is 110 _               <grn:regulation>
+is 111 _                 <grn:product>
+is 112 _                   <grn:ChemicalSpecies grn:uid="TetR"/>
+is 113 _                 </grn:product>
+is 114 _               </grn:regulation>
+is 115 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000316"/>
+is 116 _             </s:DnaComponent>
+is 117 _           </s:subComponent>
+is 118 _         </s:SequenceAnnotation>
+is 119 _       </s:annotation>
+is 120 _       <s:annotation>
+is 121 _         <s:SequenceAnnotation rdf:about="SHORT/anot/an_12">
+is 122 _           <s:subComponent>
+is 123 _             <s:DnaComponent rdf:about="part_11">
+is 124 _               <s:displayId>part_11</s:displayId>
+is 125 _               <s:name>Terminator 11</s:name>
+is 126 _               <rdf:type rdf:resource="http://purl.obolibrary.org/obo/SO_0000141"/>
+is 127 _             </s:DnaComponent>
+is 128 _           </s:subComponent>
+is 129 _         </s:SequenceAnnotation>
+is 130 _       </s:annotation>
+is 131 _     </s:DnaComponent>
+is 132 _   </s:component>
+//is 133 _   
+is 134 _   <!-- Regulatory Reactions -->
+is 135 _   <grn:regulation>
+is 136 _     <grn:RegulatoryReaction>
+is 137 _       <grn:substrate>
+is 138 _         <grn:ChemicalSpecies grn:uid="TetR"/>
+is 139 _       </grn:substrate>
+is 140 _       <grn:regulatedBy grn:repression="true">
+is 141 _         <grn:ChemicalSpecies grn:uid="aTc">
+is 142 _           <grn:design>
+is 143 _             <grn:DataType grn:logicalType="boolean"/>
+is 144 _           </grn:design>
+is 145 _         </grn:ChemicalSpecies>
+is 146 _       </grn:regulatedBy>
+is 147 _     </grn:RegulatoryReaction>
+is 148 _   </grn:regulation>
+is 149 _ </s:Collection>
+is 150 _ </rdf:RDF>

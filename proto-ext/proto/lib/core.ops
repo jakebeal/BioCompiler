@@ -1,0 +1,144 @@
+;; Opcodes must be defined in the same sequence as their compiler enum
+;; as the numbers of the opcodes come from this
+;; Start w. low-level opcodes
+((RET_OP -1)
+ (EXIT_OP 0)
+ (LIT_OP 1)
+ (LIT_0_OP 1)
+ (LIT_1_OP 1)
+ (LIT_2_OP 1)
+ (LIT_3_OP 1)
+ (LIT_4_OP 1)
+ (LIT_FLO_OP 1)
+ (NUL_TUP_OP 1)
+ (FAB_TUP_OP variable)
+ (DEF_TUP_OP variable)
+ (FAB_VEC_OP 1)
+ (DEF_VEC_OP 0)
+ (FAB_NUM_VEC_OP 1)
+ (DEF_NUM_VEC_OP 0)
+ (DEF_NUM_VEC_1_OP 0)
+ (DEF_NUM_VEC_2_OP 0)
+ (DEF_NUM_VEC_3_OP 0)
+ (DEF_OP -1)
+ (REF_OP 1)
+ (REF_0_OP 1)
+ (REF_1_OP 1)
+ (REF_2_OP 1)
+ (REF_3_OP 1)
+ (DEF_VM_OP 0)
+ (GLO_REF_OP 1)
+ (GLO_REF_0_OP 1)
+ (GLO_REF_1_OP 1)
+ (GLO_REF_2_OP 1)
+ (GLO_REF_3_OP 1)
+ (LET_OP variable) ;; let & pop_let also change env pointer
+ (LET_1_OP -1)
+ (LET_2_OP -2)
+ (LET_3_OP -3)
+ (LET_4_OP -4)
+ (POP_LET_OP 0)
+ (POP_LET_1_OP 0)
+ (POP_LET_2_OP 0)
+ (POP_LET_3_OP 0)
+ (POP_LET_4_OP 0)
+;; Universal sensing & actuation ops
+ (SET_DT_OP 0 set-dt)
+ (MOV_OP 0 mov)
+ (PROBE_OP -1 probe)
+ (HOOD_RADIUS_OP 1 hood-radius)
+ (AREA_OP 1)				; obsoleted by infinitesimal?
+ (FLEX_OP 0 flex)
+ (DENSITY_OP 1 density)
+ (INFINITESIMAL_OP 1 infinitesimal)
+ (DT_OP 1 dt)
+ (NBR_RANGE_OP 1 nbr-range)
+ (NBR_BEARING_OP 1 nbr-bearing)
+ (NBR_VEC_OP 1 nbr-vec)
+ (NBR_LAG_OP 1 nbr-lag)
+ (MID_OP 1 mid)
+ (SPEED_OP 1 speed)
+ (BEARING_OP 1 bearing)
+;; Math Opcodes
+ (INF_OP 1)				; not actually used
+ (ELT_OP -1 elt)
+ (RND_OP -1 rnd)
+ (NOT_OP 0 not)
+ (ADD_OP -1) ;; type-dependent & n-ary
+ (SUB_OP -1) ;; type-dependent & n-ary
+ (MUL_OP -1) ;; type-dependent & n-ary
+ (DIV_OP -1) ;; type-dependent & n-ary
+ (FLOOR_OP 0 floor)
+ (CEIL_OP 0 ceil)
+ (ROUND_OP 0 round)
+ (MOD_OP -1 mod)
+ (REM_OP -1 rem)
+ (POW_OP -1 pow)
+ (LOG_OP 0 log)
+ (SQRT_OP 0 sqrt)
+ (SIN_OP 0 sin)
+ (COS_OP 0 cos)
+ (TAN_OP 0 tan)
+ (SINH_OP 0 sinh)
+ (COSH_OP 0 cosh)
+ (TANH_OP 0 tanh)
+ (ASIN_OP 0 asin)
+ (ACOS_OP 0 acos)
+ (ATAN2_OP -1 atan2)
+ (LT_OP -1) ;; type-dependent
+ (LTE_OP -1) ;; type-dependent
+ (GT_OP -1) ;; type-dependent
+ (GTE_OP -1) ;; type-dependent
+ (EQ_OP -1) ;; type-dependent
+ (MAX_OP -1) ;; type-dependent & n-ary
+ (MIN_OP -1) ;; type-dependent & n-ary
+ (ABS_OP 0 abs)
+;; Vector & Tuple Opcodes
+ (TUP_OP variable) ;; n-ary
+ (VEC_OP 999)				; appears to be obsolete & unused
+ (LEN_OP 0 len)
+ (VFIL_OP 999)				; appears to be obsolete & unused
+ (VADD_OP -1) ;; type-dependent & n-ary
+ (VDOT_OP -1 vdot)
+ (VMUL_OP -1) ;; type-dependent & n-ary
+ (VSUB_OP -1) ;; type-dependent & n-ary
+ (VSLICE_OP -1)				; slice op needs examination
+ (VLT_OP -1) ;; type-dependent
+ (VLTE_OP -1) ;; type-dependent
+ (VGT_OP -1) ;; type-dependent
+ (VGTE_OP -1) ;; type-dependent
+ (VEQ_OP -1) ;; type-dependent
+ (VMIN_OP -1) ;; type-dependent & n-ary
+ (VMAX_OP -1) ;; type-dependent & n-ary
+;; Special Forms Opcodes
+ (APPLY_OP -1 apply)
+ (MAP_OP -1)				; map needs examination
+ (FOLD_OP -2)				; fold needs examination
+ (VFOLD_OP -2)				; fold needs examination
+ (DEF_FUN_2_OP 0)
+ (DEF_FUN_3_OP 0)
+ (DEF_FUN_4_OP 0)
+ (DEF_FUN_5_OP 0)
+ (DEF_FUN_6_OP 0)
+ (DEF_FUN_7_OP 0)
+ (DEF_FUN_OP 0)
+ (FOLD_HOOD_OP -2)
+ (VFOLD_HOOD_OP -2)
+ (FOLD_HOOD_PLUS_OP -2)
+ (VFOLD_HOOD_PLUS_OP -2)
+ (INIT_FEEDBACK_OP 0)
+ (FEEDBACK_OP -1)
+;; Control flow opcodes
+ (ALL_OP variable)
+ (NO_OP 0)
+ (MUX_OP -2) ;; type-dependent
+ (VMUX_OP -2) ;; type-dependent
+ (IF_OP -1)
+ (JMP_OP 0)
+ (FUNCALL_0_OP variable)  ;; stack_delta=0
+ (FUNCALL_1_OP variable)  ;; stack_delta=-1
+ (FUNCALL_2_OP variable)  ;; stack_delta=-2
+ (FUNCALL_3_OP variable)  ;; stack_delta=-3
+ (FUNCALL_4_OP variable)  ;; stack_delta=-4
+ (FUNCALL_OP   variable)) ;; but funcall_ops all listed as 'variable' because 
+                          ;; stack_delta is computed dynamically

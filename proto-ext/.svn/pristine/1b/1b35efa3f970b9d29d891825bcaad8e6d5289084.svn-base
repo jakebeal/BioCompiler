@@ -1,0 +1,16 @@
+;; Scale-free random walk, for high-speed dispersion, with reactivity
+;; to sensor to avoid getting "stuck" on walls or other devices
+
+(def choose-motion ()
+  (tup (/ 1 (rnd 0 1)) (polar-to-rect (tup 1 (rnd 0 (* 2 (pi)))))))
+
+(def reactive-levy-walk (sensor)
+  (2nd
+   (rep 
+    (tup timeout direction)
+    (choose-motion)
+    (if (muxand (not sensor) (> timeout 0))
+      (tup (- timeout (dt)) direction)
+      (choose-motion)))))
+
+;; proto -m -n 1000 "(mov (reactive-levy-walk 0))" -dist-dim -5 5 -5 5 -dim 1000 1000 -r 1 -s 1

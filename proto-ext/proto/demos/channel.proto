@@ -1,0 +1,14 @@
+(def channel (src dst width)
+  (let* ((d     (distance src dst))
+         (trail (<= (+ (gradient src) (gradient dst)) (+ d 0.01))) ;; float error
+         ;; (trail (= (+ (gradient src) (gradient dst)) d))
+         )
+    (dilate trail width)))
+
+;; To see a channel calculated from geometric primitives, run:
+;;   proto -n 1000 -l -m -s 0.5 "(blue (channel (sense 1) (sense 2) 10))"
+;; click on a device and hit 't' to set up the source, then click on
+;; another device and hit 'y' to designate the destination.  At first
+;; every device will be blue, but then it should clear and you should
+;; see a thick blue path connecting the two devices you selected.
+

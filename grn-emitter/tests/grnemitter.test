@@ -1,0 +1,115 @@
+// The --no-output prevents production of .xml files that confuse hudson
+$(P2B_ARGS) = -EM grn --instructions --no-grn-optimization --no-output --cellular-platform ecoli-platform
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high (foo|boolean t 20) value T))) (green (foo))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [high]]--[foo type=<Boolean>]--[Alfa type=<Boolean>]--T
+is 2 _ [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(or false (not true))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [low][Alfa + type=<Boolean false>]]--[Charlie type=<Boolean>]--T
+is 2 _ [Promoter [low][Bravo + type=<Boolean false>]]--[Charlie type=<Boolean>]--T
+is 3 _ [Promoter [low][Charlie + type=<Boolean>]]--T
+is 4 _ [Promoter [low]]--[Alfa type=<Boolean false>]--T
+is 5 _ [Promoter [low]]--[Bravo type=<Boolean false>]--T
+is 6 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(and true true)"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [high][Alfa - type=<Boolean true>]]--[Charlie type=<Boolean>]--T
+is 2 _ [Promoter [high][Bravo - type=<Boolean true>]]--[Delta type=<Boolean>]--T
+is 3 _ [Promoter [high][Charlie - type=<Boolean>][Delta - type=<Boolean>]]--T
+is 4 _ [Promoter [high]]--[Alfa type=<Boolean true>]--T
+is 5 _ [Promoter [high]]--[Bravo type=<Boolean true>]--T
+is 6 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(not (ni* (aTc) 0.8))" -CDanalyzed
+is 0 _ Amorphous Mediums:
+is 1 _   [Medium: Alfa = root]
+is 2 _ Fields:
+is 3 _   Bravo: Alfa --> <Boolean> OUTPUT
+is 4 _   Charlie: Alfa --> <Boolean>
+is 5 _   Delta: Alfa --> <Boolean>
+is 6 _   Echo: Alfa --> <Scalar 0.8>
+is 7 _ Operator Instances:
+is 8 _   Charlie<Boolean> --> [not] --> Bravo<Boolean> OUTPUT
+is 9 _   Delta<Boolean>, Echo<Scalar 0.8> --> [ni*] --> Charlie<Boolean>
+is 10 _   [atc] --> Delta<Boolean>
+is 11 _   [Lit: <Scalar 0.8>] --> Echo<Scalar 0.8>
+is 12 _ command-line:1 Warning: Operator [Lit: <Scalar 0.8>] has at least one instance that returns a number, rather than a Boolean value.  Numbers are not yet fully supported, and may produce incorrect GRNs.
+is 13 _ Genetic Regulatory Network:
+is 14 _ Reaction: aTc represses TetR
+is 15 _ [Promoter [0.800]]--[Echo type=<Scalar 0.8>]--T
+is 16 _ [Promoter [high][Charlie - type=<Boolean>]]--T
+is 17 _ [Promoter [high][TetR - type=<Boolean>]]--[Delta type=<Boolean>]--T
+is 18 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 19 _ [Promoter [low][Delta + type=<Boolean>][Echo - type=<Scalar 0.8>]]--[Charlie type=<Boolean>]--T
+is 20 _ End of Genetic Regulatory Network
+
+test: $(P2B) --grn-out ni_atc "(green (ni* (aTc) false))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 3 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 4 _ [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 5 _ [Promoter [low][Bravo + type=<Boolean>][Charlie - type=<Boolean false>]]--[Alfa type=<Boolean>]--T
+is 6 _ [Promoter [low]]--[Charlie type=<Boolean false>]--T
+is 7 _ End of Genetic Regulatory Network
+
+test: $(P2B) --grn-out quadnot "(green (not (not (not (not (aTc))))))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][Bravo - type=<Boolean>]]--[Alfa type=<Boolean>]--T
+is 3 _ [Promoter [high][Charlie - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 4 _ [Promoter [high][Delta - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 5 _ [Promoter [high][Echo - type=<Boolean>]]--[Delta type=<Boolean>]--T
+is 6 _ [Promoter [high][TetR - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 7 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 8 _ [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 9 _ End of Genetic Regulatory Network
+
+test: $(P2B) --grn-out any_atc "(green (any-time (aTc)))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 3 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 4 _ [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 5 _ [Promoter [low][Bravo + 101-fold dc=285 type=<Boolean>]]--[Bravo type=<Boolean>]--[Alfa type=<Boolean>]--T
+is 6 _ End of Genetic Regulatory Network
+
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+
+test: $(P2B) "(red (not (green (aTc))))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][Bravo - type=<Boolean>]]--[RFP type=<Boolean>]--T
+is 3 _ [Promoter [high][TetR - type=<Boolean>]]--[GFP type=<Boolean>]--[Bravo type=<Boolean>]--T
+is 4 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 5 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(red (not (green (aTc))))" --single-products-only
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][Bravo - type=<Boolean>]]--[RFP type=<Boolean>]--T
+is 3 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 4 _ [Promoter [high][TetR - type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 5 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 6 _ End of Genetic Regulatory Network
+
+
+$(P2B_ARGS) = -EM grn --instructions --no-output -path "../examples/" --cellular-platform ecoli-platform
+
+test: $(P2B) --grn-out simple_sr "(green (sr-latch (aTc) (IPTG)))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: IPTG represses LacI
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][Delta - type=<Boolean>]]--[Echo1 type=<Boolean>]--T
+is 4 _ [Promoter [high][Echo1 - type=<Boolean>]]--[GFP type=<Boolean>]--[Delta type=<Boolean>]--T
+is 5 _ [Promoter [high][LacI - type=<Boolean>]]--[Echo1 type=<Boolean>]--T
+is 6 _ [Promoter [high][TetR - type=<Boolean>]]--[Delta type=<Boolean>]--T
+is 7 _ [Promoter [high]]--[TetR type=<Boolean>]--[LacI type=<Boolean>]--T
+is 8 _ End of Genetic Regulatory Network
+
+// For later: "(let ((v (aTc))) (and (> v 0.8) (< v 1.5)))"

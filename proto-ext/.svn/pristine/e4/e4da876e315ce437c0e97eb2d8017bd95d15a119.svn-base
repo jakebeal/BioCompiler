@@ -1,0 +1,3 @@
+function timer () { 
+  feedback t { t = 0; } update { t = t + dt; };
+}

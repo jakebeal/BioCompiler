@@ -1,0 +1,7 @@
+(defop ? speak scalar scalar)
+(defop ? light scalar)
+(defop ? sound scalar)
+(defop ? temp scalar)
+(defop ? conductive scalar)
+(defop ? button scalar scalar)
+(defop ? slider scalar scalar scalar scalar scalar scalar scalar)

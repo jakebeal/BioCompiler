@@ -1,0 +1,136 @@
+Passed 6 out of 11 tests.
+Test #0
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((P high value R- FF4|boolean T))) (green (foo))" --test-mode -D -dump-stem prototest22168 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22168.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #1
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- FF4|boolean value R- FF5|boolean T))) (green (foo))" --no-grn-optimization --test-mode -D -dump-stem prototest22169 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22169.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #2
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- FF4|boolean value R- FF5|boolean T))) (green (foo))" --test-mode -D -dump-stem prototest22170 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22170.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #3
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((R- FF4|boolean R- FF5|boolean P high value T))) (green (foo))" --test-mode -D -dump-stem prototest22171 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22171.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #4
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((R- FF4|boolean R- FF5|boolean T))) (green (foo))" --test-mode -D -dump-stem prototest22172 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22172.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #5
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((P high GFP|boolean R- FF4|boolean value R- FF5|boolean T))) (red (foo))" --test-mode -D -dump-stem prototest22173 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22173.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+FAIL: Failed 1 out of 4 assertions.
+FAIL	Value at Line 2 Column _ (
+[Promoter [high]]--[RFP type=<Boolean>[FF4 - type=<Boolean>]]--[GFP type=<Boolean>[FF4 - type=<Boolean>]]--T)  is  
+[Promoter [high]]--[RFP type=<Boolean>[FF4 - type=<Boolean>]]--[GFP type=<Boolean>[FF5 - type=<Boolean>]--T 
+--------------------------------------------------------------------------------
+Test #6
+Running with arguments: $(P2B) "(primitive foo () boolean :grn-motif ((P high GFP|boolean value R- FF4|boolean R- FF5|boolean T))) (red (foo))" --test-mode -D -dump-stem prototest22174 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22174.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+All assertions passed.
+--------------------------------------------------------------------------------
+Test #7
+Running with arguments: $(P2B) "(green (not (aTc)))" --no-grn-optimization --test-mode -D -dump-stem prototest22175 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22175.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+FAIL: Failed 3 out of 8 assertions.
+FAIL	Value at Line 5 Column _ ([Promoter [high]]--[Charlie type=<Boolean>[Alfa - type=<Boolean>]]--T)  is  [Promoter [high]]--[TetR type=<Boolean>]--T 
+FAIL	Value at Line 6 Column _ ([Promoter [high]]--[GFP type=<Boolean>[Charlie - type=<Boolean>]]--T)  is  [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T 
+FAIL	Value at Line 7 Column _ ([Promoter [high]]--[TetR type=<Boolean>]--T)  is  End of Genetic Regulatory Network 
+--------------------------------------------------------------------------------
+Test #8
+Running with arguments: $(P2B) "(green (not (aTc)))" --test-mode -D -dump-stem prototest22176 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22176.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+FAIL: Failed 3 out of 7 assertions.
+FAIL	Value at Line 3 Column _ ([Promoter [high][TetR - type=<Boolean>]]--[Charlie type=<Boolean>]--T)  is  [Promoter [high][TetR - type=<Boolean>]]--[Alfa type=<Boolean>]--T 
+FAIL	Value at Line 6 Column _ (End of Genetic Regulatory Network)  is  [Promoter [low][Alfa - type=<Boolean>]]--[GFP type=<Boolean>]--T 
+FAIL	Value at Line 7 Column _ ()  is  End of Genetic Regulatory Network 
+--------------------------------------------------------------------------------
+Test #9
+Running with arguments: $(P2B) "(green (and (not (aTc)) (not (aTc))))" --test-mode -D -dump-stem prototest22177 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22177.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+FAIL: Failed 1 out of 3 assertions.
+FAIL	Value at Line 7 Column _ ()  is  End of Genetic Regulatory Network 
+--------------------------------------------------------------------------------
+Test #10
+Running with arguments: $(P2B) "(green (and (IPTG) (aTc)))" --test-mode -D -dump-stem prototest22178 -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+Dump file path: /Users/jakebeal/cur_proj/SynBioIRAD/BioCompiler/grn-emitter/tests/dumps/prototest22178.log
+
+***PROTO OUTPUT***
+PROTO v374[neo] (Kernel DelftProto VM 806) (Developed by MIT Space-Time Programming Group 2005-2008)
+
+***END PROTO OUTPUT***
+
+FAIL: Failed 4 out of 9 assertions.
+FAIL	Value at Line 4 Column _ ([Promoter [high][LacI - type=<Boolean>]]--[Echo type=<Boolean>]--T)  is  [Promoter [high]]--[LacI - type=<Boolean>]--[Charlie type=<Boolean>]--T 
+FAIL	Value at Line 5 Column _ ([Promoter [high][TetR - type=<Boolean>]]--[Foxtrot type=<Boolean>]--T)  is  [Promoter [high]]--[TetR - type=<Boolean>]--[Bravo type=<Boolean>]--T 
+FAIL	Value at Line 6 Column _ ([Promoter [high]]--[LacI type=<Boolean>]--[TetR type=<Boolean>]--T)  is  [Promoter [high]]--[TetR type=<Boolean>]--[LacI type=<Boolean>]--T 
+FAIL	Value at Line 7 Column _ ([Promoter [low]]--[GFP type=<Boolean>[Echo + type=<Boolean>][Foxtrot + type=<Boolean>]]--T)  is  [Promoter [low]]--[Bravo - type=<Boolean>]--[Charlie - type=<Boolean>]--[GFP type=<Boolean>]--T 
+--------------------------------------------------------------------------------

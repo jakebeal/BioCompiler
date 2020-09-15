@@ -1,0 +1,12 @@
+;; init:     (flip 0.1 'leader 'follower)
+;; leader:   (flip 0.1 'follower 'leader)
+;; follower: (if (< leader-grad threshold) (flip 0.1 'leader 'follower))
+
+(def elect ()
+  (letfed ((s (flip 0.1 'leader 'follower) 
+	      (mux (= s 'leader)
+		  (flip 0.001 'follower 'leader)
+		(mux (> (probe (gradient (= s 'leader)) 0) 400) 
+		     (flip 0.001 'leader 'follower)
+		     'follower))))
+    (= s 'leader)))

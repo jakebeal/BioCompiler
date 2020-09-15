@@ -1,0 +1,16 @@
+;; The operators in bootstrap.proto are required for interpretation of the
+;; rest of the core.proto file:
+primitive restrict (any base, [scalar test]) -> any
+  : space protected type_constraints(value = base);
+
+primitive tup(any...) -> tuple : type_constraints(value = arg0);
+
+primitive dchange () -> boolean : space time protected;
+
+primitive not (scalar) -> boolean;
+
+primitive mux (scalar test, local true_expr, local false_expr) -> local
+  : type_constraints(value = lcs(true_expr, false_expr));
+
+primitive delay (local) -> local
+  : time protected type_constraints(value = arg0)

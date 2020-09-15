@@ -1,0 +1,3 @@
+;; Since (sense 1) shows up as orange in the simulator, this little
+;; program gives it a more intuitive name for demo purposes
+(def orange () (sense 1))

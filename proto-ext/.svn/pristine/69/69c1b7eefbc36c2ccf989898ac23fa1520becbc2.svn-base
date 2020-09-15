@@ -1,0 +1,22 @@
+(def flock-demo ()
+  (mov
+   (mux (sense 1)
+	(flock (vmul 0.5 (nav-grad (sense 1) (sense 2))))
+	(vmul 0.1 (if (not (sense 1)) (disperse) (tup 0 0))))))
+
+;; To see flocking, run:
+;;   proto -n 500 -r 15 -sv -l -m -s 0.5 "(mov (flock (tup 0 0 0)))" 
+;; To see dispersal, run:
+;;   proto -n 500 -r 15 -sv -l -m -s 0.5 -w "(mov (vmul 0.1 (disperse)))"
+;; To see distance estimation, run:
+;;   proto -n 500 -r 15 -sv -l -m -s 0.5 -w "(green (gradient (sense 1)))"
+;; click on a device and hit 't', then drag the mouse to see the
+;; distance shown as the height of green dots above their devices.
+
+;; To see flocking, distance estimation, and dispersal combined to
+;; produce a guided flock, run:
+;;   proto -n 500 -r 15 -sv -l -m -s 0.5 -w "(flock-demo)"
+;; shift-drag to select a group and hit 't' to create the flock, then
+;; shift-drag elsewhere and hit 'y' to create its goal.  Try changing
+;; the flock and goal by toggling more devices with 't' and 'y' and
+;; watch how the flock adapts its behavior

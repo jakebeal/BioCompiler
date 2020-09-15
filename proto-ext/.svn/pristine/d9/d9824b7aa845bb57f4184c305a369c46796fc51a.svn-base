@@ -1,0 +1,1 @@
+function gradcast (src f) { grad_value(src, f); }

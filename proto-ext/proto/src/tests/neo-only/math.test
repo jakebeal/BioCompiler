@@ -1,0 +1,97 @@
+// Suite of tests for Proto's numeric functions
+
+// Constants
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "inf"
+= 1 3 Inf
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "e"
+= 1 3 2.72
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "pi"
+= 1 3 3.14
+
+// Booleans
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(not 0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(not 1)"
+= 1 3 0
+
+// Scalar arithmetic
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(+ 1 3 5)"
+= 1 3 9
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- 2 4)"
+= 1 3 -2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(neg -6)"
+= 1 3 6
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(* 9 3 4 2)"
+= 1 3 216
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(/ 5 2)"
+= 1 3 2.5
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(/ 4 0)"
+= 1 3 Inf
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(/ -2 0)"
+= 1 3 -Inf
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(* 0 (/ 1 0))"
+is_nan 1 3 nan
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(mod 37 6)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(= inf (+ 1 inf))"
+= 1 3 1
+
+// Vector arithmetic
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(+ (tup 1 2) (tup 3 4))"
+= 1 3 4
+= 1 4 6
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(+ (tup 1 2 3) (tup 4))"
+= 1 3 5
+= 1 4 2
+= 1 5 3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 1 2 3) (tup 1))"
+= 1 3 0
+= 1 4 2
+= 1 5 3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 1 2 3) (tup 0 0))"
+= 1 3 1
+= 1 4 2
+= 1 5 3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 0 0) (tup 1 2 3))"
+= 1 3 -1
+= 1 4 -2
+= 1 5 -3
+
+
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 1) (tup 1 2 3))"
+= 1 3 0
+= 1 4 -2
+= 1 5 -3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 1 2 3) (tup 0 0 0))"
+= 1 3 1
+= 1 4 2
+= 1 5 3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(- (tup 0 0 0) (tup 1 2 3))"
+= 1 3 -1
+= 1 4 -2
+= 1 5 -3
+
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(* 2 (tup 1 2 3))"
+= 1 3 2
+= 1 4 4
+= 1 5 6
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(vdot (tup 1 2 3) (tup 0 0 0))"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(vdot (tup 1 2 3) (tup 1 2 3))"
+= 1 3 14
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(pow (vlen (tup 1 2 3)) 2)"
+= 1 3 14
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(vlen (normalize (tup 1 2 3)))"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rotate pi (tup 1 0) )"
+= 1 3 -1
+= 1 4 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rotate (/ pi 2) (tup 1 0) )"
+= 1 3 0
+= 1 4 1
+
+
+
+
+//test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "()"
+//= 1 3 

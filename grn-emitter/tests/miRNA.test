@@ -1,0 +1,89 @@
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform miRNA-motifs -path ../examples/
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high value R- FF4|boolean T))) (green (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high]]--[GFP type=<Boolean>[FF4 - type=<Boolean>]]--T
+is 3 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- FF4|boolean value R- FF5|boolean T))) (green (foo))" --no-grn-optimization
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high][FF4 - type=<Boolean>]]--[Alfa type=<Boolean>[FF5 - type=<Boolean>]]--T
+is 3 _ [Promoter [high]]--[Bravo type=<Boolean>[Alfa - type=<Boolean>]]--T
+is 4 _ [Promoter [high]]--[GFP type=<Boolean>[Bravo - type=<Boolean>]]--T
+is 5 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- FF4|boolean value R- FF5|boolean T))) (green (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high][FF4 - type=<Boolean>]]--[GFP type=<Boolean>[FF5 - type=<Boolean>]]--T
+is 3 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((R- FF4|boolean R- FF5|boolean P high value T))) (green (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high][FF4 - type=<Boolean>][FF5 - type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((R- FF4|boolean R- FF5|boolean T))) (green (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Error during emission:
+is 2 _ command-line:1 Error: Output is not used in GRN motif
+is 3 _ Compilation failed.
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high GFP|boolean R- FF4|boolean value R- FF5|boolean T))) (red (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high]]--[GFP type=<Boolean>[FF4 - type=<Boolean>]]--T
+is 3 _ [Promoter [high]]--[RFP type=<Boolean>[FF5 - type=<Boolean>]]--T
+is 4 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high GFP|boolean value R- FF4|boolean R- FF5|boolean T))) (red (foo))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ [Promoter [high]]--[RFP type=<Boolean>[FF4 - type=<Boolean>][FF5 - type=<Boolean>]]--[GFP type=<Boolean>[FF4 - type=<Boolean>][FF5 - type=<Boolean>]]--T
+is 3 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(green (not (aTc)))" --no-grn-optimization
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 4 _ [Promoter [high]]--[Alfa type=<Boolean>[Bravo - type=<Boolean>]]--T
+is 5 _ [Promoter [high]]--[Charlie type=<Boolean>[Alfa - type=<Boolean>]]--T
+is 6 _ [Promoter [high]]--[GFP type=<Boolean>[Charlie - type=<Boolean>]]--T
+is 7 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 8 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(green (not (aTc)))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][TetR - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 4 _ [Promoter [high]]--[GFP type=<Boolean>[Charlie - type=<Boolean>]]--T
+is 5 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 6 _ End of Genetic Regulatory Network
+
+// TODO: deal with duplicate inputs for reactions?
+test: $(P2B) "(green (and (not (aTc)) (not (aTc))))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][TetR - type=<Boolean>]]--[Golf type=<Boolean>]--T
+is 4 _ [Promoter [high]]--[GFP type=<Boolean>[Golf - type=<Boolean>]]--T
+is 5 _ [Promoter [high]]--[TetR type=<Boolean>]--[TetR type=<Boolean>]--T
+is 6 _ End of Genetic Regulatory Network
+
+test: $(P2B) "(green (and (IPTG) (aTc)))"
+is 0 _ Warning: Primitive 'not' overriding duplicate ':grn-motif' attribute
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: IPTG represses LacI
+is 3 _ Reaction: aTc represses TetR
+is 4 _ [Promoter [high][LacI - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 5 _ [Promoter [high][TetR - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 6 _ [Promoter [high]]--[Echo type=<Boolean>[Bravo - type=<Boolean>]]--T
+is 7 _ [Promoter [high]]--[Foxtrot type=<Boolean>[Charlie - type=<Boolean>]]--T
+is 8 _ [Promoter [high]]--[GFP type=<Boolean>[Echo - type=<Boolean>][Foxtrot - type=<Boolean>]]--T
+is 9 _ [Promoter [high]]--[LacI type=<Boolean>]--[TetR type=<Boolean>]--T
+is 10 _ End of Genetic Regulatory Network

@@ -1,0 +1,2 @@
+(def denormalize (x min max)
+  (denormalizeN x 0 1 min max))

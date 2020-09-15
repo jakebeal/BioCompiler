@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <title>Thinking In Proto</title>
+      <link rel="stylesheet" href="css/tutorialStyle.css">
+      <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" />
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+      <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+      <script type="text/javascript">
+         var _gaq = _gaq || [];
+         _gaq.push(['_setAccount', 'UA-26309611-1']);
+         _gaq.push(['_trackPageview']);
+
+         (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      <script>
+         var editors = { };
+         $(document).ready(function() {
+            $.each($('.editor'), function(index, editor) {
+               editor = ace.edit(this.id);
+               editor.setTheme("ace/theme/monokai");
+               editor.getSession().setMode("ace/mode/proto");
+               editor.setFontSize(15);
+               editor.setReadOnly(true);
+               editors[this.id] = editor;
+
+               $(this).height(editor.getValue().split('\n').length * 1.5 + "em")
+
+               //now add "see it in action" link
+               $(this).parent().append(
+               "<a target=\"_blank\" href=index.html?program="
+                  + encodeURIComponent(editor.getValue())
+                  + "&step=10"
+                  + "&radius=15"
+                  + "&numDevices=200"
+                  + ">See it in action</a>");
+            });
+            $.each($('.gotryit'), function(index, answer) {
+               $(this).parent().append("<br/><br/><a target=\"_blank\" href=index.html?program="+
+                  encodeURIComponent(this.textContent)
+                  + "&step=10"
+                  + "&radius=15"
+                  + "&numDevices=200"
+                  +">Go try it!</a>");
+            });
+            $.each($('.problemanswer'), function(index, answer) {
+               $(this).accordion({
+                  collapsible:true,
+                  heightStyle: "content",
+               });
+            });
+         });
+      </script>
+   </head>
+   <body>
+      <header class='page-header'>
+         <a href="tutorial.html">Thinking<span>In</span>Proto</a>
+      </header>
+
+      <section class="page-body">
+
+      <article>
+      <h1>Thinking In Proto</h1>
+
+      <img src="figures/protorunning.png" width="100%" />
+
+      <p><i>Q: Why are you here?</i></p>
+      <p>We hope that it's because you want to learn about effective
+	programming of distributed systems, and about how the Proto
+	language makes this possible.</p>
+      <p>Only you, of course, can supply the true answer...</p>
+
+      </article>
+      <article>
+      <h1>Assumptions about the Reader</h1>
+      <p>
+      In writing this tutorial, we have made several assumptions about
+      you as a reader.  First, we assume that you are either entirely
+      new to programming or at least unfamiliar with Lisp-like
+      languages and with many programming concepts.
+      </p>
+      <p>
+      Whether or not you are already an experienced programmer, it is
+      important to realize that Proto is not like most other
+      programming languages.  Although Proto is similar to other
+      languages in many ways, the ways of thinking that are encouraged
+      by Proto are considerably different, because Proto allows its
+      user to think both about individual devices separately, and also
+      about entire collections of interacting devices as an aggregate.
+      Proto is also different because it encourages you to write
+      programs in terms of the continuous space your devices are
+      distributed through and the continuous period of time when they
+      are operating.
+      </p>
+      <p>
+      For most people, even once they've started writing Proto
+      code, it's a big jump to change how you're thinking and really
+      take advantage of Proto's aggregate view and continuous
+      space/time model.  This tutorial will hopefully help you make
+      that jump.
+      </p>
+      </article>
+
+      <article>
+      <h1>What is Proto?</h1>
+      <p>
+      Proto is a language that makes it easy to write complex programs for
+      <i>spatial computers</i>.  
+      </p>
+
+      <p>
+      A <b>spatial computer</b> is a collection of devices distributed to fill space,
+      where the difficulty of communicating between devices is strongly
+      dependent on their distance. Examples of spatial computers include sensor networks,
+      robotic swarms, cells during morphogenesis, FPGAs, ad-hoc wireless
+      systems, biofilms, and distributed control systems.
+      </p>
+
+      <img src="figures/continuousModel.jpg" width="45%" />
+      <img src="figures/discreteModel.jpg" width="45%" />
+
+      <p>
+      Proto is a language for programming spatial computers using a continuous
+      space abstraction. Rather than describe the behavior of individual
+      devices, the programmer views the space filled by the devices as an
+      <i>amorphous medium</i> &mdash; a region of continuous space with a computing device
+      at every point &mdash; and describes the behavior of regions of space. These
+      programs are automatically transformed into local actions that are
+      executed approximately by the actual network of devices. When the program
+      obeys the abstraction, these local actions reliably produce an
+      approximation of the desired aggregate behavior.
+      </p>
+
+      <p>
+      If, when you're done with the tutorial, you want to learn more about
+      Proto, please visit 
+      <a href="http://proto.bbn.com">proto.bbn.com</a>.
+      </p>
+
+      </article>
+      
+      <article>
+      <h1>Using WebProto</h1>
+      <p>
+      WebProto is the first version of Proto that runs entirely in a web
+      browser.  It requires that you're running a recent web browser with some
+      HTML5 support and WebGL.  We suggest using a recent version of
+      <a href="http://www.google.com/chrome">Google Chrome</a> or 
+      <a href="http://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a>.
+      For other browsers, see the list of 
+      <a href="http://en.wikipedia.org/wiki/WebGL">which browsers
+      support WebGL</a>
+      or <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">this
+      page on getting a WebGL implementation.</a>  Furthermore,
+      WebProto will function best in an environment with hardware
+      acceleration for graphics.
+      </p>
+
+      <p>
+      The first time you use WebProto, it may load slowly while the
+      application code is downloaded by your web browser.  After
+      that, however, it should be cached and run much more quickly.
+      </p>
+
+      <p>
+      When you open WebProto, you'll see a screen such as:
+      </p>
+
+      <img src="figures/WebProtoIDE.png" width="78%" />
+
+      <p>
+      The gray pane on the right is the <i>Code Pane</i>.  That is where you
+      enter the Proto program.
+      </p>
+      
+      <p>
+      The empty black pane on the left is the <i>Simulator Pane</i>.
+      That is where the program will be simulated when you "Run" it.
+      To run the program, click the "Run Program" button in the top right.
+      </p>
+      
+      <p>
+      When you run the program, you'll see some devices appear in the
+      <i>Simulator Pane</i>.
+      </p>
+      
+      <img src="figures/WebProtoIDE-running.png" width="78%" />
+      
+      <p>
+      To navigate around the 3-D Simulator Pane, you can click-and-drag to
+      move or scroll to zoom.
+      </p>
+      
+      <p>
+      If at any time, you want to pause the execution of the Proto VM, just
+      hit the space-bar.  Hit the space-bar again to unpause.
+      </p>
+      
+      <p>
+      <b>Note:</b> A current limitation of the simulator is that, once
+      executing, the page must be reloaded before you can edit the code and
+      re-run.  Be aware that, when the page reloads, it will reload with the
+      program that was displayed when the page originally loaded (not the
+      currently-running program).
+      </p>
+      
+      </article>
+
+      <article>
+      <h1>Hello World</h1>
+      <p>
+      An extremely simple Proto program is
+      </p>
+
+<div class="editorwrapper">
+<div id="helloworld" class="editor">(green 1)
+</div> </div>
+
+      <p>
+      It assigns the value of one to the entire space (meaning that every
+      device should have a value of one) and enables every device's green LED.
+      </p>
+
+      </article>
+      
+      <article>
+      <h1>Errors</h1>
+      <p>
+      Compilation errors should give hints to help you debug your
+      program.  They are presented in red at the top of the screen if they occur.
+      </p>
+
+      <img src="figures/error.png" width="78%" />
+
+      </article>
+
+      <article>
+      <h1>Comments</h1>
+      <p>
+      Comments are useful for helping other people to understand your code.
+      Comments, however, do not change the way your program behaves.
+      </p>
+
+      <p>
+      In Proto, comments are everything after a semi-colon (";").
+      </p>
+
+<div class="editorwrapper">
+<div id="comments" class="editor">;; Here is a comment
+(green 1) ;; Here is another comment
+</div></div>
+      </article>
+      
+      
+      <article>
+      <h1>Language Essentials</h1>
+      <p>
+      Here are some essentials to the Proto language, along with the most
+      frequently used functions.
+      </p>
+
+      <h2>Evaluation</h2>
+      <p>
+      Proto is a purely functional language. Proto is written using s-expressions in a manner very
+      similar to Lisp. Evaluating a Proto expression produces a program: a dataflow graph that may be
+      evaluated against a space to produce an evolving field of values at every point on the space.
+      </p>
+
+      <h2>Data Types</h2>
+      <p>
+      All Proto expressions produce fields that map every point in space to a value. The values
+      produced are categorized into four basic types: fields, lambdas, tuples, and scalars.
+      Booleans are represented as scalars that evaluate to 0 when false, or
+      anything else (true).
+      </p>
+
+<div class="editorwrapper">
+<div id="datatypes" class="editor">;; Data Types
+(tup 0 1 2.2)
+</div></div>
+
+      <p>
+      While this isn't very interesting to see executing, it assigns the value
+      <tt>[0 1 2.2]</tt> to the entire space (and therefore, each of devices).
+      </p>
+
+      </article>
+
+      <article>
+      <h1>Nesting</h1>
+      <p>
+      Data-types, logic, functions, etc. can all be nested.  A good example is
+      a tuple-of-tuples:
+      </p>
+
+<div class="editorwrapper">
+<div id="nesting" class="editor">;; Nesting
+(tup 0 1.1 (tup 2 3 4) (tup 5 6 7))
+</div></div>
+      
+      <p>
+      Again, the execution isn't very interesting to see, but under-the-hood,
+      we're assigning the value <tt>[0 1.1 [2 3 4] [5 6 7]]</tt> to the entire space (and
+      therefore, each of devices).
+      </p>
+
+      </article>
+
+
+      <article>
+      <h1>Sensors and Actuators</h1>
+      <p>
+      Sensors and actuators are the inputs and outputs (respectively) to the
+      Proto program.
+      </p>
+
+      <p>
+      We have pre-defined a set of test sensors for simulating a boolean
+      sensor (e.g., button-press, motion sensor, etc.).  In code they look like
+      <tt>(sense i)</tt> where <tt>i</tt> is the <i>ith</i> sensor.  To
+      activate the sensor(s) in the simulator, select the device upon which
+      you want to activate the sensor.  The device should then be surrounded by
+      a translucent highlight.
+      </p>
+
+      <img src="figures/selectedNode.png" width="50%" />
+      
+      <p>
+      Then, hit one of sensor keys:
+      </p>
+      <table border="1px">
+         <tr> <td> <b>Key</b> </td> <td> <b>Sensor Proto Code</b> </td> <td> <b>Color of Device</b> </td> </tr>
+         <tr> <td> t </td> <td> <tt>(sense 1)</tt> </td> <td> orange </td> </tr>
+         <tr> <td> y </td> <td> <tt>(sense 2)</tt> </td> <td> purple </td> </tr>
+         <tr> <td> u </td> <td> <tt>(sense 3)</tt> </td> <td> magenta </td> </tr>
+      </table>
+      <p>
+      You should see the device's color change when the sensor is enabled.
+      </p>
+
+      <img src="figures/sensorEnabled.png" width="50%" />
+      
+      <p>
+      Try toggling sensor number one on some nodes in the example below:
+      </p>
+
+<div class="editorwrapper">
+<div id="sensorsAndActuators" class="editor">;;Sensors and Actuators
+(if
+   (sense 1)  ;; If sensor number 1 is enabled,
+   (blue 1)   ;; turn on the blue LED
+   (blue 0))  ;; otherwise, turn off the blue LED
+</div></div>
+
+      <p>
+      You'll notice that the example also makes use of an actuator, <tt>(blue i)</tt>.
+      The blue actuator toggles a blue LED with the brightness of the LED
+      being indicated by <i>i</i>, a number between 0 and 1 (inclusive).
+      </p>
+      
+      <p>
+      Play around with the <tt>blue</tt> actuator a bit.  There are also
+      <tt>red</tt> and <tt>green</tt> actuators that behave identically.
+      Note that, using the color actuators together results in a "blending" of
+      the colors (think RGB style blending).  What color do you think should
+      be produced by the following program?
+      </p>
+      
+<div class="editorwrapper">
+<div id="colorblending" class="editor">;;Color Blending
+(all
+   (blue 0.5)    ;; turn on the blue LED, half-brightness
+   (green 0.5))  ;; turn on the green LED, half-brightness
+</div></div>
+
+      <p>
+      There is also an actuator to control the movement of devices in Proto,
+      <tt>mov</tt>.  Pass <tt>mov</tt> a tuple which represents its velocity
+      (in x, y, z directions respectively).
+      </p>
+      
+<div class="editorwrapper">
+<div id="movement" class="editor">;;Movement
+(mov            ;; Move with velocity
+   (tup 1 2 3)) ;; x=1 m/s, y=2 m/s, z=3 m/s
+</div></div>
+
+</article>
+
+      
+      <article>
+      <h1>Spatial Restriction</h1>
+      <p>
+      Let's say we want some lucky points we select to enable their blue LED, while
+      the others remain the default color.  How would we accomplish that?  The
+      answer is <i>spatial restriction</i>, but that's just one feature of
+      Proto's control-flow.
+      </p>
+      
+      <h2>Control Flow</h2>
+      <p>
+      <tt>(all statement1 statement2 ... statementN)</tt>: 
+      All statements (1-n) are evaluated in parallel and the value of the last
+      statement isreturned.  We'll use <tt>all</tt> a lot for executing multiple
+      statements.
+      </p>
+      
+<div class="editorwrapper">
+<div id="allexample" class="editor">;;All Example
+(all
+   (blue 1)    ;; turns blue LED on at highest brightness
+   (green 1))  ;; turns green LED on at highest brightness
+               ;; ... this should produce cyan
+</div></div>
+
+      <p>
+      <tt>(mux test true-branch false-branch)</tt>: 
+      Evaluates both true and false expressions. When test is true, returns
+      the result of the true expression, otherwise returns the result of the
+      false expression.  The true and false expressions must return the same
+      type.
+      </p>
+      <p>
+      <tt>(if test true-branch false-branch)</tt>: 
+      Restricts execution to subspaces based on test. Where test is true, the
+      true expression is evaluated; where test is false, the false expression
+      is evaluated.  The true and false expressions must return the same type.
+      </p>
+
+<div class="editorwrapper">
+<div id="restriction" class="editor">;;Spatial Restriction
+(if
+   (sense 1)  ;; conditional statement
+   (blue 1)   ;; executed when conditional evaluates to true
+   (green 1))  ;; executed when conditional evaluates to false
+</div></div>
+
+      <p>
+      There is an important distinction here between <tt>mux</tt> and
+      <tt>if</tt>.  The difference is that, while <tt>if</tt> only evaluates
+      the <i>true</i> branch, <tt>mux</tt> evaluates both the <i>true</i>
+      <b>AND</b> <i>false</i> branches.  That doesn't seem very important, but
+      it is, especially when the branches contain actuators.  What do you
+      think will happen in the following program (all we've done is changed
+      the <tt>if</tt> to a <tt>mux</tt>)?
+      </p>
+
+<div class="editorwrapper">
+<div id="muxvsif" class="editor">;;Mux vs. If
+(mux
+   (sense 1)  ;; conditional statement
+   (blue 1)   ;; executed when conditional evaluates to true
+   (green 1))  ;; executed when conditional evaluates to false
+</div></div>
+
+
+      </article>
+      
+      
+      <article>
+      <h1>Functions and Variables</h1>
+      <p>
+      Functions are a way of naming and re-using a behavior.  They are great
+      for code maintainability and readability.
+      </p>
+      <p>
+      Proto doesn't really have <i>variables</i>, like some other programing
+      languages.  However, like variables, there is a way to assign a name to a value,
+      but unlike traditional variables, the value can never change.
+      </p>
+
+      <h2>Scope and Bindings</h2>
+      <p>
+      Proto is a lexically scoped language. Names are not case sensitive. Bindings
+      contain values and are looked up by name. Lexical bindings are visible only within the scope in which they
+      are bound, and shadow bindings of the same name from enclosing scopes.
+      </p>
+
+      <p>
+      <tt>(def function-name (arg1 arg2 ... argN) body-branch)</tt>:
+      Define a function name in the current scope, with as many arguments as
+      there are arg identifiers. The body-branch is evaluated within an
+      extended scope where the arg identifiers are bound to arguments to the
+      function. 
+      </p>
+
+      <p>
+      <tt>(fun (arg1 arg2 ... argN) body-branch)</tt>, is similar to <tt>def</tt> but
+      creates anonymous functions &mdash; hense the lack of the function-name parameter.
+      </p>
+
+      <p>
+      <tt>(let ((var1 value1) (var2 value2) ... (varN valueN)) body-branch)</tt>: 
+      Extends scope, binding all var identifiers to their associated value in
+      parallel. The body is evaluated in the extended scope. <tt>let*</tt> is
+      like let, except that identifies are bound sequentially, so later ones
+      can use earlier ones in their definition.
+      </p>
+
+
+<div class="editorwrapper">
+<div id="functions" class="editor">;;Function Definitions
+(def check              ;; name of the function
+   (src)                ;; function arguments
+   (blue (if src 1 0))) ;; function body
+
+(check (sense 1)) ;; now, call the function
+</div></div>
+
+<p>
+And now... a test!
+</p>
+
+      <div class="problemanswer">
+         <h3>Exercise</h3>
+      <div class="problem">
+Write a function such that if any of the senses
+are turned on on a device, that device's LED turns green.
+<div class="gotryit" style="display:none">; Write a function such that if any of the senses
+; are turned on on a device, that device's LED turns green.
+
+; Here's some code to get you started:
+(def check (value)
+   ; do something with the value
+   )
+
+(check 
+ ; call your function with something
+ )
+</div>
+      </div>
+
+         <h3>Solution</h3>
+<div class="editorwrapper">
+<div id="anysense" class="editor">;;Green if any sensor
+(def check (src)
+   (green (if src 1 0)))
+
+(check (or (sense 1) 
+         (or (sense 2) 
+             (sense 3))))
+</div></div></div>
+
+      </article>
+      
+      <article>
+      <h1>Thinking about Space</h1>
+      <p>
+      Space is a big part of what Proto is about.  Most of the programs that
+      you write in Proto will manipulate space, doing things like naming
+      regions of space, measuring distances, and moving information around from
+      place to place.  Proto is designed to make this easy by letting you
+      work with <i>fields</i>.
+      </p>
+      
+      <p>
+      A field assigns values to every point in a space.  For example, let's
+      say our space is a rectangular room, with an air conditioner over on the
+      left wall and the sun streaming through the windows on the right wall.
+      We can view the temperature in the room as a field: every location in
+      the room has a temperature, and the temperature may be different from
+      place to place.  The figure below shows a temperature field,
+      shading from coldest (shown as blue) to warmest (shown as red).  The
+      field is the whole collection of temperature values, each associated
+      with its location.
+      </p>
+
+      <img src="figures/heatmap.png" width="50%" />
+      
+      <p>
+      Of course, we may not get to measure temperature everywhere.  If we
+      only have a few devices, and we build our network by scattering them
+      around the room, then we get something more like what is shown
+      below.
+      </p>
+      
+      <img src="figures/heatmap-discrete.png" width="50%" />
+      
+      <p>
+      Now, say you've acquired the field depicted above,
+      <tt>(temperature)</tt>, that lists the temperature at each point in
+      space and you want to perform some operation on the field.  For
+      instance, let's say you want to know all the places where the
+      temperature is over 25 degrees Celsius.  In Proto, it's as simple as
+      saying <tt>(> (temperature) 25)</tt>.  Graphically, it would look
+      something like this:
+      </p>
+      
+      <img src="figures/fieldoperation.png" width="78%" />
+
+      <p>
+      What's important to know is two things:
+      (1) The more devices that we have, the better that they approximate
+      space; and
+      (2) Some programs need better approximations than others, but a lot
+      of programs will work well with very crude approximations.
+      </p>
+
+      <p>
+      A big part of the trick of writing good Proto programs is to think
+      about the space, while remembering that it will be approximated.
+      </p>
+
+      </article>
+
+      <article>
+      <h1>Using Space</h1>
+
+      <p>
+      Now let's start writing some programs that work with space in more
+      complicated ways.  Take a look at this code:
+      </p>
+
+<div class="editorwrapper">
+<div id="close" class="editor">;;Using Space
+(def close (src)
+   (let ((d (distance-to src)))
+      (if (and (< d 10) (> d 1))
+         (blue 1)
+         (blue 0))))
+
+(close (sense 1))
+</div></div>
+
+      <p>
+      There are several new things in this code. For instance, the <tt>let</tt>
+      assigns the variables inside it to a value.  In this
+      <tt>let</tt> statement, the variable <tt>d</tt> is set as the distance to the
+      source.
+      The function <tt>distance-to</tt>, as its name suggests, gives each
+      device its own value of estimated distance to the source. 
+      </p>
+
+      <p> 
+      If we execute this program, and turn on <tt>sense 1</tt> for a few
+      devices, you will see that only devices within a very small select range
+      from the source turn on their blue LED.  If you turn on <tt>sense
+      1</tt> on a fairly isolated device, you might not have any of the
+      surrounding device LEDs turn blue at all.  The program tells each device
+      to figure out their distance to the <tt>sense 1</tt> device(s), which they
+      should call <tt>d</tt>, and that if their individual value of <tt>d</tt> is
+      less than ten meters and greater than one meter, then they may turn
+      their LEDs blue.  Otherwise, the LEDs remain blank.  Try
+      expanding this range of blue LEDs by increasing the first parameter of
+      the <tt>and</tt> statement.
+      </p>
+      
+
+      </article>
+
+      <article>
+      <h1>Refining Space</h1>
+      <p>
+      The previous example shows how to select several close nodes, but what if we
+      wanted to be more precise in our selection?  What if, instead of taking three
+      points or no points, based on how close the randomly placed points were to the
+      src, we wanted just a single closest point, no matter how far or close it is
+      to the src?  This is where the <tt>nbr</tt> and the <tt>hood</tt> functions come
+      in.  These functions are used to tell a device exactly where each point within
+      its communication range is relative to itself and what values these neighbors
+      have calculated, giving the device fields of points and values to work with.
+      Using these functions, we can select the point(s) that we want accurately.
+      This demonstrates that ability:
+      </p>
+
+<div class="editorwrapper">
+<div id="closest" class="editor">;;Refining Space
+(def closest (src)
+   (let ((d (distance-to src))
+         (min-d (broadcast src 
+                 (min-hood+ (nbr (distance-to src))))))
+     (if (and (not (= min-d (inf)))
+              (= min-d d))
+         (blue 1)
+         (blue 0))))
+
+(closest (sense 1))
+</div></div>
+<p>
+This code is built to light up the device LED that is closest to the
+<tt>src</tt> (source) blue, and it introduces a wide variety of new
+functions. 
+</p>
+
+<p>
+We see our <tt>let</tt> operation again, except this time it defines two
+separate variables instead of just one.  The first one we know
+already: variable <tt>d</tt> is the distance to the source device. The
+second definition is where most of the confusing bit comes in.
+</p>
+
+<p>
+We are trying to assign the value of the shortest distance to the
+source to our new variable <tt>min-d</tt> (minimum distance).  Let's work
+from the inside parentheses out in this definition.  First, we have
+our <tt>(distance-to src)</tt>.  Note that you cannot use the predefined
+<tt>d</tt> here, because <tt>let</tt> defines everything at once, and so
+Proto will not recognize this variable as being already defined.
+Now that each device has established its
+own distance value (which happens to be the same as <tt>d</tt>).  The
+<tt>nbr</tt> function gathers up these values from each device's
+neighborhood, returning a field that maps each point in the
+neighborhood to a distance value.  All the functions starting with
+<tt>nbr</tt> in the Proto Language Reference create fields of values
+assigned to neighboring devices.  In fact, instead of putting
+<tt>(nbr (distance-to src))</tt> here, one could instead put
+<tt>(nbr-range)</tt>, which again assigns a field of distances to
+neighbors, with the same outcome since for this program we only care
+about neighbors of the <tt>src</tt>.  The <tt>min-hood+</tt> function takes
+all of these values returned by <tt>nbr</tt> as pairs, (neighbor,
+distance away), and then takes the minimum "distance away" value as
+its return value.  This is important: because of the <tt>+</tt> at the end
+of <tt>min-hood</tt>, the device excludes its own value from the calculation.
+Were this not the case, the closest device to itself would always be
+itself.
+</p>
+
+<center><img src="figures/nbr-d.png" width="30%" /></center>
+
+<p>
+The broadcast function sends information from the <tt>src</tt> devices to
+all of the other devices.  If there is one <tt>src</tt> device, then
+every device ends up with the same value; if there is more than one
+<tt>src</tt> device, then every device ends up with the value from the
+nearest <tt>src</tt> device.  Here, in our <tt>closest</tt> function, we
+are using broadcast to have the <tt>src</tt> tell every other device
+what the closest device to itself is.  Every device computes the
+<tt>min-hood+</tt> expression, to find out how close is its closest neighbor 
+(besides itself) to the source.  Only the <tt>src</tt> devices send the value.
+</p>
+<p>
+The main part of this function, (after the <tt>let</tt>) is actually
+quite simple.  All it does is have each device ask itself, ``Is my
+distance to the source equal to the minimum distance to the source,
+and is the minimum distance to the source not infinity? If so, turn
+LED blue; if not, leave LED blank.''  This part: <tt>(not (= min-d (inf)))</tt> stops the devices from automatically turning blue, because
+before any source is identified, the minimum distance to the source is
+infinite, and all the devices' <tt>d</tt> variables are also infinite and
+therefore equal to <tt>min-d</tt>.  This test tells the program to wait
+until a <tt>src</tt> exists, which will cause <tt>min-d</tt> become finite.
+Remember that if you want to look over any of the <tt>nbr</tt>,
+<tt>hood</tt>, <tt>broadcast</tt> or <tt>not</tt> functions, or even how to
+use constants such as <tt>inf</tt>, you can find them all in the Proto
+Language Reference.
+</p>
+<p>
+When executed, this produces a field of devices, shown as little red
+dots.  Right now, all the devices know that <tt>min-d</tt> is equal to
+infinity, and therefore all their LEDs are off.  Turn <tt>sense 1</tt>
+on on any device.  After a few seconds, a blue LED goes on on the
+closest device to the <tt>src</tt>, no matter how close or far that
+device may be.  You can turn <tt>sense 1</tt> on or off at several
+devices, and their closest neighbors' LEDs will turn on or off
+accordingly, since the <tt>broadcast</tt> is taking the value from the
+<i>nearest</i> source.  Take note, however,
+that if you isolate a <tt>sense 1</tt> device to the point that all
+other points are outside of its radio-range, no <tt>min-d</tt> can be
+found.  Also, turning on two <tt>sense 1</tt> devices close together may
+allow only a single <tt>min-d</tt> value (depending on where exactly the
+closest neighbors are), so only one of the sensed points may light up
+its closest neighbor.  Similarly, if a <tt>sense 1</tt> device is with
+direct communication range of another <tt>sense 1</tt> device, both will
+light their LEDs, since they both see the other being zero distance
+from the <tt>src</tt>.
+</p>
+
+
+      </article>
+      
+      
+      <article>
+      <h1>Bullseye</h1>
+
+      <div class="problemanswer">
+         <h3>Exercise</h3>
+      <div class="problem">
+         <p>
+         Try this test: Write a program in which all the points create
+         a bullseye target-board using LEDs.  You don't have to use any
+         <tt>nbr</tt>s or <tt>hood</tt>s for this program.  Remember to refer to
+         the Proto Language Reference whenever you get stuck.  You can do
+         this any way you like with any colors you like. 
+         If it seems complicated, you are probably over-thinking things.  
+         <b>Hint:</b> Nested <tt>if</tt>s may prove helpful.
+         </p>
+         
+         <center><img src="figures/bullseye.png" width="40%" /></center>
+         
+         <div class="gotryit" style="display:none">; Write a program in which all the points create
+; a bullseye target-board using LEDs.
+(def bullseye (src)
+   ;; Your code here
+)
+
+(bullseye (sense 1))
+         </div>
+
+      </div>
+
+         <h3>Solution</h3>
+<div class="editorwrapper">
+<div id="bullseye" class="editor">;;Bullseye
+(def bullseye (src)
+   (let ((d (distance-to src)))
+      (if (< d 15)
+         (red 1)
+         (if (< d 30)
+            (green 1)
+            (if (< d 45)
+               (blue 1)
+               0)))))
+
+(bullseye (sense 1))
+</div></div></div>
+      </article>
+
+
+      <article>
+      <h1>Thinking in Time</h1>
+      <p>
+      In Proto, as with any programming language, time is an important part
+      of its programs.  The simulator 
+      clock is always running unless, of course, you pause the simulator (using the space-bar).
+      In Proto, our timers will not run in actual seconds, but will run at
+      whatever rate Proto is managing to run through its program.
+      </p>
+      
+      <p>
+      Now we will start working with time directly in our programs as well.
+      Let's start by setting a simple timer on every device, and having
+      them turn on their red LED after 300 simulated seconds.
+      </p>
+      
+<div class="editorwrapper">
+<div id="timer" class="editor">;;Timer
+(def timer () 
+  (rep t 0 (+ t (dt))))
+
+(if (> (timer) 300)
+  (red 1)
+  0)
+</div></div>
+
+<p>
+There are a two new functions in here: <tt>rep</tt> and <tt>dt</tt>.  Both
+are defined on page 5 of the Proto Language Reference.  Take a look at
+the form of <tt>rep</tt>.  The <tt>rep</tt> function creates a variable,
+just like <tt>let</tt>, but the variable created by <tt>rep</tt> is used to
+remember information from round to round of the program.  In this
+case, we use the function <tt>rep</tt> to create the feedback variable
+<tt>t</tt>, which will store elapsed time and has the initial value of 0.
+The third argument, <tt>(+ t (dt))</tt>, tells the how the value changes
+over time&mdash;how it ``evolves.''  In this case, Proto reads that every
+time it runs through this code, it should add one <tt>(dt)</tt> to the
+current time.  What is one <tt>dt</tt>?  This <tt>dt</tt> value is the
+amount of time elapsed between rounds in a program.  So we essentially
+add the time of one round every time we go through a round.  The whole
+<tt>rep</tt> expression then returns the value of <tt>t</tt>.  We can also
+make more complicated feedback functions using <tt>letfed</tt>, which can
+make more than one feedback variable and allows you to use them in a
+further part of the program just like variables from a <tt>let</tt>.
+</p>
+
+<p>
+<b>Note:</b> Because this "timer" program is used so frequently, it has it's
+own special operation, <tt>(timer)</tt>.
+</p>
+
+      </article>
+      
+      <article>
+      <h1>Using Time</h1>
+      <p>
+      Now, let's do something interesting using time.
+      </p>
+      
+      <div class="problemanswer">
+         <h3>Exercise</h3>
+      <div class="problem">
+Write a program such that devices move after 100 time ticks.
+
+<div class="gotryit" style="display:none">; Write a program such that devices move after 100 time ticks.
+(mov
+   ;; Your code here
+)
+</div>
+
+      </div>
+
+         <h3>Solution</h3>
+<div class="editorwrapper">
+<div id="moveattime" class="editor">;;Move at Time
+(mov
+   (if
+      (> (timer) 100)
+      (tup 1 1 1)
+      (tup 0 0 0))
+</div></div></div>
+
+      </article>
+
+<!--
+      <article>
+      <h1>Microwave Timer</h1>
+
+      <p>
+      Let's say our field is a giant collection of microwave ovens.  Do we
+      want our microwave timer running all the time, and on all the machines?
+      Of course not.  Let's try put some limits on our timer.  We only want
+      this timer to run on the microwaves that are turned on. 
+      </p>
+
+<div class="editorwrapper">
+<div id="microwavetimer" class="editor">;;Microwave Timer
+(all
+   (def MWTimer (src)
+     (if src (rep t 0 (+ t (dt))) 0))
+   (MWTimer (sense 1))
+</div></div>
+
+      </article>
+-->
+
+
+
+      </section>
+
+   </body>
+</html

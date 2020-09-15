@@ -1,0 +1,7 @@
+;; disperse does not scale properly with neighborhood size!
+
+function disperse() {
+    vec = nbr_vec;
+    dist_sqr = vdot(vec,vec);
+    int_hood(mux(dist_sqr < 0.01,tup(0,0,0),neg(0.05 / dist_sqr ) * vec));
+}

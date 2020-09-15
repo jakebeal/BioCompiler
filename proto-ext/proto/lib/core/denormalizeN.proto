@@ -1,0 +1,5 @@
+(def denormalizeN (x oldmin oldmax newmin newmax)
+  (+ (- newmin oldmin)
+     (* x
+        (/ (- newmax newmin)
+           (- oldmax oldmin)))))

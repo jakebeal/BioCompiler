@@ -1,0 +1,16 @@
+;; init:     (flip 0.1 'leader 'follower)
+;; leader:   (flip 0.1 'follower 'leader)
+;; follower: (if (< leader-grad threshold) (flip 0.1 'leader 'follower))
+
+function elect () {
+    rep s {
+        flip(0.1, 'leader, 'follower)
+    } update {
+        mux {
+            flip(0.001, 'follower, 'leader)
+        } and {
+	    flip(0.001, 'follower, 'leader) \ 'follower ? gradient(s == 'leader) > 400;
+        } select(s == 'leader);
+    }
+    s == 'leader
+}

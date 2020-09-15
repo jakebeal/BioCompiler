@@ -1,0 +1,7 @@
+Biocompiler tests to add:
+"(debug-1 (or (sense-1) false))" --no-grn-optimization
+	  Check to see whether sim is OK
+
+"(debug-1 (xor (sense-1) false))"
+	  Check to see whether optimization goes to just (debug-1 (sense-1))
+

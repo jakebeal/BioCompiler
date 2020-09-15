@@ -1,0 +1,203 @@
+$(P2B_ARGS) = -EM grn --grn-out stdout --cellular-platform ecoli-platform --to-matlab
+
+test: $(P2B) "(green (or (IPTG) (not (aTc))))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: IPTG represses LacI
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][Charlie - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 4 _ [Promoter [high][LacI - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 5 _ [Promoter [high][TetR - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 6 _ [Promoter [high]]--[LacI type=<Boolean>]--[TetR type=<Boolean>]--T
+is 7 _ [Promoter [low][Echo + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 8 _ End of Genetic Regulatory Network
+is 9 _ function dy = stdout(t, y)
+is 10 _ % Genetic circuit for Proto: (green (or (IPTG) (not (aTc))))
+is 11 _ % Ordinary differential equations describing the evolution of
+is 12 _ % a genetic circuit.  Variable t is the current time (in 
+is 13 _ % y is the current concentrations of species (nanomolar)
+is 14 _ % Function is designed to be called from accompanying file
+is 15 _ % stdout_system.m, which defines constants.
+is 16 _ %{
+is 17 _ Circuit equations represent network: 
+is 18 _ Reaction: IPTG represses LacI
+is 19 _ Reaction: aTc represses TetR
+is 20 _ [Promoter [high][Charlie - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 21 _ [Promoter [high][LacI - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 22 _ [Promoter [high][TetR - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 23 _ [Promoter [high]]--[LacI type=<Boolean>]--[TetR type=<Boolean>]--T
+is 24 _ [Promoter [low][Echo + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 25 _ %}
+//is 26 _ 
+is 27 _ % make sure system parameters are accessible
+is 28 _ global R_1 K_Echo D_Echo R_2 K_LacI D_LacI R_3 K_Charlie D_Charlie R_4 R_5 K_TetR D_TetR K_IPTGLacI D_IPTGLacI K_aTcTetR D_aTcTetR H_Charlie t_Charlie H_Echo t_Echo H_GFP t_GFP H_IPTG t_IPTG H_LacI t_LacI H_TetR t_TetR H_aTc t_aTc;
+is 29 _ global input_values n_stages;
+//is 30 _ 
+is 31 _ % unpack y into named concentrations
+is 32 _ Charlie = y(1);
+is 33 _ Echo = y(2);
+is 34 _ GFP = y(3);
+is 35 _ IPTG = y(4);
+is 36 _ LacI = y(5);
+is 37 _ TetR = y(6);
+is 38 _ aTc = y(7);
+//is 39 _ 
+is 40 _ % compute derivative of concentrations
+is 41 _ LacI_eff = LacI*K_IPTGLacI*((1/(1+(IPTG./D_IPTGLacI).^H_IPTG)));
+is 42 _ TetR_eff = TetR*K_aTcTetR*((1/(1+(aTc./D_aTcTetR).^H_aTc)));
+is 43 _ dCharlie = R_5.*(1+K_TetR.^(-1).*(TetR_eff./D_TetR).^H_TetR)./(1+(TetR_eff./D_TetR).^H_TetR) - log(2)./t_Charlie.*Charlie;
+is 44 _ dEcho = R_2.*(1+K_LacI.^(-1).*(LacI_eff./D_LacI).^H_LacI)./(1+(LacI_eff./D_LacI).^H_LacI) + R_3.*(1+K_Charlie.^(-1).*(Charlie./D_Charlie).^H_Charlie)./(1+(Charlie./D_Charlie).^H_Charlie) - log(2)./t_Echo.*Echo;
+is 45 _ dGFP = R_1.*(1+K_Echo.*(Echo./D_Echo).^H_Echo)./(1+(Echo./D_Echo).^H_Echo) - log(2)./t_GFP.*GFP;
+is 46 _ dIPTG =  - log(2)./t_IPTG.*IPTG;
+is 47 _ dLacI = R_4 - log(2)./t_LacI.*LacI;
+is 48 _ dTetR = R_4 - log(2)./t_TetR.*TetR;
+is 49 _ daTc =  - log(2)./t_aTc.*aTc;
+//is 50 _ 
+is 51 _ % drive inputs to match specified value waveform
+is 52 _ stage = floor(t/input_values.stage_length)+1;
+is 53 _ if(stage>n_stages), stage=n_stages; end;
+is 54 _ dIPTG = dIPTG + 0.01*((1+499*input_values.IPTG(stage))-IPTG);
+is 55 _ daTc = daTc + 0.01*((1+499*input_values.aTc(stage))-aTc);
+//is 56 _ 
+is 57 _ % pack derivatives into dy column vector
+is 58 _ dy = [dCharlie; dEcho; dGFP; dIPTG; dLacI; dTetR; daTc];
+is 59 _ function [output_values,T,Y] = stdout_system(input_waveform,plot_figures)
+is 60 _ % Simulates genetic circuit for Proto: (green (or (IPTG) (not (aTc))))
+is 61 _ % 1. Global parameters are set at the top
+is 62 _ % 2. Simulation runs for interval tspan = [initial,final]
+is 63 _ %    interval [will be] computed from propagation delay
+is 64 _ % 3. Simulation length and inputs may be set by optional input_waveform argument
+is 65 _ % 4. Plots are (optionally) made for each sensor & actuator
+//is 66 _ 
+is 67 _ v = ver(); is_octave = strcmpi(v(1).Name,'octave');
+//is 68 _ 
+is 69 _ if nargin < 2
+is 70 _   plot_figures=1;
+is 71 _ end
+//is 72 _ 
+is 73 _ % make sure system parameters are shared
+is 74 _ global R_1 K_Echo D_Echo R_2 K_LacI D_LacI R_3 K_Charlie D_Charlie R_4 R_5 K_TetR D_TetR K_IPTGLacI D_IPTGLacI K_aTcTetR D_aTcTetR H_Charlie t_Charlie H_Echo t_Echo H_GFP t_GFP H_IPTG t_IPTG H_LacI t_LacI H_TetR t_TetR H_aTc t_aTc;
+is 75 _ global input_values n_stages;
+is 76 _ % declare parameter values
+is 77 _ R_1 = 0.00020;
+is 78 _ K_Echo = 500.00;
+is 79 _ D_Echo = 25.00;
+is 80 _ R_2 = 0.33300;
+is 81 _ K_LacI = 500.00;
+is 82 _ D_LacI = 25.00;
+is 83 _ R_3 = 0.33300;
+is 84 _ K_Charlie = 500.00;
+is 85 _ D_Charlie = 25.00;
+is 86 _ R_4 = 0.33300;
+is 87 _ R_5 = 0.33300;
+is 88 _ K_TetR = 500.00;
+is 89 _ D_TetR = 25.00;
+is 90 _ K_IPTGLacI = 1.00;
+is 91 _ D_IPTGLacI = 25.00;
+is 92 _ K_aTcTetR = 1.00;
+is 93 _ D_aTcTetR = 25.00;
+is 94 _ H_Charlie = 3;
+is 95 _ t_Charlie = 1800;
+is 96 _ H_Echo = 3;
+is 97 _ t_Echo = 1800;
+is 98 _ H_GFP = 3;
+is 99 _ t_GFP = 1800;
+is 100 _ H_IPTG = 3;
+is 101 _ t_IPTG = 1800;
+is 102 _ H_LacI = 3;
+is 103 _ t_LacI = 1800;
+is 104 _ H_TetR = 3;
+is 105 _ t_TetR = 1800;
+is 106 _ H_aTc = 3;
+is 107 _ t_aTc = 1800;
+//is 108 _ 
+is 109 _ % system initial condition, packed into y_0
+is 110 _ Charlie_0 = 0;
+is 111 _ Echo_0 = 0;
+is 112 _ GFP_0 = 0;
+is 113 _ IPTG_0 = 0;
+is 114 _ LacI_0 = 0;
+is 115 _ TetR_0 = 0;
+is 116 _ aTc_0 = 0;
+is 117 _ y_0 = [Charlie_0; Echo_0; GFP_0; IPTG_0; LacI_0; TetR_0; aTc_0];
+//is 118 _ 
+is 119 _ % simulation time interval (propagation delay)
+is 120 _ if nargin > 0
+is 121 _     input_values = input_waveform;
+is 122 _     n_stages = numel(input_waveform.IPTG);
+is 123 _ else % choose defaults
+is 124 _     n_stages = 1;
+is 125 _     input_values.stage_length = 10000 * 7;
+is 126 _     input_values.time_step = 1e3;
+is 127 _     input_values.IPTG = IPTG_0;
+is 128 _     input_values.aTc = aTc_0;
+is 129 _ end
+is 130 _ endtime = input_values.stage_length*n_stages;
+is 131 _ tspan = 0:input_values.time_step:endtime;
+//is 132 _ 
+is 133 _ % Run ODE numerical integrator
+is 134 _ if is_octave, ode_tspan = [0 endtime]; else ode_tspan = tspan; end;
+is 135 _ [Ttmp,Ytmp] = ode23s(@stdout,ode_tspan,y_0,odeset('MaxStep',input_values.time_step));
+is 136 _ Y = interp1 (Ttmp, Ytmp, tspan);
+is 137 _ T = tspan;
+//is 138 _ 
+//is 139 _ 
+is 140 _ % Make plots
+is 141 _ if plot_figures
+is 142 _   h = figure();
+is 143 _   set(h,'visible','off');
+is 144 _   subplot(2,2,1);
+is 145 _   semilogy(T,Y(:,4),'b-');
+is 146 _   axis([min(T),max(T),1e0,1e3]);
+is 147 _   xlabel('Time (s)'); ylabel('[IPTG] (nM)');
+//is 148 _ 
+is 149 _   subplot(2,2,2);
+is 150 _   semilogy(T,Y(:,7),'b-');
+is 151 _   axis([min(T),max(T),1e0,1e3]);
+is 152 _   xlabel('Time (s)'); ylabel('[aTc] (nM)');
+//is 153 _ 
+is 154 _   subplot(2,2,3);
+is 155 _   semilogy(T,Y(:,3),'b-');
+is 156 _   axis([min(T),max(T),1e0,1e3]);
+is 157 _   xlabel('Time (s)'); ylabel('[GFP] (nM)');
+//is 158 _ 
+is 159 _   if (is_octave)
+is 160 _     FN = findall(h,'-property','FontName');
+is 161 _     set(FN,'FontName','Helvetica');
+is 162 _     print(h,'-dpdfwrite','stdout_simulation');
+is 163 _   else
+is 164 _     print(h,'-depsc2','stdout_simulation');
+is 165 _   end
+is 166 _   print(h,'-dpng','stdout_simulation');
+is 167 _   saveas(h,'stdout_simulation.fig');
+is 168 _ end
+//is 169 _ 
+is 170 _ % Note: assumption that time_step divides evently into stage_length
+is 171 _ phase_ends = find(mod(tspan(2:end),input_values.stage_length)==0)-1;
+is 172 _ output_values.GFP = Y(phase_ends,3)>1e2;
+is 173 _ % Simulates genetic circuit for Proto: (green (or (IPTG) (not (aTc))))
+is 174 _ % with all combinations of binary inputs
+//is 175 _ 
+is 176 _ v = ver(); is_octave = strcmpi(v(1).Name,'octave');
+is 177 _ if is_octave
+is 178 _   pkg load odepkg
+is 179 _ end
+//is 180 _ 
+is 181 _ input_waveform.stage_length = 10000 * 7;
+is 182 _ input_waveform.time_step = 1e3;
+is 183 _ input_waveform.IPTG = [0 1 0 1];
+is 184 _ input_waveform.aTc = [0 0 1 1];
+is 185 _ [out,T,Y] = stdout_system(input_waveform);
+//is 186 _ 
+is 187 _ f = fopen('stdout_timeseries.csv','w');
+is 188 _ fprintf(f,'Time,Charlie,Echo,GFP,IPTG,LacI,TetR,aTc\n');
+is 189 _ for i=1:numel(T),
+is 190 _   fprintf(f,'%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n',T(i),Y(i,1),Y(i,2),Y(i,3),Y(i,4),Y(i,5),Y(i,6),Y(i,7));
+is 191 _ end
+is 192 _ fclose(f);
+//is 193 _ 
+is 194 _ f = fopen('stdout_truth_table.csv','w');
+is 195 _ fprintf(f,'IPTG,aTc,GFP\n');
+is 196 _ for i=1:4
+is 197 _   fprintf(f,'%i,%i,%i\n',input_waveform.IPTG(i),input_waveform.aTc(i),out.GFP(i));
+is 198 _ end
+is 199 _ fclose(f);

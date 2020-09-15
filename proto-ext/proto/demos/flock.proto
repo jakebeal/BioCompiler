@@ -1,0 +1,21 @@
+(def flock (dir)
+  (rep v 
+   (tup 0 0 0)
+   (let ((d
+	  (normalize
+	   (int-hood
+	    (if (< (nbr-range) 5)
+	      (* -1 (normalize (nbr-vec)))
+	      (if (> (nbr-range) 10)
+		(* 0.2 (normalize (nbr-vec)))
+		(normalize (nbr v))))))))
+     (normalize 
+      (+ dir (mux (> (vdot d d) 0) d v))))))
+
+;; To see leader-influenced flocking, run:
+;;   proto -n 500 -r 15 -sv -l -m -s 0.5 "(mov (flock (* -0.5 (sense 1) (normalize (coord)))))"
+;; Shift-drag to select some of the nodes, then hit 't' to make them
+;; seek the center of the screen.  Depending on the relative size of
+;; the group you select and the flock they are part of, the rest of
+;; the flock will either turn with them or break apart.
+

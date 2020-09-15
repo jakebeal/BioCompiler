@@ -1,0 +1,85 @@
+PROJECT_NAME         = Proto
+PROJECT_NUMBER       = 8
+
+# General configuration options
+#---------------------------------------------------------------------------
+QUIET                = YES
+WARNINGS             = YES
+
+GENERATE_LATEX       = no
+GENERATE_HTML        = yes
+GENERATE_MAN         = YES
+GENERATE_RTF         = NO
+
+OUTPUT_DIRECTORY     = .
+HTML_OUTPUT          = html/api
+HTML_HEADER          =
+HTML_FOOTER          = 
+LATEX_OUTPUT         = latex
+MAN_OUTPUT           = man
+
+DISABLE_INDEX        = NO
+EXTRACT_ALL          = YES
+EXTRACT_STATIC       = YES
+EXTRACT_PRIVATE      = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+HIDE_UNDOC_MEMBERS   = NO
+BRIEF_MEMBER_DESC    = YES
+REPEAT_BRIEF         = YES
+JAVADOC_AUTOBRIEF    = YES
+INHERIT_DOCS         = YES
+FULL_PATH_NAMES      = NO
+CLASS_DIAGRAMS       = YES
+SHOW_INCLUDE_FILES     = YES
+SOURCE_BROWSER       = YES
+
+# Pages
+#---------------------------------------------------------------------------
+GENERATE_TODOLIST      = YES
+GENERATE_TESTLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST= YES
+SHOW_USED_FILES        = YES
+SHOW_DIRECTORIES       = YES
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = YES
+
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT            = ../src ../doc/mainPage.txt
+FILE_PATTERNS    = *.cpp *.h *.hh
+EXAMPLE_PATH     = 
+RECURSIVE        = YES
+INPUT_FILTER     = 
+CASE_SENSE_NAMES = YES
+
+# Configuration options related to the preprocessor 
+#---------------------------------------------------------------------------
+ENABLE_PREPROCESSING = YES
+MACRO_EXPANSION      = YES
+SEARCH_INCLUDES      = YES
+INCLUDE_PATH         = 
+EXPAND_ONLY_PREDEF   = NO
+PREDEFINED           = 
+
+# Configuration options related to external references 
+#---------------------------------------------------------------------------
+TAGFILES         = 
+GENERATE_TAGFILE = 
+ALLEXTERNALS     = NO
+PERL_PATH        = /usr/bin/perl
+
+# Configuration options related to the dot tool   
+#---------------------------------------------------------------------------
+HAVE_DOT             = no
+COLLABORATION_GRAPH  = YES
+INCLUDE_GRAPH        = YES
+INCLUDED_BY_GRAPH    = YES
+GRAPHICAL_HIERARCHY  = YES
+GENERATE_LEGEND        = YES
+CLASS_GRAPH            = YES
+#UML_LOOK               = YES
+#CALL_GRAPH             = YES
+#CALLER_GRAPH           = YES
+DOT_IMAGE_FORMAT = png

@@ -1,0 +1,39 @@
+;; Base Motif collection
+;; Copyright (C) 2009-2011, Raytheon BBN Technologies and contributors listed 
+;; in the AUTHORS file in TASBE BioCompiler distribution's top directory.
+;;
+;; This file is part of the TASBE BioCompiler, and is distributed under
+;; the terms of the GNU General Public License, with a linking exception,
+;; as described in the file LICENSE in the TASBE BioCompiler
+;; distribution's top directory.
+
+;; LOGICAL OPERATORS
+(annotate not :grn-motif ((P high value R- arg0 T)))
+(primitive and (boolean boolean) boolean
+	   :grn-motif ((P high ?X|boolean R- arg0 T)
+			 (P high ?Y|boolean R- arg1 T)
+			 (P high value R- ?X R- ?Y T)))
+
+(def or (a b)
+  (not (and (not a) (not b))))
+
+;; Actuators are regulated by double-negation
+(primitive green (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P high ?X|boolean R- arg0 T)
+	      (P high GFP|arg0 value R- ?X T)))
+(primitive red (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P high ?X|boolean R- arg0 T)
+	      (P high RFP|arg0 R- ?X T)
+	      (P high value R- ?X T)))
+
+
+(primitive aTc () boolean
+ :grn-motif ((P high TetR|boolean T) 
+	     (RXN (aTc|boolean) represses TetR)
+	     (P high R- TetR value T)))
+(primitive IPTG () boolean
+ :grn-motif ((P high LacI|boolean T) 
+	     (RXN (IPTG|boolean) represses LacI)
+	     (P high R- LacI value T)))

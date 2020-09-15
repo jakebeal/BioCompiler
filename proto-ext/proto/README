@@ -1,0 +1,197 @@
+Welcome to Proto, the world's premier language for spatial computing!
+
+In this release of MIT Proto, you will find the following key files
+and directories:
+
+AUTHORS		 Authorship and a brief history for MIT Proto
+COPYING/LICENSE	 Explains that MIT Proto is free software, but that it
+		 can be used to create non-free projects.
+INSTALL		 Standard instructions for installation
+README		 This document
+README.developer Additional info for developers
+demos/		 Demonstration proto programs
+lib/		 Proto libraries and core code
+man/		 Manuals
+platforms/	 Proto support for various hardware platforms
+plugins/	 Plug-in modules for the simulator
+src/		 Proto compiler, kernel, and simulator
+
+For support, join proto-discuss@csail.mit.edu and ask your question.
+Somebody there might be able to help you.  If you've identified a bug
+in MIT Proto, use the bugtracker at http://proto.bbn.com/bugzilla/
+
+
+MIT PROTO INSTALLATION HELP
+
+This version of Proto has been set up to build with GNU autotools, and
+to install in a standard location in your system. These tools may not
+be installed and installation varies on different systems.  Sections
+below list packages needed in order to provide the necessary tools and
+libraries.
+
+Once you have all the necessary packages installed, you can start to
+build.  First, you need to generate the configuration files by running
+"./autogen.sh".  This will create build files appropriate to your
+system.  From there, you should be able to just follow the
+instructions in INSTALL and have everything build and install
+correctly.
+
+You may need to add options such as "--with-x" and "--with-glut" when
+you run "./configure" if the configuration software does not
+automatically detect your graphics correctly.
+
+If you are using a standard install of Mac OS X, you need to add the
+option "--with-apple-opengl-framework" when you run "./configure":
+  "./configure --with-apple-opengl-framework"
+
+Correct installation will put two applications into your path:
+* proto: Proto simulator (incorporating compiler)
+* p2b:   Proto standalone compiler
+
+Once you've installed proto, you can do a smoke-test by running:
+  proto -n 1000 -s 0.1 -T -l "(red (gradient (= (mid) 0)))"
+which should produce a cone of red dots extending out from a random
+device in the network.  Click and drag your mouse in the window to see
+the 3D shape of the dots better.
+
+
+1. DEPENDENCIES
+
+Proto depends on the following applications and libraries:
+* GNU C/C++ (v. 4.0 or later)
+* GNU autotools	(usually bundled with GNU C/C++; libtool must be >= v. 1.8)
+* flex 		(usually bundled with GNU C/C++)
+* OpenGL (and GLUT)
+* X Windows
+* Open Dynamics Engine (ODE) v0.8  [optional]
+* Xmu (X miscellaneous utility routines - usually already installed)
+* Xi (X input Extension library - usually already installed)
+* Doxygen (optional) for API documentation building
+* Graphviz (optional) for graph generation in API documentation
+* CPPUnit (optional) unit testing framework for compiler
+
+If you have all of these installed, you should just be able to run
+'make' in this directory and have the whole thing build correctly.
+In order to run proto, you will need to install it with 'make install'
+
+The Prototest regression testing package requires Python 2.5
+
+Sometimes the dependencies between libraries are not obvious.  One of
+these is the implicit dependence of glut on certain -lXmu and -Xi
+libraries. If you are building a non-headless version of proto, it may
+appear that the -lglut library is missing. While this may in fact be
+the case, it may also be the case that either or both of -lXmu and
+-lXi are missing. In general, if a certain library appears to be
+missing, examine the corresponding ax_check_*.m4 configuration file to
+see what other libraries are also required.  Similarly, if you get an
+error telling you to run autoconf again, run "./autogen.sh" and
+"./configure" again and the error will likely resolve itself.
+
+
+2. SYSTEMS
+
+Proto is intended to work on Linux, BSD, MacOS X, and Windows, and
+should be easily portable to any other unix.
+
+Proto has been tested on the following platforms:
+* Debian Lenny, CSAIL Debian, Ubuntu Gutsy & Hardy, Linux Mint Darnya
+* Fedora Sulphur 9, CentOS 5
+* PC-BSD 1.5.1 [currently not working]
+* Mac OS X: 10.4, 10.5, 10.6
+* Windows: XP (with Cygwin), Vista (with Cygwin)
+
+If you have the required dependencies, we expect Proto to work without
+any problems.
+
+
+3. PLATFORM-SPECIFIC INSTRUCTIONS:
+
+A. Linux
+Installing the Required Packages:
+* Debian/Ubuntu/derivatives: 
+  Use the following command to install required packages: 
+  "sudo apt-get install autoconf libtool build-essential
+   libglu1-mesa-dev freeglut3-dev mesa-common-dev libxmu-dev libxi-dev
+   flex"
+  You may need to substitute "libxi6-dev" for "libxi-dev".
+  To use ODE, add "libode0-dev" to the list.
+  Make sure libtool is newer than version 1.8. You need Ubuntu 8.10 or
+  later or install libtool yourself.
+
+* Redhat/CentOS/Fedora/derivatives: use yum to install make, gcc,
+  gcc-c++, freeglut-devel.i386, ode.i386.  You might have to compile
+  ode yourself on CentOS.
+
+Other Linux notes:
+* If you have ATI/NVIDIA graphics cards, using the "Restricted
+  Drivers" greatly increases performance.
+* DEBIAN: When using nvidia drivers in Debian, you may need to install
+  nvidia-glx-dev to get the OpenGL rendering to work correctly. If
+  your make complains during linking that it cannot find "pthread"
+  routines, this is likely the problem.
+* DEBIAN: Debian may not, by default, search for libraries in the
+  directory where ODE is likely to have installed itself.  By default,
+  ODE installs in /usr/local/lib.  If that is not part of the library
+  path, add it to /etc/ld.so.conf and run ldconfig
+   
+B. Windows
+* Proto expects the its GNU and X Windows to be provided by Cygwin.
+* Cygwin doesn't install gcc, g++, make, OpenGL, or GLUT by default.
+  You will need the following packages (under Devel):
+   automake, libtool, flex, gcc, g++, libglut-devel, openGL, make, 
+   lixXmu6, libXi6
+* You may need to start X Windows manually by running startxwin.bat
+* USING ODE: The easiest way is to get use the "Autotools" method with
+  Cygwin (as described in ODE's install notes). You will need to tell
+  Cygwin to install "libtool" to install ode this way.
+* Install Python into cygwin if you want to run regression testing.
+
+C. MacOS X
+* If OpenGL and GNU tools aren't already installed, install the
+  following Xcode packages: DevSDK.pkg and OpenGLSDK.pkg.  For recent OS
+  versions (e.g., 10.6), everything is provided by the XCode distribution.
+* If autotools or GNU libtool are not included, use you favorite
+  package manager to install them (brew is recommended).
+  You will also likely need to modify your CPATH to point to their location
+  (e.g, with brew, make sure /usr/local is in your CPATH)
+* If you can't right click (e.g. to zoom), then check the application
+  preferences and make sure that multi-button mouse emulation is
+  turned on.
+* If you have problems with the autotools, it may be because your
+  libtool is too old.  To install a recent distribution from GNU, you
+  will need to make sure you configure with "--program-prefix=g" to
+  have it install as "glibtool" rather than "libtool" (it is renamed
+  in Mac OS X to avoid conflict with a different Apple-provided
+  utility).  You shouldn't have any problems in 10.6.
+
+D. BSD
+* You need GNU Make to compile proto.  This is not the default BSD make.
+* Make sure that your version of GCC is 4.0 or later. Either alias the
+  new version of GCC to "gcc", or make changes to the Makefile to
+  ensure that the new version is used. (Changing all instances of
+  "gcc" to "gcc4_3" should suffice).
+* If your /proc filesystem is not mounted, Proto cannot determine
+  where it is running, and will be unable to load.  If this happens
+  to you, log in as root and run 'mount -t procfs proc /proc'
+
+
+Non-Standard Plugin Installation
+================================
+
+   At times, it may be impossible to install Proto in the standard location.
+When this is the case, it is possible to install Proto in any directory by
+passing the `--prefix' parameters to the configure script.  When building
+plugins for this installation, however, it is necessary to explicitly state the
+installation location(s).  You can do so by passing the `LDFLAGS' and
+`CPPFLAGS' arguments to the plugins' configure script.For example, your
+configure line may look similar to the following:
+
+./configure --prefix=${INSTALLATION_DIR} \
+            LDFLAGS=-L${DIR_TO_LIB_FILES} \
+            CPPFLAGS=-I${DIR_TO_HEADER_FILES}
+
+Where ${INSTALLATION_DIR} is where the proto plugin will be installed,
+${DIR_TO_LIB_FILES} is where the proto library files are located (e.g., *.la),
+and ${DIR_TO_HEADER_FILES} is where the proto header files are located 
+(e.g., *.h).
+

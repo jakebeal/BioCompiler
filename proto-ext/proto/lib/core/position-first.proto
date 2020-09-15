@@ -1,0 +1,13 @@
+;;position-first
+;;Returns the index of first occurence of item in a tuple.
+;;OR -1 if item doesn't occur.
+
+(def position-first (val elts)
+    (pos-helper val elts 0 (len elts)))
+    
+(def pos-helper (val elts index length)
+    (if (= val (elt elts index)) 
+            index
+            (if (= index (- length 1))
+                -1
+                (pos-helper val elts (+ 1 index) length))))

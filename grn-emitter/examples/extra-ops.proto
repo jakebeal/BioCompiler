@@ -1,0 +1,5 @@
+(primitive Sense4 () boolean
+ :grn-motif ((P high Sense4P|boolean T) 
+	     (RXN (Sense4|boolean) represses LacI)
+	     (P high R- Sense4P value T)))
+

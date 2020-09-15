@@ -1,0 +1,4 @@
+The SVN version number is automatically included in the
+configuration files by the GNU autotools.
+- When you first build, it will be included automatically via ./autogen.sh
+- To update, run ./autogen.sh again

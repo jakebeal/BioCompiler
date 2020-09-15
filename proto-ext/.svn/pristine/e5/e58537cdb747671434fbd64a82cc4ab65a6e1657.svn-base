@@ -1,0 +1,39 @@
+;; a version of tracking designed to demo nicely, with all the code in one file
+(all
+ (def broadcast (src f)
+   (letfed ((d (inf) (gradient src))
+	    (v f (mux src f (2nd (fold-hood
+			 	  (fun (r x) (if (< (1st x) (1st r)) x r))
+				  (tup (inf) f)
+				  (tup d v))))))
+     (all d v)))
+ (def channel (src dst width)
+   (let* ((d (distance src dst))
+          (trail (<= (+ (gradient src) (gradient dst)) (+ d 1)))) ;; slop
+     (and (< d (inf)) (dilate trail width))))
+ (def track (target dst coord)
+   (if (channel target dst 10)
+     (all (blue 1)
+      (mux dst (- (broadcast target coord) coord) (tup 0 0 0)))
+     (tup 0 0 0)))
+
+ (def track-demo ()
+   (all 
+    (let ((mobile (once (< (rnd 0 1) 0.5))))
+      (mov (* (if (or (sense 1) (or (sense 2) mobile)) 0.01 0) (dither))))
+    (track (sense 1) (sense 2) (coord))))
+)
+
+;; Run one of these commands:
+;;   proto -n 500 -r 15 -sv -l -m -w -s 0.5 "(track-demo)"
+;;   proto -n 150 -r 15 -sv -l -m -w -s 0.1 "(track-demo)"
+;;   proto -n 2000 -r 5 -sv -l -m -w -s 1.0 "(track-demo)"
+
+;; click on one device and hit 't' to select the target to be tracked,
+;; then click on another device and hit 'y' to select the base station
+;; where its location is sent.  You should see blue dots on the nodes
+;; in the channel forwarding information from the target to the base
+;; station, and a vector pointing from the base station to a spot
+;; close to the target.  Notice that the tracking behavior scales
+;; smoothly to all these networks of radically different sizes,
+

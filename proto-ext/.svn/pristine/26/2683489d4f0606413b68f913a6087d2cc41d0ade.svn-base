@@ -1,0 +1,16 @@
+function gradient (src) {
+    feedback d,v {
+        d = inf;
+        v = 0;
+    } update {
+        constrained = any_hood+( nbr(d) + nbr-range + v*(nbr-lag + dt) <= d);
+        tri-inequality = min_hood+(nbr(d) + nbr-range);
+        v0 = radio-range / (dt * 12);
+        
+        d = mux { 0; }
+	    and { tri-inequality \ d+(v0*dt) ? constrained; }
+	    select(src);
+        v = 0 \ v0 ? (src && constrained);
+    }
+    d;
+}

@@ -1,0 +1,26 @@
+Note that our test platform for Windows actually uses
+cross-compilation from a Linux machine, using the mingw32 compiler
+(the Windows cross-compiler distribution for gcc).
+
+Making this work with Hudson regression testing requires some extra fiddles:
+
+- Some black-magic options need to be added to the build specification:
+
+  configureopts=--host=i686-w64-mingw32 --build x86_64-unknown-linux-gnu --without-glut ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
+  extralibs=-lws2_32 -lwinmm
+  exeExt=.exe
+  cflags=-posix
+
+- Some symbolic links are needed in the installdir's bin, pointing to
+  some mingw32 libraries, to ensure that buildregistry can execute
+
+  Assuming that:
+  $INSTALL_DIR=/opt/hudson/workspace/Proto-Windows-cross-compile/proto-dist
+
+  Then you need 4 links in $INSTALL_DIR/bin and $INSTALL_DIR/lib/proto: 
+  libdl.dll, libgcc_s_sjlj-1.dll, libltdl-7.dll, and libstdc++-6.dll.  If 
+  you 'cd' into each and run this:
+  ln -s /usr/i686-w64-mingw32/sys-root/mingw/bin/libdl.dll 
+    /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll 
+    /usr/i686-w64-mingw32/sys-root/mingw/bin/libltdl-7.dll 
+    /usr/i686-w64-mingw32/sys-root/mingw/bin/libstdc++-6.dll

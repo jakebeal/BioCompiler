@@ -1,0 +1,2 @@
+(def xor (x y)
+  (if x (not y) y))

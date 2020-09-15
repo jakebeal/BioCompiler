@@ -1,0 +1,34 @@
+(Last Revision: $Date: 2010-01-03 10:40:50 -0500 (Sun, 03 Jan 2010) $)
+
+This project contains an MIT Proto plugin that provides physics
+simulation using the ODE physics engine.  It also allows Proto to
+create structures of devices connected by DOE joints by means of a
+distribution that reads blueprints from XML files.
+
+DEPENDENCIES:
+
+* MIT Proto (v. 1.5 or later)
+* ODE (v. 0.11)
+* xercesc3 (C++ XML parser, v.3.0 or later)
+* pkg-config
+
+INSTALLATION NOTES:
+
+This project uses GNU autotools, so if you have already installed MIT
+Proto, you should be able to build it by running:
+  `./autogen.sh; ./configure; make; make install'
+
+You may need to add options such as "--with-x" and "--with-glut" when
+you run "./configure" if the configuration software does not
+automatically detect your graphics correctly.
+
+If you are using a standard install of Mac OS X, you need to add the
+option "--with-apple-opengl-framework" when you run "./configure":
+  "./configure --with-apple-opengl-framework"
+
+Test the plugin by running:
+  proto -L odedynamics -m "(mov (* -0.01 (coord)))" -n 10
+This should result in a collection of devices, represented by boxes,
+moving toward the center of the screen and colliding.  Initially, they
+are blue, but when they touch they turn green instead.
+

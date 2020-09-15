@@ -1,0 +1,61 @@
+$(P2B_ARGS) = -CDlocalized --no-emission
+
+// Simple neighborhood localization:
+// test: $(P2B) "(max-hood (nbr (= (mid) 0)))"
+// is 0 _ Function: lambda~4 [Signature: <Any> --> <Any>] called 1 times
+// is 1 _   Amorphous Mediums:
+// is 2 _     [Medium: Golf = root]
+// is 3 _   Fields:
+// is 4 _     Hotel: Golf --> <Boolean>
+// is 5 _     India: Golf --> <Field <Boolean>> OUTPUT
+// is 6 _   Operator Instances:
+// is 7 _     [Parameter 0: arg~5] --> Hotel<Boolean>
+// is 8 _     Hotel<Local> --> [nbr] --> India<Field <Boolean>> OUTPUT
+// is 9 _ Amorphous Mediums:
+// is 10 _   [Medium: Alfa = root]
+// is 11 _ Fields:
+// is 12 _   Delta: Alfa --> <Boolean>
+// is 13 _   Echo: Alfa --> <Scalar>
+// is 14 _   Foxtrot: Alfa --> <Scalar 0>
+// is 15 _   Juliet: Alfa --> <Number> OUTPUT
+// is 16 _   Kilo: Alfa --> <Lambda [max]>
+// is 17 _   Lima: Alfa --> <Lambda [Fun: lambda~4]>
+// is 18 _ Operator Instances:
+// is 19 _   Echo<Scalar>, Foxtrot<Scalar 0> --> [=] --> Delta<Boolean>
+// is 20 _   [mid] --> Echo<Scalar>
+// is 21 _   [Lit: <Scalar 0>] --> Foxtrot<Scalar 0>
+// is 22 _   Kilo<Lambda [max]>, Lima<Lambda [Fun: lambda~4]>, Delta<Boolean> --> [fold-hood-plus] --> Juliet<Number> OUTPUT
+// is 22 _   [Lit: <Lambda [max]>] --> Kilo<Lambda [max]>
+// is 23 _   [Lit: <Lambda [Fun: lambda~4]>] --> Lima<Lambda [Fun: lambda~4]>
+
+// Neighborhood variables:
+//test: $(P2B) "(let ((x (+ 2 (mid)))) (+ x (min-hood (+ x (nbr x)))))"
+
+// Function external references:
+test: $(P2B) "(let ((x (+ (mid) 1))) ((lambda (y) (* x y)) 3))" --function-inlining-threshold 0
+is 0 _ Function: lambda~4 [Signature: <Any> --> <Scalar>] called 1 times
+is 1 _   Amorphous Mediums:
+is 2 _     [Medium: Alfa = root]
+is 3 _   Fields:
+is 4 _     Bravo: Alfa --> <Scalar> OUTPUT
+is 5 _     Charlie: Alfa --> <Scalar>
+is 6 _     Delta: Alfa --> <Scalar 3>
+is 7 _   Operator Instances:
+is 8 _     Charlie<Scalar>, Delta<Scalar 3> --> [*] --> Bravo<Scalar> OUTPUT
+is 9 _     Echo<Scalar> --> [reference] --> Charlie<Scalar>
+is 10 _     [Lit: <Scalar 3>] --> Delta<Scalar 3>
+is 11 _ Amorphous Mediums:
+is 12 _   [Medium: Foxtrot = root]
+is 13 _ Fields:
+is 14 _   Echo: Foxtrot --> <Scalar>
+is 15 _   Golf: Foxtrot --> <Scalar>
+is 16 _   Hotel: Foxtrot --> <Scalar 1>
+is 17 _   India: Foxtrot --> <Scalar> OUTPUT
+is 18 _   Juliet: Foxtrot --> <Scalar 3>
+is 19 _ Operator Instances:
+is 20 _   Golf<Scalar>, Hotel<Scalar 1> --> [+] --> Echo<Scalar>
+is 21 _   [mid] --> Golf<Scalar>
+is 22 _   [Lit: <Scalar 1>] --> Hotel<Scalar 1>
+is 23 _   Juliet<Scalar 3> --> [Fun: lambda~4] --> India<Scalar> OUTPUT
+is 24 _   [Lit: <Scalar 3>] --> Juliet<Scalar 3>
+

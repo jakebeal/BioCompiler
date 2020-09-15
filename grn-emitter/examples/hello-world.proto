@@ -1,0 +1,8 @@
+(def hello-world ()
+  (let ((x (test-sensor)))
+    (debug x)
+    (debug-2 (not x))))
+
+;; Call with:
+;; neop2b --instructions -EM grn "(hello-world)" --DLL ../libbiocompiler.la --cellular-platform ecoli-platform
+;; neop2b --instructions -EM grn "(hello-world)" --DLL ../libbiocompiler.la --cellular-platform mammalian-platform

@@ -1,0 +1,2 @@
+(def assoc (val tups)
+  (fold (fun (res t) (if (= val (1st t)) t res)) (tup -1 -1) tups))

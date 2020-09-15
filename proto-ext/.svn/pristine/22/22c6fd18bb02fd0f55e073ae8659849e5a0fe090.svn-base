@@ -1,0 +1,22 @@
+This project contains a JavaScript implementation of Proto.  
+It is based on porting the MIT Proto simulator and the DelftProto VM
+to JavaScript.  Compilation is handled by call-outs to a CGI
+
+This is a highly experiment project, and should be considered as early Beta.
+
+
+To Install on a Server:
+1) svn co <PROTO/trunk>
+2) compile proto (via instructions in SVN repo)
+3) copy webproto/webcompiler into CGI directory (e.g., /usr/lib/cgi-bin) and edit as necessary
+
+
+Additional component notes:
+
+- p2b is a python script that is meant to handle calls via CGI.
+  put it in your system's CGI folder (e.g., /usr/lib/cgi-bin),
+  make sure to enable CGI, and point it to your JSON-enabled
+  version of the proto p2b
+
+- ace is the library that we're using to display/edit code.
+  We added a syntax highlighting module, ace/mode-proto.js

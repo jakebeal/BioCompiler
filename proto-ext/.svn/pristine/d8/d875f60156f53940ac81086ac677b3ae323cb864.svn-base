@@ -1,0 +1,5 @@
+#define INSTRUCTION(name) X(name##_OP)
+#define INSTRUCTION_N(name,n) X(name##_##n##_OP)
+#include "instructions.def"
+#undef INSTRUCTION_N
+#undef INSTRUCTION

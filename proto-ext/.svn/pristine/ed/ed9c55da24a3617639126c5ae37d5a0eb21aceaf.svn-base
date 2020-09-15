@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <title>Proto Demos</title>
+      <link rel="stylesheet" href="css/tutorialStyle.css">
+      <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" />
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+      <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+      <script type="text/javascript">
+         var _gaq = _gaq || [];
+         _gaq.push(['_setAccount', 'UA-26309611-1']);
+         _gaq.push(['_trackPageview']);
+
+         (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      <script>
+         var editors = { };
+         $(document).ready(function() {
+            $.each($('.editor'), function(index, editor) {
+               editor = ace.edit(this.id);
+               editor.setTheme("ace/theme/monokai");
+               editor.getSession().setMode("ace/mode/proto");
+               editor.setFontSize(15);
+               editor.setReadOnly(true);
+               editors[this.id] = editor;
+
+               $(this).height(editor.getValue().split('\n').length * 1.1 + "em")
+
+               //now add "see it in action" link
+               $(this).parent().append(
+               "<a target=\"_blank\" href=index.html?program="
+                  + encodeURIComponent(editor.getValue())
+                  + "&step=10"
+                  + "&radius=15"
+                  + "&numDevices=200"
+                  + ">See it in action</a>");
+            });
+            $.each($('.gotryit'), function(index, answer) {
+               $(this).parent().append("<br/><br/><a target=\"_blank\" href=index.html?program="+
+                  encodeURIComponent(this.textContent)
+                  + "&step=10"
+                  + "&radius=15"
+                  + "&numDevices=200"
+                  +">Go try it!</a>");
+            });
+            $.each($('.problemanswer'), function(index, answer) {
+               $(this).accordion({
+                  collapsible:true,
+                  heightStyle: "content",
+               });
+            });
+         });
+      </script>
+   </head>
+   <body>
+      <header class='page-header'>
+         <a href="demo.html">SASO<span>2013</span>Demo</a>
+      </header>
+
+      <section class="page-body">
+
+      <h1>SASO 2013 Demonstration</h1>
+      <img src="figures/protorunning.png" width="100%" />
+      
+      <article>
+      <h1>Bullseye</h1>
+      <b>Goal:</b> Produce an LED pattern dependent on distance from a source.
+      <center><img src="figures/bullseye.png" width="60%" /></center>
+      
+<div class="editorwrapper">
+<div id="bullseye" class="editor">;;Bullseye
+(def bullseye (src)
+   (let ((d (distance-to src)))
+      (if (< d 15)
+         (red 1)
+         (if (< d 30)
+            (green 1)
+            (if (< d 45)
+               (blue 1)
+               0)))))
+
+;; Click on a node and hit 't' to toggle sense 1
+(bullseye (sense 1))
+</div></div>
+      </article>
+      
+      <article>
+      <h1>Voronoi</h1>
+      <b>Goal:</b> A Voronoi diagram divides space into a number of regions
+      based on a set of seed sites.  Our goal is to dynamically create a
+      Voronoi diagram based on a set of seeds with an activated sensor.
+      <center><img src="figures/voronoi.png" width="60%" /></center>
+      
+<div class="editorwrapper">
+<div id="voronoi" class="editor">;;Voronoi
+(def uid2rgb (uid f)
+     (let* ((r (mod uid f))
+            (g (- (mod uid (pow f 2)) r))
+            (b (- (mod uid (pow f 3)) (+ r g))))
+       (rgb (tup (/ r f) (/ g (pow f 2)) (/ b (pow f 3))))))
+
+(def voronoi (src showedge)
+     (let* ((closest-src (broadcast src (mid)))
+            (edge (any-hood (not (= (nbr closest-src) closest-src))))
+            (vertex 
+              (and edge 
+                   (let ((max-nbr (max-hood (if (not (= closest-src (nbr closest-src)))
+                                              (nbr closest-src)
+                                              -1)))
+                         (min-nbr (min-hood (if (not (= closest-src (nbr closest-src)))
+                                              (nbr closest-src)
+                                              (inf)))))
+                     (not (= max-nbr min-nbr))))))
+       (if (and edge showedge)
+         (if vertex
+           (rgb (tup 1 0 0))
+           (rgb (tup 0 0 0.5)))
+         (uid2rgb closest-src 10))
+       (tup closest-src edge)))
+
+;; Click on a node and hit 't' to toggle sense 1
+;; Each "sense 1" node is a seed of the Voronoi diagram
+(voronoi (sense 1) 1)
+</div></div>
+      </article>
+
+
+      <article>
+      <h1>Channel</h1>
+      <b>Goal:</b> to identify the set of nodes within ten meters of the
+      shortest path between two devices.
+      
+<div class="editorwrapper">
+<div id="channel" class="editor">;;Channel
+(def channel (src dst width) 
+     (let* ((d     (distance src dst)) 
+            (trail (<= (+ (gradient src) (gradient dst)) (+ d 0.01)))
+            )   
+       (dilate trail width))) 
+
+;; Click on a node and hit 't' to toggle sense 1
+;; Then click on another node and hit 'y' to toggle sense 2
+(blue (channel (sense 1) (sense 2) 10))
+</div></div>
+      </article>
+      
+      
+      
+      <article>
+      <h1>Dither</h1>
+      <b>Goal:</b> to demonstrate node mobility using a random motion
+      dispersion technique.
+      
+<div class="editorwrapper">
+<div id="dither" class="editor">;;Dither
+;; Click and drag on the simulation to rotate in 3 dimensions
+;; Use the two-finger scrolling gesture to zoom in and out
+(mov (* 0.1 (dither)))
+</div></div>
+      </article>
+      
+      
+      
+      
+      <article>
+      <h1>Energy-Aware Routing</h1>
+      <p>
+      <b>Goal:</b> to demonstrate energy-aware packet routing by gradient
+      descent.  Every device with a packet picks the lowest value neighbor and
+      tries to hand a packet to it.  The handoff will be retried until the
+      neighbor takes up the packet.  If there is no appropriate neighbor, the
+      packet is dropped.  By incorporating energy cost into metrics, this
+      energy-routing function will change the packets' paths over time.
+      </p>
+      
+<div class="editorwrapper">
+<div id="energy" class="editor">;; Click on a node and hit 't' to toggle sense 1
+;; Then click on another node and hit 'y' to toggle sense 2
+;; Nodes will be green when they have lots of energy, and shade
+;; towards red as they run out of energy.
+;; Packets are blue as they flow through the nodes.
+;; Notice that the packets move farther than farther from the 
+;; shortest path as the energy decreases.
+
+;;Energy-aware Routing
+;; Like a gradient, except that it replaces the metric
+(def distance-to-metric (src init metric maxhop)
+     (1st (rep (tup d v) (tup (inf) 0)
+               (mux src (tup (init) 0)    ; source
+                    (mux (any-hood+
+                           (<= (+ (nbr d) (metric) (* v (+ (nbr-lag) (dt)))) d))
+                         (tup (min-hood+ (+ (nbr d) (metric))) 0)
+                         (let ((v0 (if (= (dt) 0) 1 (/ (maxhop) (* (dt) 12))))) (tup (+ d (* v0 (dt))) v0)))))))
+
+;; This is a simple utility function for doing gradient descent
+(def choose-lowest-neighbor (d)
+     (2nd (min-hood (mux (< (nbr d) d) 
+                         (tup (nbr d) (nbr (mid))) 
+                         (tup (inf) -1)))))
+
+
+;; The purpose of this is to demonstrate packet routing by gradient descent
+;; Every device with a packet picks the lowest value neighbor and
+;; tries to hand a packet to it.  The handoff will be retried until
+;; the neighbor takes up the packet.
+;; If there is no appropriate neighbor, the packet is dropped
+
+;; Note that this can be clearly improved by adding deconfliction
+;; strategies to decrease the likelihood of neighbors trying to
+;; route packets to the same locations
+
+(def route-packets (input distance)
+     (rep 
+       packet
+       0
+       (let ((best-hop (choose-lowest-neighbor distance)))
+         (mux input
+              input ; input wipes any packet already there
+              (mux packet
+                   (mux (any-hood (muxand (< (nbr distance) distance) 
+                                          (= (nbr packet) packet)))
+                        0 ; packet has moved forward; discard local copy
+                        (mux (= best-hop -1)
+                             0 ; if there's nowhere to go, wipe the packet
+                             packet)) ; otherwise hold for passing on
+                   (max-hood (mux (= (nbr best-hop) (mid)) (nbr packet) 0)))))))
+
+
+;; By incorporating energy cost into metrics, this energy-routing
+;; function will change where packets go over time
+(def energy-routing (dst packet-src init-energy)
+     (letfed ((energy
+                init-energy
+                (let* ((stretch (/ init-energy energy))
+                       (d (distance-to-metric dst 
+                                              (fun () 0) 
+                                              (fun () (* (nbr-range) stretch)) 
+                                              (fun () (* (radio-range) stretch))))
+                       (packets (route-packets packet-src d)))
+                  (blue (> packets 0)) ;(green (* d 0.1))
+                  (mux dst init-energy
+                       (max 0 (- energy (* (dt) (+ 0.01 (mux packets 1 0)))))))))
+             energy))
+
+;; Once every n seconds, return true1; otherwise return false
+(def flash-per-n (n)
+     (letfed ((v (rnd 0 n) (if (> v n) (- n (dt)) (if (> v (dt)) (- v (dt)) n))))
+             (= v n)))
+
+;; This injects a sequence of numerically increasing packets, so that we can
+;; test the integrity of the sequence
+(def test-packet-source (src period)
+     (let ((inject (and src (flash-per-n period))))
+       (letfed ((packet-id 0 (mux inject (+ 1 packet-id) packet-id)))
+               (mux inject packet-id 0))))
+
+(let ((energy 
+        (* 0.01 
+           (energy-routing (sense 1) 
+                           (test-packet-source (sense 2) 10) 
+                           100))))
+  (red (- 1 energy))
+  (green energy))
+</div></div>
+</article>
+
+      <article>
+      <h1>Flock</h1>
+      <b>Goal:</b> to demonstrate a simple flocking behavior.
+      
+<div class="editorwrapper">
+<div id="flock" class="editor">;;Flock
+(def flock (dir)
+     (rep v 
+          (tup 0 0 0)
+          (let ((d
+                  (normalize
+                    (int-hood
+                      (if (< (nbr-range) 5)
+                        (* -1 (normalize (nbr-vec)))
+                        (if (> (nbr-range) 10)
+                          (* 0.2 (normalize (nbr-vec)))
+                          (normalize (nbr v))))))))
+            (normalize 
+              (+ dir (mux (> (vdot d d) 0) d v))))))
+
+(let ((phase (* (timer) 0.1)))
+  (mov (flock (tup (sin phase) (cos phase) 0))))
+</div></div>
+      </article>
+
+      </section>
+
+   </body>
+</html

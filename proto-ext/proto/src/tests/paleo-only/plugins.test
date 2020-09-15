@@ -1,0 +1,33 @@
+// Test grid and simple-dynamics
+test: $(PROTO) -m -DD grid "(mov (tup (green 1) 2 3))" -l -L DebugLayer -stop-after 10.5 -NDall -Ddynamics -Ddebug -Ddebug-mask 0xE0 -dump-after 10 -headless
+~= 1 3 -56 1
+~= 1 4 -31 1
+= 1 5 0
+= 1 10 0
+= 1 11 1
+= 1 12 0
+~= 25 3 -23 1
+~= 25 4 -31 1
+= 25 5 0
+= 37 6 1.0
+= 37 7 2.0
+= 37 8 3.0
+
+// Test gridrandom and lifecycle
+test: $(PROTO) -DD grid "(if (mod (mid) 3) (sum-hood 1) (die 1))" -L simple-life-cycle -n 300 -r 10 -stop-after 5.5 -dump-after 5 -Dvalue -headless -NDall
+= 1 0 1
+= 1 3 4
+= 42 0 62
+= 42 3 6
+
+// Test mica2mote (mostly just making sure the opcodes load)
+test: $(PROTO) -n 1 -L mote-io -dump-after 5 -Dvalue -headless -NDall "(+ (light) (sound) (temp) (conductive))" -stop-after 5.5
+= 1 3 0
+
+// Test wormhole-radio
+test: $(PROTO) -L wormholes -dim 500 50 -n 1000 -wn 5000 "(let ((g (red (rep x 0 (mux (= (mid) 0) 0 (+ 1 (min-hood (nbr x)))))))) (rep diam 0 (max-hood (nbr (max diam (mux (< g (inf)) g 0))))))" -dump-after 100 -stop-after 100.5 -s 0.1 -Dvalue -headless -NDall
+> 1 3 3
+< 1 3 20
+
+// TODO: Test duplicate loading of plugins
+// TODO: Test overriding default load of 

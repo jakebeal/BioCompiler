@@ -1,0 +1,30 @@
+(def uid2rgb (uid f)
+  (let* ((r (mod uid f))
+	 (g (- (mod uid (pow f 2)) r))
+	 (b (- (mod uid (pow f 3)) (+ r g))))
+    (rgb (tup (/ r f) (/ g (pow f 2)) (/ b (pow f 3))))))
+
+(def voronoi (src showedge)
+  (let* ((closest-src (broadcast src (mid)))
+  	 (edge (any-hood (not (= (nbr closest-src) closest-src))))
+	 (vertex 
+	  (and edge 
+	   (let ((max-nbr (max-hood (if (not (= closest-src (nbr closest-src)))
+				      (nbr closest-src)
+				      -1)))
+		 (min-nbr (min-hood (if (not (= closest-src (nbr closest-src)))
+				      (nbr closest-src)
+				      (inf)))))
+	     (not (= max-nbr min-nbr))))))
+    (if (and edge showedge)
+      (if vertex
+	(rgb (tup 1 0 0))
+	(rgb (tup 0 0 0.5)))
+      (uid2rgb closest-src 10))
+    (tup closest-src edge)))
+
+;; proto -n 1000 -s 0.1 -r 8 -l -led-blend "(voronoi (sense 1) 1)"
+;; proto -n 1000 -s 0.1 -r 7 -l -led-blend "(voronoi (random-subset 0.01) (broadcast (sense 1) (sense 2)))"
+;; For 10K, use -r 1.7
+
+;; proto -n 10000 -s 0.5 -T -r 1.7 -l -led-blend "(voronoi (once (random-subset 0.002)) 1)" -DD hexgrid -rad 0.2

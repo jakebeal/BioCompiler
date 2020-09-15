@@ -1,0 +1,1 @@
+(def 3rd (v) (elt v 2))

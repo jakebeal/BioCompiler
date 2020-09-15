@@ -1,0 +1,1 @@
+function distance (p1, p2) { grad_value(p1, gradient(p2)); }

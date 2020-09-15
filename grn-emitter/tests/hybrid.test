@@ -1,0 +1,23 @@
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+
+test: $(P2B) "(green (ni* (aTc) (IPTG)))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: IPTG represses LacI
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][LacI - type=<Boolean>]]--[Charlie type=<Boolean>]--T
+is 4 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 5 _ [Promoter [high]]--[TetR type=<Boolean>]--[LacI type=<Boolean>]--T
+is 6 _ [Promoter [low][Bravo + type=<Boolean>][Charlie - type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 7 _ End of Genetic Regulatory Network
+
+// Should *not* optimize into a hybrid promoter
+test: $(P2B) "(green (and (IPTG) (not (aTc))))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: IPTG represses LacI
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][Bravo - type=<Boolean>]]--[Echo type=<Boolean>]--T
+is 4 _ [Promoter [high][Echo - type=<Boolean>][Foxtrot - type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 5 _ [Promoter [high][LacI - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 6 _ [Promoter [high][TetR - type=<Boolean>]]--[Foxtrot type=<Boolean>]--T
+is 7 _ [Promoter [high]]--[LacI type=<Boolean>]--[TetR type=<Boolean>]--T
+is 8 _ End of Genetic Regulatory Network

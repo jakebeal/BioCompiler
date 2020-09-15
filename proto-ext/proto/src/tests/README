@@ -1,0 +1,5 @@
+Ordinarily, every test in this directory should always pass.
+They are segregated into three groups:
+- neo-only tests will run with the neocompiler, but not the paleocompiler
+- paleo-only tests will run with the paleocompiler, but not the neocompiler
+- universal tests will run on both

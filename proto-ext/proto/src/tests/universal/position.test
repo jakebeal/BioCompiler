@@ -1,0 +1,18 @@
+//Test Position
+
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-first 1 (tup 1 2 3))"
+//= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-first 1 (tup 1 1 1))"
+//= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-first 1 (tup 2 2 3))"
+//= 1 3 -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-first 1 (tup ))"
+//= 1 3 -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-last 1 (tup 1 2 3))"
+//= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-last 1 (tup 1 1 1))"
+//= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-last 1 (tup 2 2 3))"
+//= 1 3 -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(position-last 1 (tup ))"
+//= 1 3 -1

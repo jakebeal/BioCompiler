@@ -1,0 +1,4 @@
+;; Scale-free
+function brownian () {
+    norm( rnd(0,1) / sqrt(dt), tup(rnd(-1,1),rnd(-1,1),rnd(-1,1)));
+}

@@ -1,0 +1,40 @@
+;;;; SMALL-MOLECULE SENSORS
+;; Note: the sensors need to have a chemical reaction modeled and have
+;;   the activator/repressor type represented accurately
+(primitive Dox () boolean
+ :grn-motif ((P high rtTA|boolean T) 
+	     (RXN (Dox|boolean) activates rtTA)
+	     (P low R+ rtTA value T)))
+(primitive RSL () boolean
+ :grn-motif ((P high RheoAct-Rec|boolean T) 
+	     (RXN (RSL|boolean) activates RheoAct-Rec)
+	     (P low R+ RheoAct-Rec value T)))
+(primitive IPTG () boolean
+ :grn-motif ((P high LacI|boolean T) 
+	     (RXN (IPTG|boolean) represses LacI)
+	     (P high R- LacI value T)))
+
+;;;; FLUORESCENT REPORTERS
+(primitive green (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 GFP|arg0 value T)))
+(primitive red (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 mKate|arg0 T)
+	      (P R+ arg0 value T)))
+(primitive blue (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 EBFP2|arg0 value T)))
+(primitive yellow (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 EYFP|arg0 value T)))
+(primitive cyan (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 AmCyan|arg0 value T)))
+
+;;;; GENERIC DEBUG MAPPING
+(macro test-sensor Dox)
+(macro test-sensor-2 RSL)
+(macro debug blue)
+(macro debug-2 yellow)
+(macro debug-3 red)

@@ -1,0 +1,89 @@
+// The --no-output prevents production of .xml files that confuse hudson
+
+$(P2B_ARGS) = -EM grn --instructions --no-grn-optimization --to-matlab --cellular-platform ecoli-platform
+test: $(P2B) "(primitive foo (x|boolean) boolean :grn-motif ((P R- arg0 ?Y T) (P R- ?Y|scalar value T))) (green (foo (aTc)))"
+
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 3 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 4 _ [Promoter [low][Alfa + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 5 _ [Promoter [low][Bravo - type=<Boolean>]]--[Charlie type=<Scalar>]--T
+is 6 _ [Promoter [low][Charlie - type=<Scalar>]]--[Alfa type=<Boolean>]--T
+is 7 _ End of Genetic Regulatory Network
+is 8 _ Warning: Don't know how to XMLize type<Scalar>: type information will be discarded
+
+
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+test: $(P2B) "(primitive foo (bar|scalar) boolean :grn-motif ((P bar|scalar  value ))) (green (foo 7))"
+is 0 _ command-line:1 Warning: Operator [Lit: <Scalar 7>] has at least one instance that returns a number, rather than a Boolean value.  Numbers are not yet fully supported, and may produce incorrect GRNs.
+is 1 _ Warning: Program optimizes to empty genetic regulatory network; can any of your outputs ever be expressed?
+is 2 _ Genetic Regulatory Network:
+is 3 _ End of Genetic Regulatory Network
+
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform  --emitter-max-loops 1 
+test: $(P2B) --grn-out xor "(green (xor (aTc) (IPTG)))"
+is 0 _ Warning: GRN optimizer ran 1 times without finishing: giving up and returning current partially optimized GRN.
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: IPTG represses LacI
+is 3 _ Reaction: aTc represses TetR
+is 4 _ [Promoter [high][Alfa1 - type=<Boolean>]]--[India type=<Boolean>]--T
+is 5 _ [Promoter [high][Bravo2 - type=<Boolean>]]--[Kilo type=<Boolean>]--T
+is 6 _ [Promoter [high][India - type=<Boolean>][Juliet - type=<Boolean>]]--T
+is 7 _ [Promoter [high][India - type=<Boolean>][Juliet - type=<Boolean>]]--[Hotel type=<Boolean>]--[Delta type=<Boolean>]--T
+is 8 _ [Promoter [high][Kilo - type=<Boolean>][Lima - type=<Boolean>]]--T
+is 9 _ [Promoter [high][Kilo - type=<Boolean>][Lima - type=<Boolean>]]--[Hotel type=<Boolean>]--[Foxtrot type=<Boolean>]--T
+is 10 _ [Promoter [high][LacI - type=<Boolean>]]--T
+is 11 _ [Promoter [high][LacI - type=<Boolean>]]--[Bravo2 type=<Boolean>]--[Juliet type=<Boolean>]--T
+is 12 _ [Promoter [high][TetR - type=<Boolean>]]--T
+is 13 _ [Promoter [high][TetR - type=<Boolean>]]--[Alfa1 type=<Boolean>]--[Lima type=<Boolean>]--T
+is 14 _ [Promoter [high]]--T
+is 15 _ [Promoter [high]]--[TetR type=<Boolean>]--[LacI type=<Boolean>]--T
+is 16 _ [Promoter [low][Hotel + type=<Boolean>]]--T
+is 17 _ [Promoter [low][Hotel + type=<Boolean>]]--[GFP type=<Boolean>]--[Charlie type=<Boolean>]--T
+is 18 _ End of Genetic Regulatory Network
+
+$(P2B_ARGS) = -EM grn --instructions --cellular-platform ecoli-platform 
+test: $(P2B) "(primitive foo* () boolean :grn-motif ((RXN foo*|boolean activates bar*) (P high R+ bar*|boolean value T))) (foo*)"
+is 0 _ Warning: Program optimizes to empty genetic regulatory network; can any of your outputs ever be expressed?
+is 1 _ Genetic Regulatory Network:
+is 2 _ Reaction: foo* activates bar*
+is 3 _ End of Genetic Regulatory Network
+is 4 _ Warning: GraphViz/Matlab incompatible name 'bar*' has been changed to 'bar_'
+is 5 _ Warning: GraphViz/Matlab incompatible name 'foo*' has been changed to 'foo_'
+
+$(P2B_ARGS) = -EM grn --instructions --cellular-platform ecoli-platform 
+test: $(P2B) "(primitive foo (x|boolean) boolean :grn-motif ((P high P low R+ arg0 arg0 value T))) (green (foo (aTc)))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high][TetR - type=<Boolean>]]--[Bravo type=<Boolean>]--T
+is 3 _ [Promoter [high]]--[Promoter [low][Bravo + type=<Boolean>]]--[GFP type=<Boolean>]--[Bravo type=<Boolean>]--T
+is 4 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 5 _ End of Genetic Regulatory Network
+// Use to test for "not sure which promotor regulated"; now this warning no longer exists
+
+$(P2B_ARGS) = -EM grn --instructions --cellular-platform ecoli-platform
+test: $(P2B) "(primitive foo () boolean :grn-motif ((value R- bar|boolean T))) (green (foo))"
+is 0 _ Warning: Program optimizes to empty genetic regulatory network; can any of your outputs ever be expressed?
+is 1 _ Genetic Regulatory Network:
+is 2 _ End of Genetic Regulatory Network
+// Used to test for "no promoter to regulate"; now this warning no longer exists
+// Instead, the lack of a promoter causes the network to vanish
+
+$(P2B_ARGS) = -EM grn --instructions --cellular-platform ecoli-platform
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high value R- bar|boolean T))) (green (foo))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [high]]--[GFP type=<Boolean>[bar - type=<Boolean>]]--T
+is 2 _ End of Genetic Regulatory Network
+// Used to test for "no promoter to regulate"; now this warning no longer exists
+// Instead, tests for proper handling of CDS regulation by copy-propagation
+
+$(P2B_ARGS) = -EM grn --to-matlab --instructions --cellular-platform ecoli-platform
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P R+ foo value T) (RXN (bar|boolean) represses foo|boolean) (RXN (baz|boolean) represses foo|boolean))) (green (foo))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: bar represses foo
+is 2 _ Reaction: baz represses foo
+is 3 _ [Promoter [low][foo + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 4 _ End of Genetic Regulatory Network
+is 5 _ Warning: Multiply regulated chemicals are not currently modeled in Matlab: model will be incorrect
+is 6 _ Warning: Multiply regulated chemicals are not currently modeled in Matlab: model will be incorrect

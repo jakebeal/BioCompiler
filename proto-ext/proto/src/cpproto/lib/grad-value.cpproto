@@ -1,0 +1,9 @@
+function grad_value (src, f) {
+    d = gradient(src);
+    rep v {
+        f;
+    } update {
+        newval = fold_hood(function(r,x) { if(x[0] < r[0]) x; else r; }, {inf,f}, {d,v});
+        f \ newval[1] ? src;
+    } 
+}

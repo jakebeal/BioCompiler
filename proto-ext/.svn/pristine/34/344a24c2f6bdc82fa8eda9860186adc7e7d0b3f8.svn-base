@@ -1,0 +1,17 @@
+(def dither ()
+  (letfed ((s 0 (min 25 (abs (+ s (rnd -1 1)))))
+           (a (norm 1 (tup (rnd -1 1) (rnd -1 1) (rnd -1 1)))
+              (norm 1 (+ a (tup (rnd -0.1 0.1) (rnd -0.1 0.1) (rnd -0.1 0.1))))))
+    (* s a)))
+
+;; (def dither ()
+;; (polar-to-rect
+;; ;;  (let ((s (rnd -1 1)) (a (rnd -0.25 0.25)))
+;; ;;    (tup s a))
+;; ;;  (letfed ((s 0 (abs (+ s (rnd -0.25 0.25))))
+;;   (letfed ((s 0 (min 25 (abs (+ s (rnd -1 1)))))
+;;            (a (rnd (neg (pi)) (pi)) (+ a (rnd -0.1 0.1))))
+;;      (tup s a))))
+
+;;           (a (rnd (neg (pi)) (pi)) (+ a (rnd -1 1))))
+;;     (tup s a))))

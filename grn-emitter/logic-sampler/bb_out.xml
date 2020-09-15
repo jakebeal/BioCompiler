@@ -1,0 +1,847 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<GeneticRegulatoryNetwork xmlns="urn:clothocad.org:grn:">
+  <!-- Genetic regulatory network for Proto: (include logic.proto) (c7A) -->
+  <!-- Produced by BioCompiler v.0.00 -->
+  
+  <!-- Transcriptional Units -->
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Oscar">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Papa">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="GFP">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+              <property>
+                <Family name="GFP"/>
+              </property>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Bravo">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Oscar"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Golf">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Papa"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Charlie">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Quebec">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Foxtrot">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Romeo">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Quebec"/>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Romeo"/>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Bravo"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Delta">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Sierra">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Echo">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Tango">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Sierra"/>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Tango"/>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Charlie"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna1">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Delta"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna2">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Echo"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna3">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Foxtrot"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Hotel">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Uniform">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Kilo">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Victor">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Uniform"/>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Victor"/>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Golf"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="India">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Whiskey">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Juliet">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Xray">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Whiskey"/>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Xray"/>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Hotel"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna4">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="India"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna5">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Juliet"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Lima">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Yankee">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna7">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Zulu">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Yankee"/>
+          </regulatedBy>
+          <regulatedBy repression="true">
+            <ChemicalSpecies uid="Zulu"/>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Kilo"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+          <regulatedBy repression="false">
+            <ChemicalSpecies uid="rna6">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+            </ChemicalSpecies>
+          </regulatedBy>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Lima"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+</GeneticRegulatoryNetwork>

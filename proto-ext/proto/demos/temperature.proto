@@ -1,0 +1,9 @@
+;; Makes up a random pseudo-temperature field
+;; Used in "Thinking In Proto" explanation of fields
+
+(def temperature ()
+  (let ((hot (and (< (mid) 6) (mod (mid) 2)))
+	(cold (and (< (mid) 6) (not (mod (mid) 2)))))
+    (rep temp 25 (mux hot 30 (mux cold 20 (/ (int-hood (nbr temp)) (int-hood 1)))))))
+
+;; proto -l "(red (> (temperature) 25))"

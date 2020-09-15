@@ -1,0 +1,7 @@
+;; just a stub: really, this is about demonstrating the plugin
+(def graph-network ()
+  (blue (any-hood (sense 1))))
+
+;; proto -l -c -L graphnetwork -n 10 --graph demograph.txt "(graph-network)" -i
+;; proto -l -c -L graphnetwork -n 10 --graph demograph.txt "(graph-network)" -i -DD circle
+

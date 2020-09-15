@@ -1,0 +1,21 @@
+(def grad (v)
+  (* (/ 1 (int-hood 1)) ; normalize over neighborhood
+     (int-hood (if (or (= (nbr-range) 0) (not (< (abs (- v (nbr v))) (inf))))
+                   (tup 0 0 0) ; ignore singularity
+                   (* (/ (- v (nbr v)) (nbr-range))
+                      (normalize (nbr-vec)))))))
+
+(def share-distance-to (is-calculating source)
+  (let ((base (if is-calculating (distance-to source) (inf))))
+    (green (< base (inf)))
+    (mux is-calculating base (min-hood (+ (nbr-range) (nbr base))))))
+
+(def nav-grad (is-mover source)
+  (let ((g (grad (share-distance-to (not is-mover) source))))
+    (mux (and is-mover (> (len g) 0)) (normalize g) (tup 0 0))))
+
+;; For an example of using nav-grad, run:
+;;   proto -n 500 -r 15 -m -l -s 0.1 -sv "(let ((which (once (< (rnd 0 1) 0.1)))) (if which (blue 1) 0) (mov (mux which (nav-grad which (sense 1)) (tup 0 0))))"
+;; About 1/10 of the devices will turn blue.  Click on a device and
+;; hit 't'.  As the gradient (green) spreads through the network, the
+;; blue devices will begin moving to that spot.

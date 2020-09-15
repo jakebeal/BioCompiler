@@ -1,0 +1,1 @@
+(def int-time (v) (fold-time + 0 (* v (dt))))

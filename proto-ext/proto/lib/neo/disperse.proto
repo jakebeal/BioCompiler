@@ -1,0 +1,8 @@
+;; disperse does not scale properly with neighborhood size!
+
+(def disperse ()
+  (int-hood 
+   (let* ((vec (nbr-vec)) (dist-sqr (vdot vec vec)))
+     (mux (< dist-sqr 0.01)
+       (tup 0 0 0)
+       (* (neg (/ 0.05 dist-sqr)) vec)))))

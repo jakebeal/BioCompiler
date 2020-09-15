@@ -1,0 +1,23 @@
+;; Base Motif collection
+
+;; LOGICAL OPERATORS
+(primitive not (boolean) boolean
+           :grn-motif ((P high R- arg0 value T)))
+(primitive and (boolean boolean) boolean
+	   :grn-motif ((P high R- arg0 ?X|boolean T)
+			 (P high R- arg1 ?Y|boolean T)
+			 (P high R- ?X R- ?Y value T)))
+
+(primitive or (boolean boolean) boolean
+	   :grn-motif ((P R+ arg0 ?X|boolean T)
+	   		 (P R+ arg1 ?X T)
+			 (P R+ ?X value T)))
+;; Note: this more complex or will be easy to copy-prop
+
+(def xor (a b)
+  (or (and a (not b)) (and b (not a))))
+
+
+;; TEMPORAL OPERATORS
+(primitive delay (boolean) boolean
+           :grn-motif ((P R+ arg0 value T)))

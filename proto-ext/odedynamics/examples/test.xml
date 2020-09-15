@@ -1,0 +1,61 @@
+<!-- Call with: proto -L odedynamics -n 5 -body examples/test.xml -m 1 -->
+<root>
+  <body type="box">
+    <id>a</id>
+    <position x="0" y="0" z="10" />
+    <quaternion q1="0" q2="0" q3="0" q4="1" />
+    <mass>100</mass>
+    <dim w="10" b="10" h="10" />
+  </body>
+  
+  <body type="cylinder"> 
+    <id>b</id> 
+    <position x="15" y="0" z="10"/>
+    <quaternion q1="0" q2="0" q3="0" q4="1"/> 
+    <mass>1</mass>
+    <radius>2</radius> 
+    <height>12</height> 
+  </body>
+  
+  <body type="box">
+    <id>c</id>
+    <position x="0" y="-15" z="10" />
+    <quaternion q1="0" q2="0" q3="0" q4="1" />
+    <mass>100</mass>
+    <dim w="10" b="10" h="20" />
+  </body>
+  
+  <body type="sphere">
+    <id>d</id>
+    <position x="0" y="15" z="0" />
+    <quaternion q1="0" q2="0" q3="0" q4="1" />
+    <mass>10</mass>
+    <radius>2</radius>
+  </body>
+  
+  
+  <transform x="10" y="0" z="0">
+    <transform x="0" y="0" z="15">
+      <body type="cylinder">
+	<id>e</id>
+	<position x="0" y="0" z="0" />
+	<quaternion q1="0" q2="0" q3="0" q4="1" />
+	<mass>1</mass>
+	<radius>2</radius>
+	<height>4</height>
+      </body>
+    </transform>
+  </transform>
+  
+  <joint type="hinged">
+    <a>a</a>
+    <b>b</b>
+    <anchor x="0" y="0" z="0" />
+    <axis x="1" y="0" z="0" />
+  </joint>
+  
+  <joint type="fixed">
+    <a>c</a>
+    <b>d</b>
+  </joint>
+</root>

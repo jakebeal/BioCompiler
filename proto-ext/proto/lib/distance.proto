@@ -1,0 +1,2 @@
+(def distance (p1 p2)
+  (grad-value p1 (gradient p2)))

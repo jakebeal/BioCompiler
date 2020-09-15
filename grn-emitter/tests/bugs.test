@@ -1,0 +1,9 @@
+// The --no-output prevents production of .xml files that confuse hudson
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+
+// Used to remove whole network through incorrect optimization; fixed
+test: $(P2B) "(primitive foo (x|boolean) boolean :grn-motif ((P R+ arg0 ?Y T) (P R- ?Y|scalar value T))) (green (foo true))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [high]]--[Charlie type=<Scalar>]--T
+is 2 _ [Promoter [low][Charlie - type=<Scalar>]]--[GFP type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network

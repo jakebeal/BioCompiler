@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="file:///home/jclevela/proto-workspace/odedynamics/src/BodySchema.xsd"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="file:///home/jclevela/proto-workspace/odedynamics/src/BodySchema.xsd">
+
+
+
+
+	<xsd:complexType name="dimType">
+		<xsd:attribute name="x" type="xsd:double" />
+		<xsd:attribute name="y" type="xsd:double" />
+		<xsd:attribute name="z" type="xsd:double" />
+	</xsd:complexType>
+
+	<!-- Displacement in relative frame -->
+	<xsd:complexType name="positionType">
+		<xsd:attribute name="x" type="xsd:double" />
+		<xsd:attribute name="y" type="xsd:double" />
+		<xsd:attribute name="z" type="xsd:double" />
+	</xsd:complexType>
+
+	<!-- Implemented rotations -->
+	<xsd:complexType name="rotationType" abstract="true" />
+
+	<xsd:complexType name="fixedAngle">
+		<xsd:complexContent>
+			<xsd:extension base="rotationType">
+				<xsd:attribute name="x" type="xsd:double" />
+				<xsd:attribute name="y" type="xsd:double" />
+				<xsd:attribute name="z" type="xsd:double" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="quaternion">
+		<xsd:complexContent>
+			<xsd:extension base="rotationType">
+				<xsd:attribute name="q1" type="xsd:double" />
+				<xsd:attribute name="q2" type="xsd:double" />
+				<xsd:attribute name="q3" type="xsd:double" />
+				<xsd:attribute name="q4" type="xsd:double" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+
+
+	<!-- Bodies -->
+	<xsd:complexType name="bodyType" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:string" />
+			<xsd:element name="pos" type="positionType" />
+			<xsd:element name="rot" type="rotationType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+
+	<xsd:complexType name="sphere">
+		<xsd:complexContent>
+			<xsd:extension base="bodyType">
+				<xsd:sequence>
+					<xsd:element name="radius" type="xsd:double" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="box">
+		<xsd:complexContent>
+			<xsd:extension base="bodyType">
+				<xsd:sequence>
+					<xsd:element name="dim" type="dimType" />
+				</xsd:sequence>
+				
+		<xsd:attribute name="x" type="xsd:double" />
+		<xsd:attribute name="y" type="xsd:double" />
+		<xsd:attribute name="z" type="xsd:double" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="cylinder">
+		<xsd:complexContent>
+			<xsd:extension base="bodyType">
+				<xsd:sequence>
+					<xsd:element name="radius" type="xsd:double"></xsd:element>
+					<xsd:element name="height" type="xsd:double"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+	<!-- Joints -->
+	<xsd:complexType name="joint" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="bodyId" type="xsd:string" maxOccurs="2"	minOccurs="2" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- Frames -->
+	<xsd:complexType name="frameType">
+		<xsd:sequence>
+			<xsd:element name="name" type="xsd:string" />
+			<xsd:element name="rot" type="rotationType" />
+			<xsd:element name="pos" type="positionType" />
+			<xsd:element name="frame" type="frameType" maxOccurs="unbounded"
+				minOccurs="0" />
+			<xsd:sequence>
+				<xsd:element name="body" type="bodyType"  maxOccurs="unbounded"
+				minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="fixedJoint">
+		<xsd:complexContent>
+			<xsd:extension base="joint" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="hinged">
+		<xsd:complexContent>
+			<xsd:extension base="joint">
+				<xsd:sequence>
+					<xsd:element name="anchor" type="positionType" />
+					<xsd:element name="axis" type="axisType" />
+					<xsd:element name="lowStop" type="xsd:double" default="-INF" />
+					<xsd:element name="highStop" type="xsd:double" default="INF" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="sliderJoint">
+		<xsd:complexContent>
+			<xsd:extension base="joint">
+				<xsd:sequence>
+					<xsd:element name="axis" type="axisType" />
+					<xsd:element name="lowStop" type="xsd:double" default="-INF" />
+					<xsd:element name="highStop" type="xsd:double" default="INF" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="axisType">
+		<xsd:attribute name="x" type="xsd:double" />
+		<xsd:attribute name="y" type="xsd:double" />
+		<xsd:attribute name="z" type="xsd:double" />
+	</xsd:complexType>
+
+
+    <xsd:element name="World" type="frameType"/>
+
+</xsd:schema>

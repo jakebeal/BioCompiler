@@ -1,0 +1,8 @@
+;; Pretty Red/Yellow/Blue coloring for the temperature demo 
+
+(def temp-color (temp)
+  (red (/ (- temp 22) 3))
+  (blue (/ (- 25 temp) 5))
+  (green (- 1 (/ (abs (- temp 25)) 3))))
+
+;; proto -v -l -led-blend "(temp-color (temperature))"

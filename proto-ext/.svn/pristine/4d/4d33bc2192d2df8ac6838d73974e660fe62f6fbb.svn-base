@@ -1,0 +1,1 @@
+(def 1st (v) (elt v 0))

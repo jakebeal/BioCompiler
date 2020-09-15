@@ -1,0 +1,23 @@
+-*- Mode: Outline -*-
+
+2011-09-01
+
+Proto approximates integration over fields by sampling the field at
+discrete points, finding its value at each of the discrete set of
+neighbours and multiplying that by a discrete approximation to the
+manifold's volume element (`infinitesimal volume') at that point:
+
+   (int-hood f) ~= (sum-hood (* f (infinitesimal)))
+
+The geometrically nicest approximation of the volume element at a node
+would be the area of that node's Voronoi cell intersected with its
+disc of radio communication.  However, we don't have that information,
+the disc of radio communication is very approximate, and there are
+screw cases.
+
+Instead, we estimate that each node's Voronoi cell will occupy
+approximately the same fraction of its disc of radio communication as
+all its neighbours.  Hence the current definition of machine_area in
+the Proto kernel: divide the volume of the disc of radio communication
+by the number of nodes in it (i.e., one more than the number of
+neighbours).

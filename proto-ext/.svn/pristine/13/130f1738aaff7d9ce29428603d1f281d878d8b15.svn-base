@@ -1,0 +1,8 @@
+(def in-circle (o r)
+  (let ((dv (- (probe (coord) 1) o)))
+    (< (probe (vdot dv dv) 0) (* r r))))
+
+;; To see circles drawn in low, medium, and high resolution, run:
+;;   proto -n 200 -r 20 -l "(+ (blue (in-circle (tup -40 -20) 30)) (green (in-circle (tup 0 0) 20)))"
+;;   proto -n 1000 -r 15 -l "(+ (blue (in-circle (tup -40 -20) 30)) (green (in-circle (tup 0 0) 20)))"
+;;   proto -n 5000 -r 5 -l "(+ (blue (in-circle (tup -40 -20) 30)) (green (in-circle (tup 0 0) 20)))"

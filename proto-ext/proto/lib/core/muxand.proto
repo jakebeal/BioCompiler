@@ -1,0 +1,1 @@
+(def muxand (x y) (mux x y 0))

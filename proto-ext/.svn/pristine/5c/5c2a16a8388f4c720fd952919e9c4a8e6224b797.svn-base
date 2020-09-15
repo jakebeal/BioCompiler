@@ -1,0 +1,1 @@
+(def any-time (v) (fold-time or #f v))

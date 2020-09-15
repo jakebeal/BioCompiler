@@ -1,0 +1,1 @@
+(def flip (prob t f) (if (< (rnd 0 1) prob) t f))

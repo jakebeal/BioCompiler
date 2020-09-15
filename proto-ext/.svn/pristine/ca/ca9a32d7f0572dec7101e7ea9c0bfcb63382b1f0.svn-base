@@ -1,0 +1,403 @@
+/* Reader finds text and turns it into s-expressions
+Copyright (C) 2005-2008, Jonathan Bachrach, Jacob Beal, and contributors
+listed in the AUTHORS file in the MIT Proto distribution's top directory.
+
+This file is part of MIT Proto, and is distributed under the terms of
+the GNU General Public License, with a linking exception, as described
+in the file LICENSE in the MIT Proto distribution's top directory. */
+
+#include "reader.h"
+
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+
+#include "config.h"
+
+#include "lisp.h"
+#include "scoped_ptr.h"
+
+using namespace std;
+
+void
+Path::add_default_path(const string &srcdir)
+{
+  dirs.push_back(srcdir + ".");
+  if (srcdir != "") {
+    // Use srcdir-relative paths.
+    dirs.push_back(srcdir + "/lib/");
+    dirs.push_back(srcdir + "/lib/core/");
+  }
+  // Always use the install location.
+  dirs.push_back(PROTOLIBDIR);
+}
+
+ifstream *
+Path::find_in_path(const string &filename) const
+{
+  for (list<string>::const_iterator i = dirs.begin(); i != dirs.end(); ++i) {
+    string absolute_filename = *i + "/" + filename;
+    scoped_ptr<ifstream> stream(new ifstream(absolute_filename.c_str()));
+    if (stream->good())
+      return stream.release();
+  }
+
+  return 0;
+}
+
+typedef enum {
+  Token_eof,
+  Token_string,
+  Token_symbol,
+  Token_true,
+  Token_false,
+  Token_quote,
+  Token_char,
+  Token_left_paren,
+  Token_right_paren,
+} Token_type;
+
+typedef struct {
+  Token_type type;
+  char *name;
+} Token;
+
+static void
+print_token(Token *token)
+{
+  switch (token->type) {
+  case Token_left_paren: post("LP"); break;
+  case Token_right_paren: post("RP"); break;
+  case Token_symbol: post("N(%s)", token->name); break;
+  case Token_string: post("S(%s)", token->name); break;
+  case Token_eof: post("EF"); break;
+  }
+}
+
+static Token *
+new_token(Token_type type, const char *name, int max_size)
+{
+  Token *token = new Token;
+  if (strlen(name) > max_size)
+    uerror("NEW TOKEN NAME OVERFLOW %d\n", max_size);
+  token->type = type;
+  token->name = strdup(name);
+  // print_token(tok); debug("\n");
+  return token;
+}
+
+#define BUF_SIZE 1024
+
+#define OSTR_CHR '|'
+#define  STR_CHR '\"'
+#define RSTR_CHR '\''
+#define Q_CHR    '\''
+#define H_CHR    '#'
+#define C_CHR    '\''
+
+static Token *
+read_token (const char *string, int *start)
+{
+  int  is_str = 0;
+  int  i = *start;
+  int  j = 0;
+  int  len = strlen(string);
+  int  is_raw_str = 0;
+  int  is_ostr = 0;
+  int  is_hash = 0;
+  char c;
+  char buf[BUF_SIZE];
+
+  // post("READING TOKEN %s %d\n", string, *start);
+  for (;;) {
+    if (j >= BUF_SIZE)
+      uerror("BUF OVERFLOW\n");
+
+    if (i < len) {
+      c = string[i++]; *start = i;
+      switch (c) {
+      case ' ': case '\t': case '\n': case '\r': break;
+      case '(': return new_token(Token_left_paren,  "(", 1);
+      case ')': return new_token(Token_right_paren, ")", 1);
+      case H_CHR:
+        if (i < len) {
+          c = string[i++];  *start = i;
+          if (c == C_CHR)
+            return new_token(Token_char, "#/", 2);
+          else if (c == 'T' || c == 't')
+            return new_token(Token_true, "#T", 2);
+          else if (c == 'F' || c == 'f')
+            return new_token(Token_false, "#F", 2);
+          else
+            uerror("BAD CHAR TOKEN %s %d\n", string, i);
+        } else
+          uerror("BAD CHAR TOKEN %s %d\n", string, i);
+      case OSTR_CHR:
+        is_ostr = 1;
+        /* Fall through */
+      case STR_CHR:
+        is_str = 1; goto ready;
+        // case RSTR_CHR: is_raw_str = 1; is_str = 1; goto ready;
+      case Q_CHR: return new_token(Token_quote, "\'", 1);
+      case ';':
+        while (i < len) {
+          c = string[i++]; *start = i;
+          if (c == '\n' || c == '\r')
+            break;
+        }
+        return read_token(string, start);
+      default:  buf[j++] = c; buf[j] = 0; goto ready;
+      }
+    } else {
+      return new_token(Token_eof, "", 1);
+    }
+  }
+ ready:
+  if (is_str) {
+    int is_esc = 0;
+    while (i < len && j < BUF_SIZE) {
+      c      = string[i++];
+      *start = i;
+      if (!is_raw_str && c == '\\') {
+        is_esc = 1;
+        continue;
+      }
+      if ((!is_esc && !is_raw_str &&
+           ((!is_ostr && c == STR_CHR) || (is_ostr && c == OSTR_CHR))) ||
+          (is_raw_str && c == RSTR_CHR)) {
+        return new_token(Token_string, buf, BUF_SIZE);
+      }
+      buf[j++] = (is_esc && c == 'n') ? '\n' : c;
+      buf[j]   = 0;
+      is_esc   = 0;
+    }
+    uerror("unable to find end of string %s\n", buf);
+  } else {
+    while (i < len) {
+      c      = string[i++];
+      *start = i;
+      if (c == ')' || c == '(')
+        *start -= 1;
+      if (c == ')'  || c == '('  || c == ' ' ||
+          c == '\t' || c == '\n' || c == '\r')
+        return new_token(Token_symbol, buf, BUF_SIZE);
+      buf[j++] = c;
+      buf[j]   = 0;
+    }
+    *start = i;
+    return new_token(Token_symbol, buf, BUF_SIZE);
+  }
+}
+
+static Obj *read_from(Token *token, const char *string, int *start);
+
+static List *
+read_list(const char *string, int *start)
+{
+  List *_list  = lisp_nil;
+  // debug("READING LIST %d\n", *start);
+  for (;;) {
+    Token *token = read_token(string, start);
+    Obj   *expr;
+    // print_token(token); debug(" READ LIST TOKEN %d\n", *start);
+    switch (token->type) {
+      case Token_right_paren:
+      case Token_eof:
+	// debug("DONE READING LIST\n");
+	return lst_rev(_list);
+    }
+    expr = read_from(token, string, start);
+    // post("PAIRING "); print_object(list); post("\n");
+    _list = new List(expr, _list);
+  }
+}
+
+static int
+isnum(const char *name)
+{
+  int i, nump;
+  nump = isdigit(name[0]) || (name[0] == '-' && strlen(name) > 1);
+  for (i = 1; i < strlen(name); i++)
+    nump = nump && (isdigit(name[i]) || name[i] == '.');
+  return nump;
+}
+
+static Obj *
+new_sym_or_num(const char *name)
+{
+  if (isnum(name)) {
+    int inum; flo fnum;
+    int res = sscanf(name, "%f", &fnum);
+    if (res == 1) {
+      return new Number(fnum);
+    } else {
+      res = sscanf(name, "%d", &inum);
+      if (res == 1) {
+	return new Number(inum);
+      } else
+	uerror("UNABLE TO PARSE NUM %s", name);
+    }
+  } else
+    return new Symbol(name);
+}
+
+static Obj *
+read_from(Token *token, const char *string, int *start)
+{
+  // post("READING FROM %s\n", &string[*start]);
+  switch (token->type) {
+  case Token_quote:
+    return
+      PAIR(new Symbol("QUOTE"), PAIR(read_object(string, start), lisp_nil));
+  case Token_char: {
+    Obj *obj = read_object(string, start);
+    if (numberp(obj))
+      return new Number('0' + dynamic_cast<Number &>(*obj).getValue());
+    else if (symbolp(obj))
+      return new Number(dynamic_cast<Symbol &>(*obj).getName()[0]);
+    else
+      uerror("BAD CHAR TOKEN\n");
+  }
+  case Token_string:      return new String(token->name);
+  case Token_true:        return new Number(1);
+  case Token_false:       return new Number(0);
+  case Token_symbol:      return new_sym_or_num(token->name);
+  case Token_left_paren:  return read_list(string, start);
+  case Token_right_paren: uerror("Unbalanced parens\n");
+  case Token_eof:         return NULL;
+  default:                uerror("Unknown token type %d\n", token->type);
+  }
+}
+
+Obj *
+read_object(const char *string, int *start)
+{
+  Token *token = read_token(string, start);
+  return read_from(token, string, start);
+}
+
+#define STREAM_BUF_SIZE 100000
+
+static int
+copy_from_stream(istream *stream, char *buf)
+{
+  int i = 0;
+  while (stream->good() && i < STREAM_BUF_SIZE - 1)
+    buf[i++] = stream->get();
+  if (i == STREAM_BUF_SIZE - 1)
+    uerror("STREAM READING BUFFER OVERFLOW %d\n", i);
+  buf[i-1] = 0; // minus 1 because last character came from EOF
+  return 1;
+}
+
+static List *
+read_objects_from(istream *stream)
+{
+  int    start = 0;
+  List   *objs = lisp_nil;
+  char   buf[STREAM_BUF_SIZE];
+
+  if (!copy_from_stream(stream, buf))
+    return NULL;
+  for (;;) {
+    Obj *obj = read_object(buf, &start);
+    if (obj == NULL) {
+      return lst_rev(objs);
+    } else {
+      objs = new List(obj, objs);
+    }
+  }
+}
+
+List *
+read_objects_from_dirs (const string &filename, const Path *path)
+{
+  scoped_ptr<ifstream> stream(path->find_in_path(filename));
+  if (stream == NULL)
+    return NULL;
+  return read_objects_from(stream.get());
+}
+
+List *
+qq_env (const char *str, Obj *val, ...)
+{
+  int i, n;
+  va_list ap;
+  List *res = PAIR(PAIR(new Symbol(str), PAIR(val, lisp_nil)), lisp_nil);
+  va_start(ap, val);
+  for (n = 1; ; n++) {
+    char *s = va_arg(ap, char *);
+    if (s == NULL) break;
+    Obj *v = va_arg(ap, Obj *);
+    if (v == NULL) break;
+    res = PAIR(PAIR(new Symbol(s), PAIR(v, lisp_nil)), res);
+  }
+  va_end(ap);
+  return lst_rev(res);
+}
+
+Obj *
+read_from_str(const char *str)
+{
+  int    j = 0;
+  Obj *obj = read_object(str, &j);
+  return obj;
+}
+
+static Obj *
+qq_lookup(const char *name, List *env)
+{
+  int i;
+  List *args = lisp_nil;
+  for (i = 0; i < lst_len(env); i++) {
+    List &binding = dynamic_cast<List &>(*lst_elt(env, i));
+    if (sym_name(lst_elt(&binding, 0)) == name)
+      return lst_elt(&binding, 1);
+  }
+  uerror("Unable to find qq_binding %s", name);
+}
+
+static Obj *
+copy_eval_quasi_quote(Obj *obj, List *env)
+{
+  if (obj->lispType() == LISP_SYMBOL) {
+    if (sym_name(obj)[0] == '$') {
+      return qq_lookup(sym_name(obj).c_str(), env);
+    } else
+      return obj;
+  } else if (obj->lispType() == LISP_NUMBER) {
+    return obj;
+  } else if (obj->lispType() == LISP_LIST) {
+    int i;
+    int is_dot = 0;
+    List &list = dynamic_cast<List &>(*obj);
+    List *args = lisp_nil;
+    for (i = 0; i < lst_len(&list); i++) {
+      Obj *copy = copy_eval_quasi_quote(lst_elt(&list, i), env);
+      if (is_dot) {
+	args = lst_rev(args);
+	List *a = args;
+	while (a->getTail() != lisp_nil)
+	  a = &dynamic_cast<List &>(*a->getTail());
+	a->setTail(copy);
+	return args;
+      } else if (copy->lispType() == LISP_SYMBOL && sym_name(copy) == ".")
+	is_dot = 1;
+      else
+	args = PAIR(copy, args);
+    }
+    return lst_rev(args);
+  } else
+    uerror("Unknown quasi quote element %s", obj->typeName());
+}
+
+Obj *
+read_qq (const char *str, List *env)
+{
+  Obj *obj = read_from_str(str);
+  return copy_eval_quasi_quote(obj, env);
+}
+
+

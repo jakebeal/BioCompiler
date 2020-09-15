@@ -1,0 +1,9 @@
+BACKGROUND 1 0.8 0.8 1  
+# Test comment and broken color
+NOT_A_COLOR 3 4 5 6 7
+SHORT_COLOR 5
+
+  # and this whitespace and comment should be OK too
+SIMPLE_BODY 0 1 0  
+TIME_DISPLAY 0 1 1 0.5
+FPS_DISPLAY 1 1 1 0.3

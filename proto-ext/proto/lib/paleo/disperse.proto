@@ -1,0 +1,21 @@
+;; disperse does not scale properly with neighborhood size!
+
+(def newdisperse ()
+  (int-hood 
+   (let* ((vec (nbr-vec)) (dist-sqr (vdot vec vec)))
+     (if (< dist-sqr 0.01)
+       (tup 0 0 0)
+       (* (neg (/ 0.05 dist-sqr)) vec)))))
+
+(def olddisperse ()
+  (fold-hood (fun (t p)
+	       (let* ((r (nbr-range)))
+		   (let* (;; (r (radio-range))
+			  (vec (nbr-vec))
+			  (dist-sqr (vdot vec vec))
+			  ;; 25000
+			  (s (if (< dist-sqr 0.01) 0 (/ 5 dist-sqr)))) 
+		     (+ t (* (neg s) vec)))))
+	     (tup 0 0 0) 0))
+
+(def disperse () (newdisperse))

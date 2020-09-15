@@ -1,0 +1,2 @@
+--DLL ../libbiocompiler.la -EM grn --instructions
+

@@ -1,0 +1,8 @@
+;; Scale-free
+(def brownian ()
+  (norm (/ (rnd 0 1) (sqrt (dt)))
+  	(tup (rnd -1 1) (rnd -1 1) (rnd -1 1))))
+
+;; Not scale-free
+;;(def brownian ()
+;;  (norm (rnd 0 1) (tup (rnd -1 1) (rnd -1 1) (rnd -1 1))))

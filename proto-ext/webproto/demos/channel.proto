@@ -1,0 +1,9 @@
+;; http://localhost/tmp/webproto/?radius=18&numDevices=200&stepSize=1&program=(def%20channel%20(src%20dst%20width)%20%20%0A%20%20%20%20%20(let*%20((d%20%20%20%20%20(distance%20src%20dst))%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20(trail%20(%3C%3D%20(%2B%20(gradient%20src)%20(gradient%20dst))%20(%2B%20d%200.01)))%20%3B%3B%20float%20error%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20)%20%20%20%20%0A%20%20%20%20%20%20%20(dilate%20trail%20width)))%20%20%0A%20%0A(blue%20(channel%20(sense%201)%20(sense%202)%2010))%20
+
+(def channel (src dst width) 
+     (let* ((d     (distance src dst)) 
+            (trail (<= (+ (gradient src) (gradient dst)) (+ d 0.01))) ;; float error 
+            )   
+       (dilate trail width))) 
+
+(blue (channel (sense 1) (sense 2) 10))

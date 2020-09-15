@@ -1,0 +1,222 @@
+//"Comprehensive" testing for the mathematical functions in proto
+
+//Prelude
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(pi)"
+= 1 3 3.14
+
+//Sin
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sin 0)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sin (pi))"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sin (/ (pi) 2))"
+= 1 3 1
+//Asin
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asin 0)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asin 1)"
+~= 1 3 3.14 .1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asin 0.7)"
+~= 1 3 .78 .1
+
+//Cos
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(cos 0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(cos (pi))"
+= 1 3 -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(cos (/ (pi) 2))"
+= 1 3 0
+//Acos
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(acos 0)"
+~= 1 3 3.14 .1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(acos 1)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(acos 0.7)"
+~= 1 3 .78 .1
+
+//Tan
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tan 0)"
+= 1 3 0
+//Due to rounding errors, tan(pi/2) is NOT inf. 
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tan (- (/ (pi) 2) 0.00005))"
+> 1 3 1000
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tan (+ (/ (pi) 2) 0.00005))"
+< 1 3 -1000
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tan (/ (pi) 4))"
+= 1 3 1
+//Atan2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(atan2 0 1)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(atan2 1 0)"
+~= 1 3 3.14 .1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(atan2 1 1 )"
+~= 1 3 .78 .1
+
+//exp & log
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(exp 0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(exp 1)"
+= 1 3 2.72
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(log (e))"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(log 1)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(log10 10)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(log10 1)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(logn 2 2)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(logn 32 2)"
+= 1 3 5
+
+//Hyperbolic functions
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sinh 0)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sinh 10)"
+~= 1 3 11013.23 1 
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(cosh 0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(cosh 10)"
+~= 1 3 11013.23 1 
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tanh 0)"
+= 1 3 0
+//Tanh converges to 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(tanh 10)"
+~= 1 3 1 0.5 
+//Inverse Hyperbolic functions
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asinh 0)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asinh 11013.23)"
+~= 1 3 10 0.5 
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(acosh 1)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(acosh 11013.23)"
+~= 1 3 10 0.5 
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(atanh 0)"
+= 1 3 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(atanh 1)"
+~= 1 3 10 0.5 
+
+//Abs
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(abs -1)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(abs 1)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(asinh 0)"
+= 1 3 0
+
+//Floor
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(floor 1.4)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(floor 1.9)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(floor 1.5)"
+= 1 3 1
+
+//Ceil
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(ceil 1.4)"
+= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(ceil 1.9)"
+= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(ceil 1.5)"
+= 1 3 2
+
+//Round
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(round 1.4)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(round 1.9)"
+= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(round 1.5)"
+= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(round 0.5)"
+= 1 3 0
+
+//Max
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(max 1 1.0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(max 1 10000)"
+= 1 3 10000
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(max -1.0 1)"
+= 1 3 1
+
+//Min
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(min 1 1.0)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(min 1 10000)"
+= 1 3 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(min -1.0 1)"
+= 1 3 -1.0
+
+//Mod and Rem
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(mod 27 5)"
+= 1 3 2
+//Mod for -ve is = (mod for +ve) * -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(mod -27 5)"
+= 1 3 3
+//Mod for floats is =  mod for ints + the "decimal part"
+//test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(mod -27.3 -5)"
+//= 1 3 -2.3
+//test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(mod 27.3 -5)"
+//= 1 3 -2.7
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rem 27 5)"
+= 1 3 2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rem -27 5)"
+= 1 3 -2
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rem -27.3 -5)"
+= 1 3 -2.3
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rem 27.3 -5)"
+= 1 3 2.3
+
+//Pow
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(pow 100.00 0)"
+= 1 3 1
+//Overflows?
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(pow 100 100)"
+= 1 3 inf
+//What is the 0^0 behavior?
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(pow 0 0)"
+= 1 3 1
+
+//Sqrt
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sqrt (pow 2 2))"
+= 1 3 2
+//Test accumulation of errors
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(sqrt (pow (sqrt (pow (sqrt (pow (sqrt (pow 2 2)) 2)) 2)) 2))"
+= 1 3 2
+
+
+//Denormalize
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(denormalizeN 0.5 0 1 0 10)"
+= 1 3 5
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(denormalize 0.5 0 10)"
+= 1 3 5
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(denormalizeN 0 -5 5 0 10)"
+= 1 3 5
+
+//Polar to Rect and back
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(polar-to-rect (tup 0 0))"
+= 1 3 0
+= 1 4 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(polar-to-rect (tup 1 0))"
+= 1 3 1
+= 1 4 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(polar-to-rect (tup 1 (- 0 (/ (pi) 2))))"
+= 1 3 0
+= 1 4 -1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(polar-to-rect (tup (sqrt 2) (/ (pi) 4)))"
+= 1 3 1
+= 1 4 1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rect-to-polar (tup 0 0))"
+= 1 3 0
+= 1 4 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rect-to-polar (tup 1 0))"
+= 1 3 1
+= 1 4 0
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rect-to-polar (tup 1 1))"
+~= 1 3 1.414 0.1
+~= 1 4 0.785 0.1
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(rect-to-polar (tup -1 0))"
+= 1 3 1
+~= 1 4 3.14 0.1
+

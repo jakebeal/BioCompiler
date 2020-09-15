@@ -1,0 +1,2 @@
+(def broadcast (src val)
+  (gradcast src val))

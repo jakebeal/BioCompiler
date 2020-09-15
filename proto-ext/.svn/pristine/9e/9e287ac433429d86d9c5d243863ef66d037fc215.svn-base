@@ -1,0 +1,2 @@
+(defop ? die scalar boolean)
+(defop ? clone scalar boolean)

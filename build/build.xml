@@ -1,0 +1,269 @@
+<?xml version="1.0" ?>
+<project default="main">
+
+   <!-- this setting will override the setting of time.midnight in init 
+   target so that every build will run tests -->
+   <property file="${os.name}.properties" />
+   <property name="proto-dir" location="../proto-ext/"/>
+   <property name="grn-plugin-dir" location="../grn-emitter"/>
+
+   <!-- the install directory can be overriden on the command line using -Dinstall-dir=<location> -->
+   <!-- <property name="install-dir" location="/Opt/hudson/jobs/BioCompiler/workspace/bin/"/> -->
+   
+ 
+   <target name="main" depends="build,test">
+     <echo>Starting Ant main target...</echo>
+   </target>
+
+   <target name="init">
+     <exec executable="hostname" outputproperty="computer.hostname"/>
+     <echo>Running on host ${computer.hostname}</echo>
+     <condition property="isDante">
+       <equals arg1="${computer.hostname}" arg2="dante"/>
+     </condition>
+     <condition property="isDanteDefaultDir">
+       <and>
+         <not> <isset property="install-dir"/> </not>
+         <istrue value="${isDante}" />
+       </and>
+     </condition>
+     <condition property="isDanteAltDir">
+       <and>
+         <isset property="install-dir"/>
+         <istrue value="${isDante}" />
+       </and>
+     </condition>
+     <condition property="notDanteDefaultDir">
+       <and>
+         <not> <isset property="install-dir"/> </not>
+         <isfalse value="${isDante}" />
+       </and>
+     </condition>
+     <condition property="notDanteAltDir">
+       <and>
+         <isset property="install-dir"/>
+         <isfalse value="${isDante}" />
+       </and>
+     </condition>
+   </target>  
+
+   <target name="build" depends="install-proto, install-bio"> </target>
+
+   <target name="clean" depends="clean-proto, clean-bio"> </target>
+
+   <target name="install-proto"  depends="build-proto">
+     <echo>Starting make install for Proto...</echo>
+     <record name="MakeInstallLog.txt" action="start" />
+       <antcall target="install-proto-normal" />
+       <antcall target="install-proto-dante" />        
+     <record name="MakeInstallLog.txt" action="stop" />
+   </target>
+
+  <target name="install-proto-normal" unless="isDante">
+    <echo>Installing Proto for normal machine...</echo>
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+    </exec>
+  </target>
+    
+  <target name="install-proto-dante" if="isDante">
+    <echo>Installing Proto for dante...</echo>
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+  <target name="uninstall-proto" >
+    <echo>Starting uninstall for Proto..</echo>
+    <record name="MakeUninstallLog.txt" action="start" />
+    <exec dir="${proto-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" uninstall" />
+    </exec>
+    <record name="MakeUninstallLog.txt" action="stop" />
+  </target>
+
+
+   <target name="build-proto" depends="init, autogen-proto,configure-proto-altDir,configure-proto-defaultDir">
+     <echo> Running make for Proto.......</echo>
+     <record name="MakeLog.txt" action="start" />
+       <exec dir="${proto-dir}" executable="${makepath}" failonerror="true" />
+     <record name="MakeLog.txt" action="stop" />
+     <echo>Finished build</echo>
+   </target>
+
+   <target name="autogen-proto">
+     <echo>Running autogen.sh for Proto.....</echo>
+     <record name="AutogenLog.txt" action="start" />
+        <echo>${os.name}</echo>
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+           <arg line="./autogen.sh" />
+        </exec>
+     <record name="AutogenLog.txt" action="stop" />
+   </target>
+
+   <target name="configure-proto-altDir" if="install-dir">
+     <echo>Running configure for Proto.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+          <arg line="./configure --prefix=${install-dir} --with-neocompiler" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="configure-proto-defaultDir" unless="install-dir">
+     <echo>Running configure for Proto.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${proto-dir}" executable="${shellpath}" failonerror="true" >
+          <arg line="./configure --with-neocompiler" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="clean-proto" >
+     <echo>Starting make clean for Proto...</echo>
+     <exec dir="${proto-dir}" executable="${makepath}" failonerror="true" >
+        <arg line="clean" />
+     </exec>
+   </target>
+
+   <target name="compile-install-bio" depends="compile-bio,install-bio-both" />
+
+   <target name="install-bio-both">
+     <echo>Starting make install for BioCompiler plugin...</echo>
+     <record name="MakeInstallLog.txt" action="start" />
+       <antcall target="install-bio-normal" />
+       <antcall target="install-bio-dante" />
+     <record name="MakeInstallLog.txt" action="stop" />
+   </target>
+
+   <target name="install-bio"  depends="build-bio,install-bio-both"/>
+
+  <target name="install-bio-normal" unless="isDante">
+    <echo>Installing BioCompiler for normal machine...</echo>
+    <exec dir="${grn-plugin-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+    </exec>
+  </target>
+    
+  <target name="install-bio-dante" if="isDante">
+    <echo>Installing BioCompiler for dante...</echo>
+    <exec dir="${grn-plugin-dir}" executable="${makepath}" failonerror="true">
+      <arg line=" install" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+   <target name="uninstall-bio" >
+      <echo>Starting uninstall for BioCompiler plugin..</echo>
+      <record name="MakeUninstallLog.txt" action="start" />
+      <exec dir="${grn-plugin-dir}" executable="${makepath}" failonerror="true">
+        <arg line=" uninstall" />
+      </exec>
+      <record name="MakeUninstallLog.txt" action="stop" />
+   </target>
+
+   <target name="build-bio" depends="autogen-bio,configure-bio-altDir,configure-bio-defaultDir,compile-bio"/>
+
+   <target name="compile-bio">
+     <echo> Running make for BioCompiler plugin.......</echo>
+     <record name="MakeLog.txt" action="start" />
+        <exec dir="${grn-plugin-dir}" executable="${makepath}" failonerror="true" />
+     <record name="MakeLog.txt" action="stop" />
+     <echo>Finished build</echo>
+   </target>
+
+   <target name="autogen-bio">
+     <echo>Running autogen.sh for BioCompiler plugin.....</echo>
+     <record name="AutogenLog.txt" action="start" />
+        <echo>${os.name}</echo>
+        <exec dir="${grn-plugin-dir}" executable="${shellpath}" failonerror="true" >
+           <arg line="./autogen.sh" />
+        </exec>
+     <record name="AutogenLog.txt" action="stop" />
+   </target>
+
+   <target name="configure-bio-altDir" if="install-dir">
+     <echo>Running configure for BioCompiler plugin.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${grn-plugin-dir}" executable="${shellpath}" failonerror="true" >
+          <env key="CPPFLAGS" value="-I${install-dir}/include/"/>
+          <env key="LDFLAGS" value="-L${install-dir}/lib/"/>
+          <arg line="./configure --prefix=${install-dir}" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="configure-bio-defaultDir" unless="install-dir">
+     <echo>Running configure for BioCompiler plugin.....</echo>
+     <record name="ConfigureLog.txt" action="start" />
+        <exec dir="${grn-plugin-dir}" executable="${shellpath}" failonerror="true" >
+          <arg line="./configure" />
+        </exec>
+     <record name="ConfigureLog.txt" action="stop" />
+   </target>
+
+   <target name="clean-bio" >
+     <echo>Starting make clean for BioCompiler plugin...</echo>
+     <exec dir="${grn-plugin-dir}" executable="${makepath}" failonerror="true" >
+        <arg line="clean" />
+     </exec>
+   </target>
+
+   <target name="test" depends="init">
+     <echo>Starting Proto tests.....</echo>
+     <record name="TestLog.txt" action="start" />
+       <antcall target="test-bio-normal-defaultDir" />
+       <antcall target="test-bio-dante-defaultDir" />
+       <antcall target="test-bio-normal-altDir" />
+       <antcall target="test-bio-dante-altDir" />
+     <record name="TestLog.txt" action="stop" />
+     <exec dir="${grn-plugin-dir}/tests" executable="${pythonpath}" >
+       <arg value="${grn-plugin-dir}/tests/protoTestOutputFormatter.py" />
+       <arg value="*.RESULTS" />
+     </exec>
+     <antcall target="cleanDump" />
+   </target>
+
+  <target name="test-bio-normal-defaultDir" if="notDanteDefaultDir">
+    <echo>Testing BioCompiler for normal machine...</echo>
+    <exec dir="${grn-plugin-dir}/tests" executable="prototest.py">
+      <arg value="*.test" />
+    </exec>
+  </target>
+    
+  <target name="test-bio-dante-defaultDir" if="isDanteDefaultDir">
+    <echo>Testing BioCompiler for dante...</echo>
+    <exec dir="${grn-plugin-dir}/tests" executable="prototest.py" >
+      <arg value="*.test" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+  <target name="test-bio-normal-altDir" if="notDanteAltDir">
+    <echo>Testing BioCompiler for normal machine...</echo>
+    <exec dir="${grn-plugin-dir}/tests" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto" />
+      <arg value="--p2b=${install-dir}/bin/p2b" />
+      <arg value="*.test" />
+    </exec>
+  </target>
+    
+  <target name="test-bio-dante-altDir" if="isDanteAltDir">
+    <echo>Testing BioCompiler for dante...</echo>
+    <exec dir="${grn-plugin-dir}/tests" executable="${pythonpath}" >
+      <arg value="${install-dir}/bin/prototest.py" />
+      <arg value="--proto=${install-dir}/bin/proto" />
+      <arg value="--p2b=${install-dir}/bin/p2b" />
+      <arg value="*.test" />
+      <env key="LD_LIBRARY_PATH" value="/usr/local/lib/"/>
+    </exec>
+  </target>
+
+   <target name="cleanDump" >
+      <echo>Cleaning dump files.....</echo>
+      <delete dir="${grn-plugin-dir}/tests/dumps" />
+   </target>   
+
+</project>

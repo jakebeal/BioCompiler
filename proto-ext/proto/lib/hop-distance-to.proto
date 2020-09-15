@@ -1,0 +1,4 @@
+(def hop-distance-to (source)
+  (rep d (inf) (mux source 0 (+ 1 (min-hood (nbr d))))))
+
+;; proto -l "(red (hop-distance-to (= (mid) 0)))"

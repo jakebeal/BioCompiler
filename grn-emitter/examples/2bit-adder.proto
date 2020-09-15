@@ -1,0 +1,19 @@
+;; Two bit adder
+;; Copyright (C) 2009-2011, Raytheon BBN Technologies and contributors listed 
+;; in the AUTHORS file in TASBE BioCompiler distribution's top directory.
+;;
+;; This file is part of the TASBE BioCompiler, and is distributed under
+;; the terms of the GNU General Public License, with a linking exception,
+;; as described in the file LICENSE in the TASBE BioCompiler
+;; distribution's top directory.
+
+;; Low bit green, high bit red, carry bit blue
+(def 2bit-adder (a1 a0 b1 b0)
+  (green (xor a0 b0))
+  (let ((c0 (and a0 b0))
+	(x1 (xor a1 b1)))
+    (red (xor x1 c0))
+    (blue (or (and x1 c0) (and a1 b1)))))
+
+;; (P2B) -EM grn "(let ((a1 (aTc)) (a0 (IPTG)) (b1 (AHL)) (b0 (Sense4))) (green (xor a0 b0)) (let ((c0 (and a0 b0)) (x1 (xor a1 b1))) (red (xor x1 c0)) (yellow (or (and x1 c0) (and a1 b1)))))" --cellular-platform ecoli-platform --cellular-platform extra-ops
+

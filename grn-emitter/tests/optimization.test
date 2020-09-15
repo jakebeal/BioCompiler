@@ -1,0 +1,22 @@
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+
+test: $(P2B) --grn-out xor "(green (xor (aTc) (IPTG)))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: IPTG represses LacI
+is 2 _ Reaction: aTc represses TetR
+is 3 _ [Promoter [high][Alfa1 - type=<Boolean>]]--[India type=<Boolean>]--T
+is 4 _ [Promoter [high][Bravo2 - type=<Boolean>]]--[Kilo type=<Boolean>]--T
+is 5 _ [Promoter [high][India - type=<Boolean>][Bravo2 - type=<Boolean>]]--[Hotel type=<Boolean>]--T
+is 6 _ [Promoter [high][Kilo - type=<Boolean>][Alfa1 - type=<Boolean>]]--[Hotel type=<Boolean>]--T
+is 7 _ [Promoter [high][LacI - type=<Boolean>]]--[Bravo2 type=<Boolean>]--T
+is 8 _ [Promoter [high][TetR - type=<Boolean>]]--[Alfa1 type=<Boolean>]--T
+is 9 _ [Promoter [high]]--[TetR type=<Boolean>]--[LacI type=<Boolean>]--T
+is 10 _ [Promoter [low][Hotel + type=<Boolean>]]--[GFP type=<Boolean>]--T
+is 11 _ End of Genetic Regulatory Network
+
+// test case for seg fault bug that was fixed. Problem was in Merge Duplicate optimization
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high value ))) (green (foo))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ [Promoter [high]]--[GFP type=<Boolean>]--T
+is 2 _ End of Genetic Regulatory Network
+

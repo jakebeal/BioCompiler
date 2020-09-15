@@ -1,0 +1,21 @@
+; (def pretty-id (uid f)
+;   (let ((uid+ (+ uid 1)))
+;     (let* ((r (mod uid+ f))
+;            (g (- (mod uid+ (pow f 2)) r))
+;            (b (- (mod uid+ (pow f 3)) (+ r g))))
+;     (rgb (tup (/ r f) (/ g (pow f 2)) (/ b (pow f 3)))))))
+
+(def pretty-id (uid)
+  (if (<= uid 0)
+    (rgb (tup 0 0 0))
+    (let ((stage (ceil (logn (/ uid 3) 2))))
+      (if (<= stage 0)
+	(rgb (hsv2rgb (tup (* uid 120) 1 1)))
+	(let* ((stage-size (* 3 (pow 2 (- stage 1))))
+	       (phase (- uid stage-size)))
+	  (tup stage phase stage-size)
+	  (rgb (hsv2rgb (tup (* 360 (/ (+ phase 0.5) stage-size)) 1 1))))))))
+
+;; proto -l -led-blend "(pretty-id (probe (once (rndint 10)) 0))"
+
+;; proto -l -led-blend "(pretty-id (mid))" -DD grid

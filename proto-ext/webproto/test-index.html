@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>WebProto IDE</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+<link rel="stylesheet" href="css/webproto.css" />
+<link rel="stylesheet" href="css/introjs.css" />
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="css/jquery.jnotify.css">
+<script type="text/javascript">
+   var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-26309611-1']);
+   _gaq.push(['_trackPageview']);
+
+   (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+</head>
+<body>
+
+   <div id="fullpage">
+      <div id="header">
+         <img height="100px" src="http://proto.bbn.com/commons/sites/default/files/commons_connect_logo.png"/> 
+         <div id="headerbuttons" style="float: right;">
+            <table> <tr>
+               <td>
+                  <button id="runProgramButton" data-intro="Click here to run your program" data-step="3" data-position="left">Run Program</button> 
+               </td>
+               <td>
+                  <button id="settingsButton" data-intro="Click here to change how your simulation is configured or displayed." data-step="5" data-position="left">Settings</button> 
+               </td>
+               <td>
+                  <button id="linkButton" data-intro="Click here to get a URL for sharing your code and simulation with others." data-step="6" data-position="left">Share</button> 
+               </td>
+               <td>
+                  <button id="tourButton" data-intro="Click here to repeat this tour" data-step="7" data-position="left">First-Time Tour</button> 
+               </td>
+            </tr> </table>
+         </div>
+      </div>
+      <div id="sidebar" class="sidebar">
+         <span id="position"></span>
+         <div id="dragbar"></div>
+         <div id="container"> </div>
+      </div>
+
+
+      <a data-intro="Your simulation will show up in this panel" data-step="3" data-location="left"></a>
+      <a data-intro="Click and drag to rotate the simulation in 3D" data-step="3.1" data-location="left"></a>
+      <a data-intro="Use two fingers or right click to zoom" data-step="3.2" data-location="left"></a>
+      <div id="main">
+	 <a data-intro="Welcome to WebProto!  Since it looks like your first time, let's give you a tour..." data-step="1"></a>
+         <div id="editor"> 
+	 </div>
+	   <a data-intro="Write Proto code in this editor." data-step="2"></a>
+      </div>
+
+      <div id="footer"> Proto is a free and open-source project.  Go to <a href="http://proto.bbn.com">proto.bbn.com</a> to learn more.</div>
+
+   </div>
+
+   <div id="settingsDialog" title="Settings">
+      Number of Devices:
+      <input id="numDevicesInput" class="positive-integer" type="text" /><br />
+      Radius:
+      <input id="radiusInput" class="positive-integer" type="text" /><br />
+      Step Size:
+      <input id="stepInput" class="positive-integer" type="text" /><br />
+      Show Network Topology:
+      <input id="topologyInput" type="checkbox" /><br />
+   </div>
+   
+   <div id="linkDialog" title="Link">
+      Link:
+      <input id="linkInput" type="text" /><br />
+   </div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="js/jquery.numeric.js"></script>
+<script src="js/jquery.jnotify.min.js"></script>
+<script src="js/three.min.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/stats.min.js"></script>
+<script src="js/TrackballControls.js"></script>
+<script src="js/spatialcomputer.js"></script>
+<script type="text/javascript" src="js/protojs/util.js"></script>
+<script type="text/javascript" src="js/protojs/binary-parser.js"></script>
+<script type="text/javascript" src="js/protojs/neighbor.js"></script>
+<script type="text/javascript" src="js/protojs/instruction.js"></script>
+<script type="text/javascript" src="js/protojs/instructions.js"></script>
+<script type="text/javascript" src="js/protojs/state.js"></script>
+<script type="text/javascript" src="js/protojs/machine.js"></script>
+<script type="text/javascript" src="js/simulator_instructions.js"></script>
+<script src="js/protosim.js"></script>
+<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/tour.js"></script>
+<script>
+   var script, editor;
+
+   function getURLParameter(name) {
+      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+   }
+
+   $(document).ready(function() {
+      // fixing the stupid checkbox behavior
+      (function( $ ) {
+         $.fn.checked = function(value) {
+            if(value === true || value === false) {
+               // Set the value of the checkbox
+               $(this).each(function(){ this.checked = value; });
+            } 
+            else if(value === undefined || value === 'toggle') {
+               // Toggle the checkbox
+               $(this).each(function(){ this.checked = !this.checked; });
+            }
+
+            return this;
+         };
+      })( jQuery );
+
+      var prg = getURLParameter('program');
+      if(prg) {
+         $('#editor').text(prg);
+      } else {
+         var do_tour = getCookie('tour');
+         if(do_tour == 'yes' || do_tour == null) { $('#editor').text(tour_program());
+	 } else {
+	   $('#editor').text("");
+	 }
+      }
+      
+      var numDevicesUrlParam = getURLParameter('numDevices');
+      if(numDevicesUrlParam) {
+         simulatorSettings.numDevices = parseInt(numDevicesUrlParam);
+      }
+      
+      var stepSizeUrlParam = getURLParameter('step');
+      if(stepSizeUrlParam) {
+         simulatorSettings.stepSize = parseInt(stepSizeUrlParam);
+      }
+      
+      var radiusUrlParam = getURLParameter('radius');
+      if(radiusUrlParam) {
+         simulatorSettings.radius = parseInt(radiusUrlParam);
+      }
+
+      $(".numeric").numeric();
+      $(".integer").numeric(false, function() { alert("Integers only"); this.value = ""; this.focus(); });
+      $(".positive").numeric({ negative: false }, function() { alert("No negative values"); this.value = ""; this.focus(); });
+      $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+
+      $( "#settingsDialog" ).dialog({
+         autoOpen: false,
+         show: {
+            effect: "slide",
+            duration: 500
+         },
+         hide: {
+            effect: "slide",
+            duration: 500
+         }
+      });
+
+      $("#linkDialog").dialog({
+         autoOpen: false,
+         show: {
+            effect: "slide",
+            duration: 500
+         },
+         hide: {
+            effect: "slide",
+            duration: 500
+         }
+      });
+
+      $("#linkButton").click(function() {
+         $("#linkDialog").dialog( "open" );
+         $("#linkInput").val(
+         window.location.host + 
+         window.location.pathname + 
+         "?radius=" + encodeURIComponent(simulatorSettings.radius) +
+         "&numDevices=" + encodeURIComponent(simulatorSettings.numDevices) +
+         "&stepSize=" + encodeURIComponent(simulatorSettings.stepSize) +
+         "&program=" + encodeURIComponent(editor.getValue()));
+      });
+
+     $("#tourButton").click(function() { introJs().start(); if(editor.getValue()=="") { editor.setValue(tour_program()); } setCookie('tour','yes',20*365)});
+
+      $("#settingsButton").click(function() {
+         $("#settingsDialog").dialog( "open" );
+         $("#numDevicesInput").val(simulatorSettings.numDevices);
+         $("#radiusInput").val(simulatorSettings.radius);
+         $("#topologyInput").checked(simulatorSettings.drawEdges);
+         $("#stepInput").val(simulatorSettings.stepSize);
+      });
+
+      $("#numDevicesInput").change(function() {
+         simulatorSettings.adjustNumDevices(parseInt($("#numDevicesInput").val()));
+      });
+
+      $("#radiusInput").change(function() {
+         simulatorSettings.radius = parseInt($("#radiusInput").val());
+         if(spatialComputer && spatialComputer.devices) {
+            $.each(spatialComputer.devices, function(index, device) {
+               device.machine.radius = simulatorSettings.radius;
+               device.needToUpdateNeighbors = true;
+            });
+         }
+      });
+      
+      $("#topologyInput").change(function() {
+         simulatorSettings.drawEdges = $("#topologyInput").is(':checked');
+      });
+      
+      $("#stepInput").change(function() {
+         simulatorSettings.stepSize = parseInt($("#stepInput").val());
+      });
+      
+      editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/proto");
+
+      $( "#runProgramButton" ).click(function() {
+         runProgram(editor);
+      });
+
+      function runProgram(editor) {
+         var program = "";
+         var editorLines = editor.getValue().split('\n');
+         $.each(editorLines, function(lineNumber, line) {
+            var commentCharAt = line.indexOf(';');
+            if(commentCharAt >= 0) {
+               line = line.substring(0, commentCharAt);
+            }
+            line = $.trim(line);
+            if(line.length > 0) {
+               program += line + ' ';
+            }
+         });
+         runSimulator("(all " + program +")");
+      }
+
+      function runSimulator(program) {
+         // Hide the IDE
+         //$('#editor').hide();
+         console.log(program);
+
+         // Compile the Script
+         script = new Array();
+         $.ajax({
+            type: 'GET',
+            dataType: "json",
+            async: false,
+            url: '/cgi-bin/webcompiler',
+            data: { "program" : program },
+            success: function(data) {
+               console.log(data.script);
+
+               // Grab key events
+               $(document).keydown(keyHandlers);
+
+               // Add the compiler's response to a script
+               $.each(data.script, function(index, value) {
+                  script.push(value);
+               });
+
+               // Prevent further code editing
+               editor.setReadOnly(true);
+
+               // Start the Simulator
+               init();
+               animate();
+            },
+            error: function(err) {
+               $.jnotify("There was an error processing the Proto script, please check it and try again", "error");
+               if(err && err.responseText) {
+                  $.jnotify(err.responseText, "error");
+               }
+               console.log(err);
+            }
+         }); // end ajax()
+      } // end runSimulator()
+
+      // Dragging dragbar
+      $('#dragbar').mousedown(function(e){
+         e.preventDefault();
+         $(document).mousemove(function(e){
+            //$('#position').html(e.pageX +', '+ e.pageY);
+            $('#sidebar').css("width",e.pageX+2);
+            $('#main').css("left",e.pageX+2);
+         })
+      });
+      $(document).mouseup(function(e){
+         $(document).unbind('mousemove');
+      });
+
+      // Execute code by hitting Ctrl-M
+      editor.commands.addCommand({
+         name: 'myCommand',
+         bindKey: {win: 'Ctrl-M',  mac: 'Ctrl-M'},
+         exec: function(editor) {
+            runProgram(editor);
+         },
+         readOnly: false // false if this command should not apply in readOnly mode
+      });
+
+   maybe_run_tour();
+
+   }); // End of document ready function
+
+</script>
+</body>
+</html>

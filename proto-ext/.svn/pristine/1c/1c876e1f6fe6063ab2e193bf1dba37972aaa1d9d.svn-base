@@ -1,0 +1,8 @@
+pythonpath=/usr/local/bin/python
+installdir=/opt/hudson/jobs/Proto/workspace/proto
+shellpath=/bin/bash
+makepath=/usr/bin/make
+configureopts=
+extralibs=
+exeExt=
+cflags=

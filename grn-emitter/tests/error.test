@@ -1,0 +1,189 @@
+// The --no-output prevents production of .xml files that confuse hudson
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform ecoli-platform
+
+// Motif not a list of lists
+test: $(P2B) "(primitive foo () boolean :grn-motif (true)) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: In GRN motif, expected a list specifying functional unit or reaction, but got true
+is 2 _ Compilation failed.
+
+// Motif not a list of lists
+test: $(P2B) "(primitive foo () boolean :grn-motif true) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: :grn-motif description should be a list of functional units and reactions, but was not a list
+is 2 _ Error: Don't know how to make a GRN motif from [foo]
+is 3 _ Compilation failed.
+
+// Bad reaction in primitive declaration
+test: $(P2B) "(primitive foo () boolean :grn-motif ((RXN foo|boolean stimulates bar) (P high R+ bar|boolean value T))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: 'stimulates' was not expected keyword 'represses' or 'activates'
+is 2 _ Compilation failed.
+
+// Bad type in primitive declaration
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high foo|badtype value T))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Unknown type badtype
+is 2 _ Compilation failed.
+
+// incomplete type in primitive declaration
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P low foo|) (P high value ()))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Expected type is missing
+is 2 _ command-line:1 Error: Unknown type *ERROR*
+is 3 _ command-line:1 Error: Expected chemical is missing
+is 4 _ command-line:1 Error: Chemical *ERROR* was not assigned a type
+is 5 _ Compilation failed.
+
+// missing type in primitive declaration
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- foo value))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Chemical foo was not assigned a type
+is 2 _ Compilation failed.
+
+// unknown chemical property
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- (foo bar)|boolean value))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Unknown chemical property: bar
+is 2 _ Compilation failed.
+
+// unknown chemical identifier
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high R- 5 value))) (foo)"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Expecting a chemical identifier here, but don't know to interpret this as a chemical: 5 
+is 2 _ Compilation failed.
+
+// Conflicting types in GRN
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high foo|boolean foo|scalar value T))) (foo)"
+is 0 _ Error during emission:
+is 1 _ Error: Conflicting types detected! ProtoScalar ProtoBoolean
+is 2 _ Compilation failed.
+
+// No output
+test: $(P2B) "true"
+is 0 _ Error during emission:
+is 1 _ Error: Optimization reduced the network to an empty network.  Does your program have sensors and actuators?
+is 2 _ Compilation failed.
+
+// Unknown input:
+test: $(P2B) "unknowntoken"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Couldn't find definition of unknowntoken
+is 2 _ Compilation failed.
+
+// infix rather than prefix:
+test: $(P2B) "((aTc) or (IPTG))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Can't make an operator with aTc
+is 2 _ Compilation failed.
+
+// use function as value:
+test: $(P2B) "(green (not aTc))"
+is 0 _ Error during analysis:
+is 1 _ command-line:1 Error: conflict: Alfa: Bravo --> <Lambda [aTc]> vs. Alfa<Lambda [aTc]> --> [not] --> Charlie<Boolean>
+is 2 _ Compilation failed.
+
+// missing close paren:
+test: $(P2B) "(green (not (aTc))"
+is 0 _ command-line:1: Missing right parenthesis
+is 1 _ Compilation failed.
+
+// argument mismatch:
+test: $(P2B) "(or (aTc))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Called [or] with 1 arguments; it requires exactly 2
+is 2 _ Compilation failed.
+
+// malformed definition:
+test: $(P2B) "(def (a b) foo (or a b))"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Expected function name is not a symbol
+is 2 _ command-line:1 Error: Signature not a list: foo
+is 3 _ command-line:1 Error: Couldn't find definition of a
+is 4 _ command-line:1 Error: Couldn't find definition of b
+is 5 _ Compilation failed.
+
+// define and miscall:
+test: $(P2B) "(def foo (a b) (or a b)) (foo (aTc) false true)"
+is 0 _ Error during interpretation:
+is 1 _ command-line:1 Error: Called [Fun: foo] with 3 arguments; it requires exactly 2
+is 2 _ Compilation failed.
+
+// non-motif primitive:
+test: $(P2B) "(primitive foo () boolean) (foo)"
+is 0 _ Error during emission:
+is 1 _ Error: Don't know how to make a GRN motif from [foo]
+is 2 _ Compilation failed.
+
+// failure to reference input -- should generate warning, but currently doesn't
+test: $(P2B) "(primitive foo (boolean) boolean :grn-motif ((P high value))) (foo (aTc))"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+
+// no output variable
+test: $(P2B) "(primitive foo () boolean :grn-motif ((P high bar|boolean))) (green (foo))"
+is 0 _ Error during emission:
+is 1 _ command-line:1 Error: Output is not used in GRN motif
+is 2 _ Compilation failed.
+
+//test: $(P2B) "(primitive foo () boolean :grn-motif ((P high value ))) (green (foo))"
+//is 0 _ Genetic Regulatory Network:
+//is 1 _ [Promoter [high]]--[GFP type=<Boolean>]--T
+//is 2 _ End of Genetic Regulatory Network
+
+
+test: $(P2B) "(green (* (aTc) (IPTG)))"
+is 0 _ Error during emission:
+is 1 _ Error: Don't know how to make a GRN motif from [*]
+is 2 _ Compilation failed.
+
+// can't expand function
+$(P2B_ARGS) = -EM grn --cellular-platform ecoli-platform --function-inlining-threshold 0
+test: $(P2B) "(green (xor (aTc) (IPTG)))"
+is 0 _ Error during emission:
+is 1 _ Error: All functions must be expanded into primitive operations, but some could not be.
+is 2 _ Error: Don't know how to make a GRN motif from [Fun: xor]
+is 3 _ Compilation failed.
+
+// test unknown cellular platform
+$(P2B_ARGS) = -EM grn --instructions --no-output --cellular-platform badplatform
+test: $(P2B) "true"
+is 0 _ Error during initialization:
+is 1 _ Error: Can't find file 'badplatform.proto'
+is 2 _ Compilation failed.
+
+// test non-existant matlab path
+$(P2B_ARGS) = -EM grn --instructions --grn-out /foo/bar --to-matlab --cellular-platform ecoli-platform 
+test: $(P2B) "(aTc)"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+is 4 _ Error during emission:
+is 5 _ Error: Can't open matlab output files
+is 6 _ Compilation failed.
+
+// test non-existant SBOL path
+$(P2B_ARGS) = -EM grn --instructions --grn-out /foo/bar --cellular-platform ecoli-platform 
+test: $(P2B) "(aTc)"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+is 4 _ Error during emission:
+is 5 _ Error: Can't open SBOL output files
+is 6 _ Compilation failed.
+
+// test non-existant GraphViz path
+$(P2B_ARGS) = -EM grn --instructions --grn-out /foo/bar --no-sbol-output --cellular-platform ecoli-platform 
+test: $(P2B) "(aTc)"
+is 0 _ Genetic Regulatory Network:
+is 1 _ Reaction: aTc represses TetR
+is 2 _ [Promoter [high]]--[TetR type=<Boolean>]--T
+is 3 _ End of Genetic Regulatory Network
+is 4 _ Error during emission:
+is 5 _ Error: Can't open GraphViz output files
+is 6 _ Compilation failed.
+

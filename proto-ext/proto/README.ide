@@ -1,0 +1,95 @@
+
+****************************************
+****************************************
+**                                    **
+**  Proto README for IDE integration  **
+**                                    **
+****************************************
+****************************************
+ 
+This README describes how to setup Eclipse to make use of the IDE features such
+as dot-completion, refactoring, and debugging.
+
+Changelog:
+---------
+ ******************************************************************************* 
+ * Kyle Usbeck 
+ * Dec 20, 2010
+ * Created the initial version of this README.ide which describes how to
+ * import proto source into the Eclipse IDE, build it, and debug it.
+ ******************************************************************************* 
+
+Requirements:
+------------
+POSIX environment (tested with Ubuntu Linux - 10.4 LTS)
+Autotools (tested with autotools-dev 20090427.1)
+Eclipse (tested with eclipse-cpp-helios-SR1-linux-gtk)
+Linux Tools's Autotools support for CDT Eclipse plugin (tested with 2.0.0.201008261754 from update site)
+...and of course Proto (tested with v402[neo])
+
+Conventions:
+-----------
+Any time there is an ALL_CAPS string inside a less-than and greater-than sign,
+it means that the <VARIABLE> should be substituted with a name, which can be
+chosen by you.  We will also typically offer a suggestions for the value of the
+variable to help you decide.
+
+Steps:
+-----
+1) File > New > Makefile Project with Existing Code
+   * Use proto's home as the source code directory
+   * Name it <PROJECT_NAME> (e.g., proto)
+   * The structure in Eclipse should looks similar to the following:
+
+<PROJECT_NAME>
+ `-Binaries
+ `-Archives
+ `-Includes
+ `-autom4te.cache
+ `-config
+ `-demos
+ `-doc
+ `-dumps
+ `-lib
+ `-libltdl
+ `-man
+ `-platforms
+ `-plugins
+ `-src
+ | `-compiler
+ | `-examples
+ | `-...
+ `-aclocal.md4
+ `-AUTHORS
+ `-autogen.sh
+ `-...
+
+2) Create <INPUT_FILE> (e.g., input.proto) for the proto code you are testing
+   * example <INPUT_FILE> contents: (tup 1 2 3)
+   * Put it in the proto home directory
+
+3) Create <ARGUMENT_FILE> for p2b and proto arguments
+   * Proto searches ./ and ~/ for a hidden file with the same name as the
+     executed binary.  For example, if you're executing p2b, it searches for
+     a file named ``.p2b'' (without the quotes).
+   * Create these files and add the arguments that you would like to be used
+     when the command is run (e.g., -CDall --verbosity 4).
+   * Include "--infile <INPUT_FILE>" (without the quotes) in the <ARGUMENT_FILE>.
+
+4) Create an Eclipse "Debug Configuration"
+   * Name it <DEBUG_CONFIG>, (e.g., p2b)
+   * Main Tab
+     * Run > Debug Configurations...
+     * Application: src/p2b
+     * Project: <PROJECT_NAME>
+     * Build: Build (GNU)
+   * Arguments Tab
+     * -path . --srcdir .
+   * Debugger
+     * use GDB
+
+5) Run <DEBUG_CONFIG> 
+   * From little bug toolbar icon
+   * Enter debugging view of Eclipse
+   * Set breakpoints in the source code window, use F6 to step over (GDB's
+     ``next'') and F5 to step into (GDB's ``step'')

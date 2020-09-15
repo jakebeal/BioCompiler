@@ -1,0 +1,408 @@
+Checklist of implementation of things for neocompiler
+Status	Form
+done	number
+done	variable
+done	ordinary operator application
+done	let
+done	let*
+done	def with fixed arguments
+done	lambda expressions
+done	primitive declaration
+done	optional argument def
+done	"rest" argument def
+done	recursive function calls
+done	inf, -inf, NaN, e, pi
+done	scalar math ops
+done	mux
+done	if
+done	true & false
+done	restrict
+done	nbr
+done	nbr-range + other space-time ops
+done	any-hood + other *-hood, *-hood+ ops
+done	letfed
+done	delay
+done	rep
+done	dt
+done	apply
+done	implicit all
+done	def for constants
+done	symbol data type
+done	operator data type
+done	search for definitions
+done	core.proto library
+done	reserve words like "lambda" and other specials
+done	prevent duplicate variables
+done	don't lookup special operators - keep constants around
+done	restriction applies to lookups
+done	parse signatures
+done	signatures with pattern variables
+done	parse types
+done	macro transformer
+done	"include" expression
+done	non-generic types
+done	tup
+done	tuple operations
+done	tuple letfed declarations
+done	fold-hood
+done	quotation
+	warn on redefinition of primitives
+	"annotate" declaration for operations
+working	implicit parameters
+
+Deferred enhancements:
+done	lambda types
+	do defs inside defs properly scope? (i.e. sub-fns?)
+	null-of operator
+	where
+	letrec
+	keyword argument def
+	argument defaults
+	forward references to functions
+	user-defined types
+	polymorphic null
+
+Analyzer/Optimizations:
+done	propagator that includes AMs (use by backpointer, DCE)
+done	discarding dead code w/o side-effects, including defs
+done	all-flattening: when you've got an all in an all, can merge them
+done	all but last of all get disposed of if no side-effects
+done	certification of backpointers
+done	literalization (take a literal type turn op to literal)
+done	prune unused AMs
+done	literal snipper -> if we've inferred a constant, replace w. literal
+done	dead code eliminator
+done	change constant-valued apply into oi of literal
+done	discard dead code from guaranteed ifs
+done	type inference
+done	signature checking
+done	apply constant folding to FieldOps
+working	constant folding (via math functions)
+working	delete unused implicit parameters
+working	delete unused parameters, except when required by 1st class fns
+done	eliminate Env::OPNAME kludge
+done	inlining of subexpressions
+done	one-op functions are inlined
+done	no-content wrapper expressions are inlined (e.g. command-line = funcall)
+	common sub-expression elimination
+	tuple decompose & recompose -> nop
+done	legality check (e.g. make sure fields contain only locals)
+done	allow markup (e.g. biobrick description) of core primitives
+
+
+Type Inference:
+done	markup fields w. back-links
+done	propagate changes until quiescence
+done	terminate on probable infinite loop
+done	make a more sane error system, w. phase markers
+done	replace ierrors in optimizer w. compile_errors
+done	resolve argk derived type
+done	resolve args derived type
+done	resolve last derived type
+done	make sure literals aren't passed through type reasoning
+done	resolve lcs derived type
+done	feedback loop type resolution - start w. init value into mux
+done	resolve nth derived type
+done	non-constant nth reasoning as lcs
+done	resolve ft derived type
+done	resolve tupof derived type
+done	resolve unlit derived type
+done	make regression tests for type checking errors
+done	make regression tests for sub/super class relations
+done	make lcs for type system
+done	check that LCS(A,B)==LCS(B,A)
+done	make backpointers part of IR
+done	return type
+done	subroutine type resolution is broken
+done	make sure deleted ois of CompoundOps are removed from funcall table
+done	memoize standard "replace & note if typechange"
+done	handle anonymous lambda types
+done	make gcs for type system - mostly returns type conflicts, X-is-subclass
+done	parameters get IDs so they can hook to inputs
+done	confirm that all ierrors are intentional in type-resolver
+done	run a signature-checker before we do type inference
+done	signature checking
+done	make sure compound ops get propagation in & out
+done	compound op checking
+done	tuple->vector promoter
+done	check for basic type match
+done	check for derived type match
+working	resolve inputs/outputs derived type -> problem of apply
+done	mark functions as pointwise vs. space/time
+	make special case type resolution for lambda fields?
+	subroutine type resolution on a "per-instance" basis?
+	does unlit for tuples go to same-size or top tuple?
+done	promotion of pointwise fields/ops to nbrhood functions
+	vector->longer vector w. zeros promoter
+	type reasoning will probably need more leniency sometimes... when you
+	  can't yet prove it's *not* the type you want.
+working	coerce scalars into length-1 vectors
+
+Emission:
+done	establish an ordering on elements: order as Ops created
+done	dumping option
+done	find set of minima and crawl them, outputting
+done	make multiple minima result in "all" ops
+done	change consumers to a set
+done	load core.ops file and get opnames & primitives from it
+done	fill out core.ops
+done	scalar literals
+done	tuple literals
+done	tuple operations
+done	function framework
+done	lets & references
+working	VM framework
+	function calls
+	fold-hoods
+	branches
+	feedback
+	symbol literals
+	function literals
+	reuse of tuple constants
+	add VDIV_OP
+	add LIT_NEG1_OP
+	VMUL_OP can be made more efficient by multiplying the scalars first
+
+Integration:
+done	link neocompiler to simulator
+done	make prototest allow options to be defined in variables
+done	make emitter tests check live result
+	convert SpatialComputer dumping to c++ mode
+	make directory handling sane
+	use platform definition files
+
+ProtoKernel revision:
+	Either INF_OP should be removed, or NEG_INF_OP should be added
+	Tuple memory allocation needs to be fixed
+	NUL_TUP_OP shouldn't be stored in its own special location
+	rather than OP8 vs. OP16, paramater ops should use 7-bit #s, where 
+	  the 8th bit flags "use next byte too"
+	delete VEC_OP
+	what is VSLICE really supposed to do, and is it doing it?
+	make a fold-hood version that uses an OPCODE (e.g. MIN_OP) for folding
+	add typechecks to make sure operation is safe, report failure
+	add ROUND_OP to math operations
+
+Questions:
+no	Make defs no longer return the lambda which has been defined?
+not yet	Should lambdas be able to be defined dynamically?
+done    Should Proto be case sensitive?
+no	does infinity need to become INF_OP?  What about NaN?
+no, bug	should tuples be stored on the env when done in lets?
+	should multiplication allow multiple tuples?
+	should RET_OP return on the stack rather than directly?
+	should tuple types allow "optional" to have 'length X to Y' tuples
+	  distinct from unbounded tuples? (Current system leaves LEN_OP unused)
+	
+
+Status	Old Compiler Op
+prim	ELT
+prim	DT
+prim	MOV
+prim	SPEED
+prim	BEARING
+prim	SET-DT
+prim	PROBE
+prim	FLEX
+prim	RND
+prim	INF
+prim	LT
+prim	LTE
+prim	GT
+prim	GTE
+prim	EQ
+prim	ADD
+prim	SUB
+prim	MUL
+prim	DIV
+prim	FLOOR
+prim	CEIL
+prim	ABS
+prim	MAX
+prim	MIN
+prim	MOD
+prim	POW
+prim	SQRT
+prim	LOG
+prim	SIN
+prim	COS
+prim	TAN
+prim	ASIN
+prim	ACOS
+prim	ATAN2
+prim	SINH
+prim	COSH
+prim	TANH
+prim	ALL/PAR
+prim	VADD
+prim	VSUB
+prim	VMUL
+prim	LEN
+prim	VLT
+prim	VGT
+prim	VLTE
+prim	VGTE
+prim	VEQ
+prim	VMIN
+prim	VMAX
+prim	TUP
+prim	APPLY
+prim	NBR-VEC
+prim	MUX
+prim	VMUX
+prim	IF/WHERE
+prim	INFINITESIMAL
+prim	NBR-RANGE
+prim	NBR-ANGLE
+prim	HOOD-RADIUS/RADIO-RANGE/COMM-RANGE
+prim	AREA
+prim	NBR-LAG
+prim	MID
+DISCARD	MIX
+working	FOLD-HOOD-PLUS
+working	VFOLD-HOOD-PLUS
+working	FOLD-HOOD
+working	VFOLD-HOOD
+	SLICE
+	NUL-TUP
+	MAP
+	FOLD
+	VFOLD
+
+
+OPCODES: for the emitter
+done	RET_OP,
+done	EXIT_OP,
+done	LIT8_OP,
+done	LIT_0_OP,
+done	LIT_1_OP,
+done	LIT_2_OP,
+done	LIT_3_OP,
+done	LIT_4_OP,
+done	LIT16_OP,
+done	LIT_FLO_OP,
+done	NUL_TUP_OP,
+KERNBUG	FAB_TUP_OP,
+done	DEF_TUP_OP,
+KERNBUG	FAB_VEC_OP,
+UNUSED	DEF_VEC_OP,
+KERNBUG	FAB_NUM_VEC_OP,
+done	DEF_NUM_VEC_OP,
+done	DEF_NUM_VEC_1_OP,
+done	DEF_NUM_VEC_2_OP,
+done	DEF_NUM_VEC_3_OP,
+UNUSED	DEF_OP,
+EXP_OK	REF_OP,
+done	REF_0_OP,
+done	REF_1_OP,
+EXP_OK	REF_2_OP,
+EXP_OK	REF_3_OP,
+done	DEF_VM_OP,
+EXP_OK	GLO_REF16_OP,
+done	GLO_REF_OP,
+done	GLO_REF_0_OP,
+done	GLO_REF_1_OP,
+done	GLO_REF_2_OP,
+done	GLO_REF_3_OP,
+DISCARD	LET_OP,
+done	LET_1_OP,
+done	LET_2_OP,
+DISCARD	LET_3_OP,
+DISCARD	LET_4_OP,
+EXP_OK	POP_LET_OP,
+done	POP_LET_1_OP,
+done	POP_LET_2_OP,
+EXP_OK	POP_LET_3_OP,
+EXP_OK	POP_LET_4_OP,
+	// Universal sensing & actuation ops
+done	SET_DT_OP,
+	MOV_OP,
+done	PROBE_OP,
+done	HOOD_RADIUS_OP,
+UNUSED	AREA_OP,
+	FLEX_OP,
+	INFINITESIMAL_OP,
+	DT_OP,
+	NBR_RANGE_OP,
+	NBR_BEARING_OP,
+	NBR_VEC_OP,
+	NBR_LAG_OP,
+done	MID_OP,
+done	SPEED_OP,
+done	BEARING_OP,
+	// Math Opcodes
+DISCARD	INF_OP,
+done	ELT_OP,
+done	RND_OP,
+done	ADD_OP,
+done	SUB_OP,
+done	MUL_OP,
+done	DIV_OP,
+done	FLOOR_OP,
+done	CEIL_OP,
+done	MOD_OP,
+done	POW_OP,
+done	LOG_OP,
+done	SQRT_OP,
+done	SIN_OP,
+done	COS_OP,
+done	TAN_OP,
+done	SINH_OP,
+done	COSH_OP,
+done	TANH_OP,
+done	ASIN_OP,
+done	ACOS_OP,
+done	ATAN2_OP,
+done	LT_OP,
+done	LTE_OP,
+done	GT_OP,
+done	GTE_OP,
+done	EQ_OP,
+done	MAX_OP,
+done	MIN_OP,
+done	ABS_OP,
+	//Vector & Tuple Opcodes
+done	TUP_OP,
+UNUSED	VEC_OP,
+UNUSED	LEN_OP,
+UNUSED	VFIL_OP,
+done	VADD_OP,
+done	VDOT_OP,
+done	VMUL_OP,
+done	VSUB_OP,
+	VSLICE_OP,
+done	VLT_OP,
+done	VLTE_OP,
+done	VGT_OP,
+done	VGTE_OP,
+done	VEQ_OP,
+done	VMIN_OP,
+done	VMAX_OP,	 
+	//Special Forms Opcodes
+	APPLY_OP,
+	MAP_OP,
+	FOLD_OP,
+	VFOLD_OP,
+done	DEF_FUN_2_OP,
+done	DEF_FUN_3_OP,
+done	DEF_FUN_4_OP,
+done	DEF_FUN_5_OP,
+done	DEF_FUN_6_OP,
+done	DEF_FUN_7_OP,
+done	DEF_FUN_OP,
+EXP_OK	DEF_FUN16_OP,
+working	FOLD_HOOD_OP,
+working	VFOLD_HOOD_OP,
+working	FOLD_HOOD_PLUS_OP,
+working	VFOLD_HOOD_PLUS_OP,
+	INIT_FEEDBACK_OP,
+	FEEDBACK_OP,
+	// Control flow opcodes
+done	ALL_OP,
+UNUSED	NO_OP,
+done	MUX_OP,
+done	VMUX_OP,
+	IF_OP,
+	IF_16_OP,
+	JMP_OP,
+	JMP_16_OP,

@@ -1,0 +1,80 @@
+;; localhost/tmp/webproto/?radius=20&numDevices=100&stepSize=1&program=%3B%3B%20Like%20a%20gradient%2C%20except%20that%20it%20replaces%20the%20metric%0A(def%20distance-to-metric%20(src%20init%20metric%20maxhop)%0A%20%20(1st%20(rep%20(tup%20d%20v)%20(tup%20(inf)%200)%0A%20%20%20%20(mux%20src%20(tup%20(init)%200)%20%20%20%20%3B%20source%0A%20%20%20%20%20%20(mux%20(any-hood%2B%0A%09%09(%3C%3D%20(%2B%20(nbr%20d)%20(metric)%20(*%20v%20(%2B%20(nbr-lag)%20(dt))))%20d))%0A%09%20%20%20%20(tup%20(min-hood%2B%20(%2B%20(nbr%20d)%20(metric)))%200)%0A%09%20%20%20%20(let%20((v0%20(if%20(%3D%20(dt)%200)%201%20(%2F%20(maxhop)%20(*%20(dt)%2012)))))%20(tup%20(%2B%20d%20(*%20v0%20(dt)))%20v0)))))))%0A%0A%3B%3B%20proto%20-v%20-s%200.1%20%22(distance-to-metric%20(sense%201)%20(fun%20()%200)%20(fun%20()%20(nbr-range))%20(fun%20()%20(radio-range)))%22%0A%0A%3B%3B%20proto%20-v%20-s%200.1%20%22(distance-to-metric%20(sense%201)%20(fun%20()%205)%20(fun%20()%20(*%202%20(nbr-range)))%20(fun%20()%20(*%202%20(radio-range))))%22%0A%0A%3B%3B%20This%20is%20a%20simple%20utility%20function%20for%20doing%20gradient%20descent%0A(def%20choose-lowest-neighbor%20(d)%0A%20%20(2nd%20(min-hood%20(mux%20(%3C%20(nbr%20d)%20d)%20%0A%20%20%20%20%09%20%20%20(tup%20(nbr%20d)%20(nbr%20(mid)))%20%0A%09%09%20%20%20(tup%20(inf)%20-1)))))%0A%0A%0A%3B%3B%20The%20purpose%20of%20this%20is%20to%20demonstrate%20packet%20routing%20by%20gradient%20descent%0A%3B%3B%20Every%20device%20with%20a%20packet%20picks%20the%20lowest%20value%20neighbor%20and%0A%3B%3B%20tries%20to%20hand%20a%20packet%20to%20it.%20%20The%20handoff%20will%20be%20retried%20until%0A%3B%3B%20the%20neighbor%20takes%20up%20the%20packet.%0A%3B%3B%20If%20there%20is%20no%20appropriate%20neighbor%2C%20the%20packet%20is%20dropped%0A%0A%3B%3B%20Note%20that%20this%20can%20be%20clearly%20improved%20by%20adding%20deconfliction%0A%3B%3B%20strategies%20to%20decrease%20the%20likelihood%20of%20neighbors%20trying%20to%0A%3B%3B%20route%20packets%20to%20the%20same%20locations%0A%0A(def%20route-packets%20(input%20distance)%0A%20%20(rep%20%0A%20%20%20packet%0A%20%20%200%0A%20%20%20(let%20((best-hop%20(choose-lowest-neighbor%20distance)))%0A%20%20%20%20%20(mux%20input%0A%20%20%20%20%20%20%20input%20%3B%20input%20wipes%20any%20packet%20already%20there%0A%20%20%20%20%20%20%20(mux%20packet%0A%20%20%20%20%20(mux%20(any-hood%20(muxand%20(%3C%20(nbr%20distance)%20distance)%20%0A%09%09%09%20%20(%3D%20(nbr%20packet)%20packet)))%0A%09%20%20%200%20%3B%20packet%20has%20moved%20forward%3B%20discard%20local%20copy%0A%09%20%20%20(mux%20(%3D%20best-hop%20-1)%0A%09%20%20%20%20%200%20%3B%20if%20there's%20nowhere%20to%20go%2C%20wipe%20the%20packet%0A%09%20%20%20%20%20packet))%20%3B%20otherwise%20hold%20for%20passing%20on%0A%09%20(max-hood%20(mux%20(%3D%20(nbr%20best-hop)%20(mid))%20(nbr%20packet)%200)))))))%0A%0A%0A%3B%3B%20By%20incorporating%20energy%20cost%20into%20metrics%2C%20this%20energy-routing%0A%3B%3B%20function%20will%20change%20where%20packets%20go%20over%20time%0A(def%20energy-routing%20(dst%20packet-src%20init-energy)%0A%20%20(letfed%20((energy%0A%09%20%20%20%20init-energy%0A%09%20%20%20%20(let*%20((stretch%20(%2F%20init-energy%20energy))%0A%09%09%20%20%20(d%20(distance-to-metric%20dst%20%0A%09%09%20%20%20%20%20%20%20(fun%20()%200)%20%0A%09%09%20%20%20%20%20%20%20(fun%20()%20(*%20(nbr-range)%20stretch))%20%0A%09%09%20%20%20%20%20%20%20(fun%20()%20(*%20(radio-range)%20stretch))))%0A%09%09%20%20%20(packets%20(route-packets%20packet-src%20d)))%0A%09%20%20%20%20%20%20(blue%20(%3E%20packets%200))%20%3B(green%20(*%20d%200.1))%0A%09%20%20%20%20%20%20(mux%20dst%20init-energy%0A%09%09(max%200%20(-%20energy%20(*%20(dt)%20(%2B%200.01%20(mux%20packets%201%200)))))))))%0A%20%20%20%20energy))%0A%0A%3B%3B%20Once%20every%20n%20seconds%2C%20return%20true1%3B%20otherwise%20return%20false%0A(def%20flash-per-n%20(n)%0A%20%20(letfed%20((v%20(rnd%200%20n)%20(if%20(%3E%20v%20n)%20(-%20n%20(dt))%20(if%20(%3E%20v%20(dt))%20(-%20v%20(dt))%20n))))%0A%20%20%20%20(%3D%20v%20n)))%0A%0A%3B%3B%20This%20injects%20a%20sequence%20of%20numerically%20increasing%20packets%2C%20so%20that%20we%20can%0A%3B%3B%20test%20the%20integrity%20of%20the%20sequence%0A(def%20test-packet-source%20(src%20period)%0A%20%20(let%20((inject%20(and%20src%20(flash-per-n%20period))))%0A%20%20%20%20(letfed%20((packet-id%200%20(mux%20inject%20(%2B%201%20packet-id)%20packet-id)))%0A%20%20%20%20%20%20(mux%20inject%20packet-id%200))))%0A%0A(let%20((energy%20%0A%20%20%20%20%20%20%20%20(*%200.001%20%0A%20%20%20%20%20%20%20%20%20%20%20%20(energy-routing%20(sense%201)%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(test-packet-source%20(sense%202)%2010)%20%0A%20%20%20%20%20%20%20%20%20%20%20%201000))))%0A%20%20%20%20(red%20(-%201%20energy))%0A%20%20%20%20(green%20energy))
+
+;; Like a gradient, except that it replaces the metric
+(def distance-to-metric (src init metric maxhop)
+     (1st (rep (tup d v) (tup (inf) 0)
+               (mux src (tup (init) 0)    ; source
+                    (mux (any-hood+
+                           (<= (+ (nbr d) (metric) (* v (+ (nbr-lag) (dt)))) d))
+                         (tup (min-hood+ (+ (nbr d) (metric))) 0)
+                         (let ((v0 (if (= (dt) 0) 1 (/ (maxhop) (* (dt) 12))))) (tup (+ d (* v0 (dt))) v0)))))))
+
+;; This is a simple utility function for doing gradient descent
+(def choose-lowest-neighbor (d)
+     (2nd (min-hood (mux (< (nbr d) d) 
+                         (tup (nbr d) (nbr (mid))) 
+                         (tup (inf) -1)))))
+
+
+;; The purpose of this is to demonstrate packet routing by gradient descent
+;; Every device with a packet picks the lowest value neighbor and
+;; tries to hand a packet to it.  The handoff will be retried until
+;; the neighbor takes up the packet.
+;; If there is no appropriate neighbor, the packet is dropped
+
+;; Note that this can be clearly improved by adding deconfliction
+;; strategies to decrease the likelihood of neighbors trying to
+;; route packets to the same locations
+
+(def route-packets (input distance)
+     (rep 
+       packet
+       0
+       (let ((best-hop (choose-lowest-neighbor distance)))
+         (mux input
+              input ; input wipes any packet already there
+              (mux packet
+                   (mux (any-hood (muxand (< (nbr distance) distance) 
+                                          (= (nbr packet) packet)))
+                        0 ; packet has moved forward; discard local copy
+                        (mux (= best-hop -1)
+                             0 ; if there's nowhere to go, wipe the packet
+                             packet)) ; otherwise hold for passing on
+                   (max-hood (mux (= (nbr best-hop) (mid)) (nbr packet) 0)))))))
+
+
+;; By incorporating energy cost into metrics, this energy-routing
+;; function will change where packets go over time
+(def energy-routing (dst packet-src init-energy)
+     (letfed ((energy
+                init-energy
+                (let* ((stretch (/ init-energy energy))
+                       (d (distance-to-metric dst 
+                                              (fun () 0) 
+                                              (fun () (* (nbr-range) stretch)) 
+                                              (fun () (* (radio-range) stretch))))
+                       (packets (route-packets packet-src d)))
+                  (blue (> packets 0)) ;(green (* d 0.1))
+                  (mux dst init-energy
+                       (max 0 (- energy (* (dt) (+ 0.01 (mux packets 1 0)))))))))
+             energy))
+
+;; Once every n seconds, return true1; otherwise return false
+(def flash-per-n (n)
+     (letfed ((v (rnd 0 n) (if (> v n) (- n (dt)) (if (> v (dt)) (- v (dt)) n))))
+             (= v n)))
+
+;; This injects a sequence of numerically increasing packets, so that we can
+;; test the integrity of the sequence
+(def test-packet-source (src period)
+     (let ((inject (and src (flash-per-n period))))
+       (letfed ((packet-id 0 (mux inject (+ 1 packet-id) packet-id)))
+               (mux inject packet-id 0))))
+
+(let ((energy 
+        (* 0.001 
+           (energy-routing (sense 1) 
+                           (test-packet-source (sense 2) 10) 
+                           1000))))
+  (red (- 1 energy))
+  (green energy))

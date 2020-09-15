@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Script template to run p2b from the build directory, instantiated by
+# configure.
+
+builddir="$(dirname "$0")"
+srcdir="${builddir}/"'.'
+
+exec "${builddir}/src/p2b" -path "${srcdir}/lib" --srcdir "${srcdir}" \
+  ${1+"$@"}

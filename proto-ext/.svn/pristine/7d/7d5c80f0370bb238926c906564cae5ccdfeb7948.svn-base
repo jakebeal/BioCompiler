@@ -1,0 +1,12 @@
+Before making a public release, please go down this checklist:
+- run ./prepare-release.sh to set the KERNEL_VERSION and PROTO_VERSION
+- Check that all regression tests are passing
+- Make sure all configure.ac files have the right release number in AC_INIT
+- Update the release number in proto/man/src/proto-docs.sty
+- Make sure all recent authors are credited in proto/AUTHORS and 
+  proto/man/src/proto-docs.sty (and any other AUTHOR lists)
+- Make sure copyright goes through current year
+- Re-LaTex all manuals
+- Make sure all significant changes are listed in proto/NEWS
+- Use 'svn copy' to tag the release version
+- Use 'svn export' to create a clean copy, then tar it to proto-releaseN.tgz

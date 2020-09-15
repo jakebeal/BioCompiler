@@ -1,0 +1,38 @@
+;;;; SMALL-MOLECULE SENSORS
+;; Note: the sensors need to have a chemical reaction modeled and have
+;;   the activator/repressor type represented accurately
+(primitive aTc () boolean
+ :grn-motif ((P high TetR|boolean T) 
+	     (RXN (aTc|boolean) represses TetR)
+	     (P high R- TetR value T)))
+(primitive IPTG () boolean
+ :grn-motif ((P high LacI|boolean T) 
+	     (RXN (IPTG|boolean) represses LacI)
+	     (P high R- LacI value T)))
+(primitive AHL () boolean
+ :grn-motif ((P high LuxR|boolean T) 
+	     (RXN (AHL|boolean) activates LuxR)
+	     (P low R+ LuxR value T)))
+(primitive Ara () boolean
+ :grn-motif ((P high AraC|boolean T) 
+	     (RXN (Ara|boolean) activates AraC)
+	     (P low R+ AraC value T)))
+
+;;;; FLUORESCENT REPORTERS
+(primitive green (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 GFP|arg0 value T)))
+(primitive red (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 RFP|arg0 T)
+	      (P R+ arg0 value T)))
+(primitive yellow (boolean) boolean :side-effect
+  :type-constraints ((= value arg0))
+  :grn-motif ((P R+ arg0 YFP|arg0 value T)))
+
+;;;; GENERIC DEBUG MAPPING
+(macro test-sensor aTc)
+(macro test-sensor-2 IPTG)
+(macro test-sensor-3 AHL)
+(macro debug green)
+(macro debug-2 red)

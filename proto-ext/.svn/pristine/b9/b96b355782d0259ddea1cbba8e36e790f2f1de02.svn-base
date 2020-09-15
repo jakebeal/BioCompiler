@@ -1,0 +1,2 @@
+(def local-average (v)
+  (* (/ 1 (sum-hood 1)) (fold-hood + (tup 0 0 0) v)))

@@ -1,0 +1,68 @@
+-*- Mode: Outline -*-
+
+2011-08-30
+
+Notes on Proto plugins -- what they must do and how to do it.
+
+* Requirements
+
+** Semantics
+
+Proto plugins extend the behaviour of the Proto compiler and/or
+simulator.  Plugins can modify the behaviour of the compiler by
+replacing the kernel emitter by another one.  Plugins can modify the
+behaviour of the simulator by
+
+1. extending the model of space (`layers'),
+2. replacing the clock (`time model'), and/or
+3. replacing the distribution of devices in space.
+
+Any compiler/simulator plugin can also, on initialization, call every
+public member function of the compiler/simulator plugin for which it
+is being instantiated, which will make it hard to maintain a
+consistent ABI.
+
+** Pragmatics
+
+It must be straightforward to write Proto plugins, and there must be a
+straightforward way to transform an old-style plugin into a new-style
+plugin.
+
+It must be straightforward to build and install Proto plugins using
+autotools and following GNU conventions, and to load them with ltdl.
+
+Looks like to make this work on Windows requires annotating every
+declaration by __declspec(dllexport) when compiling the Proto cruft
+and __declspec(dllimport) when compiling a DLL that uses it, and then
+specifying `win32-dll' in LT_INIT in configure.ac.  (How does this
+work with C++?)
+
+It must be possible to load a plugin by name without analyzing every
+plugin in a linear search (except inasmuch as a directory lookup may
+do so) to query whether it is the right plugin.
+
+When the ABI changes, Proto must take some reasonable effort to detect
+loading an older or newer plugin that it doesn't know how to handle.
+Ideally, eventually Proto ought to be able to handle older plugins.
+The versioning scheme should rely minimally on features of ELF or
+Mach-O such as soname and symbol versioning.
+
+* Proposal
+
+Every exposed class, variable, and function in the Proto compiler and
+simulator should be annotated with an attribute PROTO_PUBLIC (or
+similar), which on Windows will be conditionally defined to be either
+__declspec(dllexport) or __declspec(dllimport), and on elven Unix with
+GCC will be defined to be __attribute__((visibility ("default"))).
+
+XXX What about macho Unix, i.e. Darwin?  Does the visibility attribute
+work the same way there too?
+
+Both in the compiler/simulator and in plugins, the Proto API should
+include a preprocessor symbol PROTO_PLUGIN_VERSION that will be
+defined to be an unsigned integer representing both the API and ABI
+version.  (Eventually it should be fixed at a particular value when we
+figure out API and ABI stability, and separate versions for API and
+ABI should be introduced.)  A Proto plugin must store this somewhere
+that the compiler/simulator can read when loading the plugin, so that
+the compiler/simulator can fail early if the version changes.

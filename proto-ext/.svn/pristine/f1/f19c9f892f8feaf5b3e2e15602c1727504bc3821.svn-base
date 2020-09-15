@@ -1,0 +1,13 @@
+;;position-lirst
+;;Returns the index of first occurence of item in a tuple.
+;;OR -1 if item doesn't occur.
+
+(def position-last (val elts)
+    (pos-helper val elts (- (len elts) 1) (len elts)))
+    
+(def pos-helper (val elts index length)
+    (if (= val (elt elts index)) 
+            index
+            (if (= index 0)
+                -1
+                (pos-helper val elts (- index 1) length))))

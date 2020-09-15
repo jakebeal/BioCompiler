@@ -1,0 +1,2 @@
+(def find (val elts)
+  (fold (fun (res e) (or res (= val e))) 0 elts))

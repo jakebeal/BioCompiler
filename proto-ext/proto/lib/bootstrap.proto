@@ -1,0 +1,14 @@
+;; The operators in bootstrap.proto are required for interpretation of the
+;; rest of the core.proto file:
+(primitive restrict (base|any &optional test|scalar) any ;; permissive boolean input
+  :space :protected :type-constraints ((= value base)))
+(primitive tup (&rest any) tuple 
+  :type-constraints ((= value arg0))) ; tuplization implicit in rest
+(primitive dchange () boolean :space :time :protected)
+(primitive not (scalar) boolean) ;; permissive boolean input
+(primitive mux (test|scalar true-expr|local false-expr|local) local ;; permissive boolean input
+  :type-constraints ((= value (lcs true-expr false-expr))))
+(primitive delay (local) local :time :protected
+  :type-constraints ((= arg0 value)))
+(primitive store (any) any :side-effect)
+(primitive read () any :side-effect)

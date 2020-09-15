@@ -1,0 +1,335 @@
+%%
+%% This is file `svn-multi.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% svn-multi.dtx  (with options: `package')
+%% 
+%% This is a generated file.
+%% 
+%% Copyright (C) 2006-2007 by Martin Scharrer <martin@scharrer-online.de>
+%% 
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%% 
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is Martin Scharrer.
+%% 
+%% This work consists of the files svn-multi.dtx and svn-multi.ins
+%% and the derived files svn-multi.sty and svnkw.sty.
+%% 
+%% DTX Id: $Id: svn-multi.dtx 628 2007-07-10 20:32:06Z martin $
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesPackage{../svn-multi} % modified to be pulled from a parent dir
+    [2007/07/10 v1.3a SVN Keywords for multi-file LaTeX documents]
+
+\newcommand{\svn}{\@ifnextchar{*}{\svn@s}{\svn@n}}
+\def\svn@n#1{\@svn@n#1}
+\def\svn@s*#1{\@svn@s#1}
+\def\@svn@n$#1${#1}
+\def\@svn@s$#1 ${#1}
+
+\def\svnrev{0}      \def\svnfilerev{0}      \def\@svn@rev{0}
+\def\svndate{}      \def\svnfiledate{}      \def\@svn@date{}
+\def\svnauthor{}    \def\svnfileauthor{}    \def\@svn@author{}
+\def\svnyear{0}     \def\svnfileyear{0}     \def\@svn@year{0}
+\def\svnmonth{0}    \def\svnfilemonth{0}    \def\@svn@month{0}
+\def\svnday{0}      \def\svnfileday{0}      \def\@svn@day{0}
+\def\svnhour{0}     \def\svnfilehour{0}     \def\@svn@hour{0}
+\def\svnminute{0}   \def\svnfileminute{0}   \def\@svn@minute{0}
+\def\svnsecond{0}   \def\svnfilesecond{0}   \def\@svn@second{0}
+\def\svntimezone{0} \def\svnfiletimezone{0} \def\@svn@timezone{0}
+\def\svnmainurl{NOT SET}\def\svnmainfilename{NOT SET}
+
+\newcommand*{\svnid}{%
+\@svnidswtrue
+\svnkwsave
+}
+\newif\if@svnidsw
+\@svnidswfalse
+
+\def\svn@scanId#1 #2 #3 #4 #5\relax{%
+\@svn@scandate{#3 #4}%
+\@svn@updateid{#2}{#3 #4}{#5}%
+\svnkwdef{Filename}{#1}%
+\svnkwdef{Date}{#3 #4}%
+\svnkwdef{Revision}{#2}%
+\svnkwdef{Author}{#5}%
+}
+
+\def\@svn@updateid#1#2#3{% #1 = rev, #2 date, #3 author (username)
+\xdef\svnfilerev{#1}%
+\xdef\svnfiledate{#2}%
+\xdef\svnfileauthor{#3}%
+\ifx\svnfilerev\empty\else
+\ifnum\@svn@rev<\svnfilerev
+\xdef\@svn@rev{#1}%
+\xdef\@svn@date{#2}%
+\xdef\@svn@author{#3}%
+\xdef\@svn@year{\svnfileyear}%
+\xdef\@svn@month{\svnfilemonth}%
+\xdef\@svn@day{\svnfileday}%
+\xdef\@svn@hour{\svnfilehour}%
+\xdef\@svn@minute{\svnfileminute}%
+\xdef\@svn@second{\svnfilesecond}%
+\xdef\@svn@timezone{\svnfiletimezone}%
+\else\fi
+\fi
+}
+
+\newcommand{\svnidlong}{%
+\svnkwdef{HeadURL}{}%
+\svnkwdef{LastChangedDate}{}%
+\svnkwdef{LastChangedRevision}{0}%
+\svnkwdef{LastChangedBy}{}%
+\begingroup
+\svn@catcodes
+\catcode`\{=12
+\catcode`\}=12
+\svnidlong@readargsfull
+}
+
+\def\svn@catcodes{%
+\catcode`\%=12
+\catcode`\_=12
+\catcode`\^=12
+\catcode`\$=12
+\catcode`\&=12
+\catcode`\#=12
+\catcode`\~=12
+ %%\catcode`\ =10
+\catcode`\\=12
+\catcode`\^^M=9
+}
+
+\begingroup
+\catcode`\{=12\catcode`\}=12
+\catcode`\(=1\catcode`\)=2
+\gdef\svnidlong@readargsfull#1{#2}#3{#4}#5{#6}#7{#8}(%
+ \svnidlong@readargs(#2)(#4)(#6)(#8)%
+)
+\endgroup
+
+\def\svnidlong@readargs#1#2#3#4{%
+\svnkwsave@read #1\relax
+\svnkwsave@read #2\relax
+\svnkwsave@read #3\relax
+\svnkwsave@read #4\relax
+\endgroup
+\ifx\svnkwLastChangedDate\empty
+\else\@svn@scanlongdate{\svnkwLastChangedDate}\fi
+\@svn@updateid{\svnkw{LastChangedRevision}}{\svnkw{LastChangedDate}}
+{\svnkw{LastChangedBy}}%
+\ignorespaces
+}%
+
+\def\svnkwsave{%
+\begingroup
+\svn@catcodes
+\svnkwsave@readargs
+}
+
+\gdef\svnkwsave@readargs#1{%
+\svnkwsave@read#1\relax
+\endgroup
+\if@svnidsw
+  \ifx\svnkwId\empty
+  \else
+    \expandafter
+    \svn@scanId\svnkwId\relax
+    \@svnidswfalse
+  \fi
+\fi
+\ignorespaces
+}
+
+\begingroup
+\catcode`\$=12
+\gdef\svnkwsave@read $#1$\relax{%
+    \svn@checkcolon#1:\relax
+}
+\endgroup
+
+\begingroup
+\catcode`\$=11
+\gdef\svnkwsave@parse$#1:#2${%
+\expandafter\xdef\csname svnkw#1\endcsname{#2}}
+\endgroup
+
+\newcommand{\svnkwdef}[2]{%
+\@ifundefined{svnkwdef@#1}
+{\svnkwdef@{#1}{#2}}
+{\csname svnkwdef@#1\endcsname{#2}}%
+}
+
+\newcommand{\svnkwdef@}[2]
+{\expandafter\xdef\csname svnkw#1\endcsname{#2}}
+
+\def\svnkwdef@Rev#1{\svnkwdef@{Rev}{#1}}
+\def\svnkwdef@Author#1{\svnkwdef@{Author}{#1}}
+\def\svnkwdef@Date#1{\svnkwdef@{Date}{#1}}
+\let\svnkwdef@Revision=\svnkwdef@Rev
+\let\svnkwdef@LastChangedRevision=\svnkwdef@Rev
+\let\svnkwdef@LastChangedBy=\svnkwdef@Author
+\let\svnkwdef@LastChangedAt=\svnkwdef@Date
+\def\svnkwRevision{\svnkwRev}
+\def\svnkwLastChangedRevision{\svnkwRev}
+\def\svnkwLastChangedBy{\svnkwAuthor}
+\def\svnkwLastChangedAt{\svnkwDate}
+
+\svnkwdef{Rev}{0}
+\svnkwdef{Date}{}
+\svnkwdef{Author}{}
+\svnkwdef{Filename}{}
+\svnkwdef{HeadURL}{}
+
+\newcommand{\svnkw}[1]{%
+\@ifundefined{svnkw#1}
+{\PackageWarning{svn-multi}{SVN keyword '#1' not defined (typo?)}}
+{\csname svnkw#1\endcsname}}%
+
+\def\svn@checkcolon#1:#2\relax{%
+    \def\svn@test{#2}%
+    \ifx\svn@test\empty
+    \svnkwdef{#1}{}%
+    \else
+      \svn@stripcolon#2\relax
+      \svnkwdef{#1}{\svn@value}%
+    \fi
+}
+
+\def\svn@stripcolon#1:\relax{%
+    \def\svn@test{#1}%
+    \ifx\svn@test\empty
+      \gdef\svn@value{}%
+    \else
+    \ifx\svn@test\svn@spaceonly
+      \gdef\svn@value{}%
+    \else
+     \svn@stripspace#1\relax\relax
+    \fi\fi
+}
+
+\def\svn@spaceonly{ }
+
+\def\svn@stripspace#1#2\relax{%
+    \def\svn@test{#1}%
+    \ifx\svn@test\svn@spaceonly
+      \gdef\svn@value{#2}%
+    \else
+      \svn@striptrailingspace#1#2\relax
+    \fi
+}
+
+\def\svn@striptrailingspace#1 \relax{%
+    \gdef\svn@value{#1}%
+}
+
+\def\@svn@scandate#1{\@svn@scandate@#1\relax}
+
+\def\@svn@scandate@#1-#2-#3 #4:#5:#6#7#8\relax{%
+\gdef\svnfileyear{#1}%
+\gdef\svnfilemonth{#2}%
+\gdef\svnfileday{#3}%
+\gdef\svnfilehour{#4}%
+\gdef\svnfileminute{#5}%
+\gdef\svnfilesecond{#6#7}%
+\gdef\svnfiletimezone{+00}% #8 always 'Z' for Zulu-time (UTC)
+}
+
+\def\@svn@scanlongdate#1{\expandafter\@svn@scanlongdate@#1\relax}
+\def\@svn@scanlongdate@#1-#2-#3 #4:#5:#6 #700 #8\relax{%
+\gdef\svnfileyear{#1}%
+\gdef\svnfilemonth{#2}%
+\gdef\svnfileday{#3}%
+\gdef\svnfilehour{#4}%
+\gdef\svnfileminute{#5}%
+\gdef\svnfilesecond{#6}%
+\gdef\svnfiletimezone{#7}%
+}
+
+\def\svnpdfdate{\svnyear\svnmonth\svnday
+\svnhour\svnminute\svnsecond\svntimezone'00'}
+
+\newcommand{\svnsetmainfile}
+{\edef\svnmainurl{\svnkw{HeadURL}}
+\edef\svnmainfilename{\svnkw{Filename}}}
+\AtBeginDocument{\svnsetmainfile}
+
+\newcommand{\svnRegisterAuthor}[2]{%
+\expandafter\def\csname svn@author@#1\endcsname{#2}%
+}
+
+\newcommand{\svnFullAuthor}{%
+\@ifnextchar{*}
+{\svnFullAuthor@star}
+{\svnFullAuthor@normal}
+}
+\def\svnFullAuthor@star*#1{\svnFullAuthor@{#1}{~(#1)}}
+\def\svnFullAuthor@normal#1{\svnFullAuthor@{#1}{}}
+\def\svnFullAuthor@#1#2{%
+\@ifundefined{svn@author@#1}
+{#1}
+{\csname svn@author@#1\endcsname #2}%
+}
+
+\newcommand{\svnRegisterRevision}[2]{%
+\expandafter\def\csname svn@revision@#1\endcsname{#2}
+}
+
+\newcommand{\svnFullRevision}{%
+\@ifnextchar{*}
+{\svnFullRevision@star}
+{\svnFullRevision@normal}
+}
+\def\svnFullRevision@star*#1{\svnFullRevision@{#1}{~(r#1)}}
+\def\svnFullRevision@normal#1{\svnFullRevision@{#1}{}}
+\def\svnFullRevision@#1#2{%
+\@ifundefined{svn@revision@#1}
+{Revision #1}
+{\csname svn@revision@#1\endcsname #2}%
+}
+
+    \DeclareRobustCommand*{\svnnolinkurl}{%
+        \@ifundefined{hyper@normalise}
+        {\PackageWarning{svn-multi}{Package hyperref is needed for \noexpand
+        \svnnolinkurl.}}
+        {\hyper@normalise\svnnolinkurl@}}%
+    \def\svnnolinkurl@#1{\Hurl{#1}}
+
+\AtEndDocument{%
+ \if@filesw
+ \ifx\@svn@rev\empty\else
+ \ifnum\@svn@rev=0\else
+ \ifx\@svn@date\empty\else
+ \ifx\@svn@author\empty\else
+ \newwrite\svn@write
+ \immediate\openout\svn@write=\jobname.svn
+ \immediate\write\svn@write{%
+ \@percentchar\space SVN cache^^J%
+ \noexpand\def\noexpand\svnrev{\@svn@rev}^^J%
+ \noexpand\def\noexpand\svndate{\@svn@date}^^J%
+ \noexpand\def\noexpand\svnauthor{\@svn@author}^^J%
+ \noexpand\def\noexpand\svnyear{\@svn@year}^^J%
+ \noexpand\def\noexpand\svnmonth{\@svn@month}^^J%
+ \noexpand\def\noexpand\svnday{\@svn@day}^^J%
+ \noexpand\def\noexpand\svnhour{\@svn@hour}^^J%
+ \noexpand\def\noexpand\svnminute{\@svn@minute}^^J%
+ \noexpand\def\noexpand\svnsecond{\@svn@second}^^J%
+ \noexpand\def\noexpand\svntimezone{\@svn@timezone}^^J%
+ }
+ \immediate\closeout\svn@write%
+ \fi\fi\fi\fi\fi%
+}
+
+\InputIfFileExists{\jobname.svn}{}{}
+\endinput
+%%
+%% End of file `svn-multi.sty'.

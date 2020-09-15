@@ -1,0 +1,33 @@
+//Assoc
+test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc 3 (tup (tup 1 3) (tup 3 6) (tup 4 7)))"
+= 1 3 3
+= 1 4 6
+// ASSOC IS KNOWN-BROKEN DUE TO COMPILER ERRORS
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc 3 (tup (tup 1 3 1) (tup 3 6 2) (tup 4 7 3)))"
+// = 1 3 3
+// = 1 4 6
+// = 1 5 2
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc 1 (tup (tup 1 2 3) (tup 1 4 5) (tup 1 6 7)))"
+// = 1 3 1
+// = 1 4 6
+// = 1 5 7
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc 1 (tup (tup 3 2 1) (tup 3 2 1) (tup 3 2 1) (tup 3 2 1)))"
+// = 1 3 1
+// = 1 4 -1
+
+// //Assoc-Debug
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc-debug 3 (tup (tup 1 3) (tup 3 6) (tup 4 7)))"
+// = 1 3 3
+// = 1 4 6
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc-debug 3 (tup (tup 1 3 1) (tup 3 6 2) (tup 4 7 3)))"
+// = 1 3 3
+// = 1 4 6
+// = 1 5 2
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc-debug 1 (tup (tup 1 2 3) (tup 1 4 5) (tup 1 6 7)))"
+// = 1 3 1
+// = 1 4 6
+// = 1 5 7
+// test: $(PROTO) -n 1 -headless -dump-after 1 -stop-after 1.5 -NDall -Dvalue "(assoc-debug 1 (tup (tup 3 2 1) (tup 3 2 1) (tup 3 2 1) (tup 3 2 1)))"
+// = 1 3 1
+// = 1 4 -1
+

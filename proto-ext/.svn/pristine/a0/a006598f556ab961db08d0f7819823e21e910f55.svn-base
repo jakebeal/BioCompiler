@@ -1,0 +1,12 @@
+; This function is the main one to call
+
+(def wire (src dest near-obst)
+    (if (and near-obst (and (not src)(not dest)))
+      (tup 0 0 0)
+      (connect src dest))
+  )
+
+
+;; NB: depends on the following functions: drawGrad, connect --> spath, vecbetween
+;; proto -sv -s 1 -l -n 1000 "(wire (sense 1) (sense 2) (sense 3))"
+;; proto -sv -s 1 -l -n 200 " (wire (+ (= (mid) 1) (= (mid) 2)) (= (mid) 3) (sense 3))"   to connect two srcs to same dest

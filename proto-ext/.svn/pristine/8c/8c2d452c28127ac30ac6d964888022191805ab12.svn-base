@@ -1,0 +1,272 @@
+;; This file contains all of the standard language operators of Proto
+;; Some are primitives; some are macros; some are small defined functions
+
+(primitive elt (tuple i|scalar) any
+  :type-constraints ((= value (nth arg0 i))))
+(primitive local (local) field :space :time :protected ; usually left implicit
+  :type-constraints ((= value (fieldof arg0))))
+
+;; Operators only used in localized code:
+;; Branch selectively executes a function; it's a localized if
+(primitive branch (test|scalar truefn|lambda falsefn|lambda) any
+  :protected
+  :type-constraints ((= value (lcs (output truefn) (output falsefn)))))
+;; Reference accesses an externally defined variable; it's a localized restrict
+(primitive reference (any) any
+  :protected
+  :type-constraints ((= value arg0)))
+
+
+;;(macro par all) ; No more par: specials like all can't be renamed w. macros
+(primitive apply (fn|lambda &rest any) any 
+  :type-constraints((= value (output fn))
+                    (= arg1 (inputs fn))))
+
+;; Boolean operations
+(macro if (test true-expr false-expr)
+  (let ((?x ,test))
+    (mux ?x (restrict ,true-expr ?x) (restrict ,false-expr (not ?x)))))
+(macro and (x y) (if ,x ,y 0))
+(macro or (x y) (let ((?tmp ,x)) (if ?tmp ?tmp ,y)))
+(macro xor (x y) (let ((?tmp ,y)) (mux ,x (not ?tmp) ?tmp)))
+
+(def muxand (x y) (mux x y false))
+(def muxor (x y) (mux x x y))
+
+;;;; Mathematical operators
+
+;; constants
+(macro pi 3.14159265358979323846264338)
+(macro e 2.71828182845904523536)
+
+;; arithmetic
+(primitive + (&rest number) number
+  :type-constraints ((= value (unlit (lcs arg0)))))
+(primitive - (number &rest number) number
+  :type-constraints ((= value (unlit (lcs arg0 arg1)))))
+;[*] expects at most one argument to be a vector and it must be the last
+(primitive * (&rest number) number
+  :type-constraints ((= value (unlit (last arg0)))))
+(primitive / (quotient|number &rest divisors|scalar) number
+  :type-constraints ((= value (unlit quotient))))
+
+(primitive > (number number) boolean)
+(primitive < (number number) boolean)
+(primitive = (number number) boolean)
+(primitive <= (number number) boolean)
+(primitive >= (number number) boolean)
+
+(primitive min (&rest number) number
+  :type-constraints ((= value (lcs arg0))))
+(primitive max (&rest number) number
+  :type-constraints ((= value (lcs arg0))))
+(primitive abs (scalar) scalar)
+
+(primitive floor (scalar) scalar)
+(primitive ceil (scalar) scalar)
+(primitive round (scalar) scalar)
+
+(def neg (x) (- 0 x))
+(def zero? (x) (= x 0))
+(def neg? (x) (< x 0))
+(def pos? (x) (> x 0))
+
+(primitive mod (num|scalar divisor|scalar) scalar)
+(primitive pow (base|scalar exponent|scalar) scalar)
+(primitive sqrt (scalar) scalar)
+(primitive log (scalar) scalar)
+(def exp (x) (pow e x))
+(def log10 (x) (/ (log x) (log 10)))
+(def logn (x base) (/ (log x) (log base)))
+
+(def denormalizeN (x oldmin oldmax newmin newmax)
+  (+ (- newmin oldmin) (* x (/ (- newmax newmin) (- oldmax oldmin)))))
+(def denormalize (x newmin newmax) (denormalizeN x 0 1 newmin newmax))
+
+(primitive rnd (min|scalar max|scalar) scalar)
+(def rndint (n) (let ((v (rnd 0 n))) (- v (mod v 1))))
+
+
+;; trigonometry
+(primitive sin (scalar) scalar)
+(primitive cos (scalar) scalar)
+(primitive tan (scalar) scalar)
+(primitive asin (scalar) scalar)
+(primitive acos (scalar) scalar)
+(primitive atan2 (y|scalar x|scalar) scalar)
+(primitive sinh (scalar) scalar)
+(primitive cosh (scalar) scalar)
+(primitive tanh (scalar) scalar)
+
+(def acosh (x) (log (+ x (sqrt (- (* x x) 1)))))
+(def asinh (x) (log (+ x (sqrt (+ (* x x) 1)))))
+(def atanh (x) (* 0.5 (log (/ (+ 1 x) (- 1 x)))))
+
+
+;; Tuples & vectors
+(primitive len (tuple) scalar)
+(macro 1st (v) (elt ,v 0))
+(macro 2nd (v) (elt ,v 1))
+(macro 3rd (v) (elt ,v 2))
+
+(primitive vdot (vector vector) scalar)
+(def vlen (v) (sqrt (vdot v v)))
+
+; (def normalize (v) ; normalizes a vector, ignoring those of size zero
+;   (if (fold or 0 v) (* (/ 1 (vlen v)) v) v))
+(def rect-to-polar (v) (tup (vlen v) (atan2 (2nd v) (1st v))))
+(def polar-to-rect (p)
+  (let ((r (1st p)) (a (2nd p))) (tup (* r (cos a)) (* r (sin a)))))
+(def rotate (radians|scalar v|vector)
+  (polar-to-rect (+ (rect-to-polar v) (tup 0 radians))))
+(def toDegrees (x) (* x (/ 180 pi)))
+(def toRadians (x) (* x (/ pi 180)))
+
+
+;;position-first
+;;Returns the index of first occurence of item in a tuple.
+;;OR -1 if item doesn't occur.
+(def fpos-helper (val elts index length)
+  (if (= val (elt elts index)) 
+      index
+    (if (= index (- length 1))
+	-1
+      (fpos-helper val elts (+ 1 index) length))))
+(def position-first (val elts)
+  (fpos-helper val elts 0 (len elts)))
+
+;;position-last
+;;Returns the index of first occurence of item in a tuple.
+;;OR -1 if item doesn't occur.
+(def lpos-helper (val elts index length)
+    (if (= val (elt elts index)) 
+            index
+            (if (= index 0)
+                -1
+                (lpos-helper val elts (- index 1) length))))
+(def position-last (val elts)
+  (lpos-helper val elts (- (len elts) 1) (len elts)))
+
+
+;;;; Space/Time
+
+;; Space
+;; sensors & actuators
+(primitive mov (velocity|vector) vector :side-effect
+  :type-constraints((= value velocity)))
+(primitive flex (angle|scalar) scalar :side-effect
+  :type-constraints((= value angle)))
+(primitive speed () scalar)
+(primitive bearing () scalar)
+
+;; communication operators
+(primitive nbr (local) field :space :time
+  :type-constraints((= value (fieldof arg0))))
+
+;; space-time metrics
+(primitive nbr-range () (field scalar) :space :time)
+(primitive nbr-bearing () (field scalar) :space :time)
+(macro nbr-angle nbr-bearing)
+(primitive nbr-vec () (field vector) :space :time)
+(primitive hood-radius () scalar)
+(macro comm-range hood-radius) (macro radio-range hood-radius)
+(primitive infinitesimal () scalar)
+(macro area infinitesmial)
+(primitive density () scalar)
+
+;; summary operators
+(primitive any-hood ((field scalar)) boolean :space :time) ;; permissive boolean input
+(primitive all-hood ((field scalar)) boolean :space :time) ;; permissive boolean input
+(primitive min-hood ((field number)) number :space :time
+  :type-constraints ((= value (ft arg0))))
+(primitive max-hood ((field number)) number :space :time
+  :type-constraints ((= value (ft arg0))))
+(primitive int-hood ((field number)) number :space :time
+  :type-constraints ((= value (ft (unlit arg0)))))
+(primitive sum-hood ((field number)) number :space :time
+  :type-constraints ((= value (ft (unlit arg0)))))
+
+(def is-self () (= (nbr-range) 0))
+(macro any-hood+ (value) (any-hood (mux (is-self) false ,value)))
+(macro all-hood+ (value) (all-hood (mux (is-self) true ,value)))
+(macro min-hood+ (value) (min-hood (mux (is-self) inf ,value)))
+(macro max-hood+ (value) (max-hood (mux (is-self) -inf ,value)))
+
+;; fold-hood's lambda takes a partial summary and the value from a nbr
+;; and combines them to make a new partial summary.  The 2nd argument is
+;; the inital summary and the 3rd argument is the value to share
+;(primitive fold-hood 
+;          ((lambda (local local) (unlit arg0)) 
+;		      (unlit (nth (inputs arg0) 0))
+;		      (unlit (nth (inputs arg0) 1)))
+;  (unlit (nth (inputs arg0) 0)) 
+;  :space :time
+;  :type-constraints
+(primitive fold-hood (lambda local local) local :space :time
+  :type-constraints ((= (inputs arg0) (tupof arg1 arg2))
+                     (= (output arg0) (unlit (inputs arg0)))
+                     (= arg1 (unlit (nth (inputs arg0) 0)))
+                     (= arg2 (unlit (nth (inputs arg0) 1)))
+                     (= value (unlit (nth (inputs arg0) 0)))))
+;(primitive fold-hood* ((lambda (local local) (unlit arg0))
+;	   	       (lambda (local) (unlit (nth (inputs arg0) 1)))
+;		       (unlit (nth (inputs arg1) 0)))
+;  (unlit (nth (inputs arg0) 0)) :space :time)
+
+(primitive fold-hood* (lambda local local) local :space :time
+  :type-constraints ((= (inputs arg0) (tupof arg1 arg2))
+                     (= (output arg0) (unlit (inputs arg0)))
+                     (= arg1 (unlit (nth (inputs arg0) 0)))
+                     (= arg2 (unlit (nth (inputs arg0) 1)))
+                     (= value (unlit (nth (inputs arg0) 0)))))
+;(primitive fold-hood-plus ((lambda (local local) (unlit (nth (inputs arg0) 0)))
+;	   		   (lambda (local) (unlit (nth (inputs arg0) 1)))
+;			   (unlit (nth (inputs arg1) 0)))
+;  (unlit (output arg1)) :space :time)
+(primitive fold-hood-plus (folder|lambda processor|lambda export|local) local
+  :space :time
+  :type-constraints ((= value (unlit (output processor)))
+                     (= (inputs folder) 
+                        (tupof (unlit (output processor)) 
+                               (unlit (output processor))))
+                     (= (output folder) (unlit (nth (inputs folder) 0)))
+                     (= (inputs processor) (tupof export))
+                     (= (output processor) (unlit (nth (inputs folder) 1)))))
+
+;; Time
+(primitive dt () scalar :time)
+(primitive set-dt (scalar) scalar :side-effect
+  :type-constraints ((= arg0 value)))
+(primitive nbr-lag () (field scalar) :space :time)
+(primitive nbr-delay () (field scalar) :space :time)
+
+(macro rep (var init update)
+  (letfed ((,var ,init ,update)) ,var))
+(macro rep+ (var type update)
+  (letfed+ ((,var ,type ,update)) ,var))
+
+(macro fold-time (f i x) (letfed ((?r ,i (,f ?r ,x))) ?r))
+(macro all-time (v) (fold-time and true v))
+(macro any-time (v) (fold-time or false v))
+(macro int-time (v) (fold-time + 0 (* v (dt))))
+(macro max-time (v) (fold-time max 0 v))
+(macro min-time (v) (fold-time min inf v))
+
+(def once (x) (letfed ((v x v)) v))
+
+
+
+; (def assoc (val tups)
+;   (fold (fun (res t) (if (= val (1st t)) t res)) (tup -1 -1) tups))
+; (def find (val elts)
+;   (fold (fun (res e) (or res (= val e))) 0 elts))
+(def id (x) x)
+; (def is-orange () (sense 1))
+; (def is-purple () (sense 2))
+
+
+;;;; DEBUG
+
+(primitive mid () scalar)
+(primitive probe (local scalar) local :side-effect
+  :type-constraints ((= arg0 value)))

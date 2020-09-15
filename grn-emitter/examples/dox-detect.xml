@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<GeneticRegulatoryNetwork xmlns="urn:clothocad.org:grn:">
+  <!-- Genetic regulatory network for Proto: (green (not (red (Dox)))) -->
+  <!-- Produced by BioCompiler v.0.20 -->
+  
+  <!-- Regulatory Reactions -->
+  <RegulatoryReaction>
+    <substrate>
+      <ChemicalSpecies uid="rtTA">
+        <designAnnotation>
+          <DataType logicalType="boolean"/>
+        </designAnnotation>
+        <property>
+          <Family name="rtTA"/>
+        </property>
+      </ChemicalSpecies>
+    </substrate>
+    <regulatedBy repression="false">
+      <ChemicalSpecies uid="Dox">
+        <designAnnotation>
+          <DataType logicalType="boolean"/>
+        </designAnnotation>
+      </ChemicalSpecies>
+    </regulatedBy>
+  </RegulatoryReaction>
+  
+  <!-- Transcriptional Units -->
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+        </Family>
+        <regulatedBy repression="true">
+          <ChemicalSpecies uid="Delta">
+            <designAnnotation>
+              <DataType logicalType="boolean"/>
+            </designAnnotation>
+          </ChemicalSpecies>
+        </regulatedBy>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="GFP">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+              <property>
+                <Family name="GFP"/>
+              </property>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="false"/>
+          </designAnnotation>
+        </Family>
+        <regulatedBy repression="false">
+          <ChemicalSpecies uid="rtTA"/>
+        </regulatedBy>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="RFP">
+              <designAnnotation>
+                <DataType logicalType="boolean"/>
+              </designAnnotation>
+              <property>
+                <Family name="RFP"/>
+              </property>
+            </ChemicalSpecies>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="Delta"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="3">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+  
+  <FeatureSequence>
+    <item index="0">
+      <Feature>
+        <Family name="promoter">
+          <designAnnotation>
+            <DataType logicalType="boolean" logicalValue="true"/>
+          </designAnnotation>
+        </Family>
+      </Feature>
+    </item>
+    <item index="1">
+      <Feature>
+        <Family name="CodingSequence">
+          <product>
+            <ChemicalSpecies uid="rtTA"/>
+          </product>
+        </Family>
+      </Feature>
+    </item>
+    <item index="2">
+      <Feature>
+        <Family name="terminator"/>
+      </Feature>
+    </item>
+  </FeatureSequence>
+</GeneticRegulatoryNetwork>

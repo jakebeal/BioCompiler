@@ -1,0 +1,10 @@
+function dither () {
+    feedback a, s {
+        s = 0;
+        a = norm(1,tup(rnd(-1,1),rnd(-1,1),rnd(-1,1)));
+    } update {
+        s = min(25,abs(s + rnd(-1,1)));
+        a = norm(1,a + tup(rnd(-0.1,0.1),rnd(-0.1,0.1),rnd(-0.1,0.1)));
+    };
+    s * a;
+}

@@ -1,0 +1,378 @@
+\documentclass{article}
+\usepackage{../proto-docs}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{../svn-multi}
+
+\title{Proto Quick Start}
+\author{By the authors of MIT Proto}
+\date{\releasetag}
+
+\newcommand\todo[1]{\immediate\write16{TODO: #1}}
+
+\newcommand\violation{{\em Capable of violating the continuous
+    space/time abstraction.}}
+
+% proto code
+\newcommand\code[1]{\begin{quote}\var{#1}\end{quote}}
+\newcommand\function[2]
+{\begin{quote}{\tt #1}: #2 \end{quote}}
+\newcommand\type[1]{$#1$}
+\newcommand\var[1]{{\tt #1}}
+
+% arguments/keystrokes
+\newcommand\key[1]{{\bf #1}}
+\newcommand\simarg[2]{\begin{quote} {\bf Argument: \var{#1}} \\ #2 \end{quote}}
+\newcommand\simkey[2]{\begin{quote} {\bf Key: \key{#1}} \\ #2 \end{quote}}
+\newcommand\simmouse[2]{\begin{quote} {\bf Mouse: \key{#1}} \\ #2 \end{quote}}
+\newcommand\simargkey[3]{
+  \begin{quote} {\bf Argument: \var{#1}, Key: \key{#2}} \\ #3 \end{quote}
+}
+\newcommand\simPMarg[3]{
+  \begin{quote}
+    {\bf Positive Argument: \var{#1}, Negative Argument: \var{#2}} \\ #3
+  \end{quote}
+}
+\newcommand\simPMargkey[4]{
+  \begin{quote}
+    {\bf Positive Argument: \var{#1}, Negative Argument: \var{#2}, 
+      Key: \key{#3}} \\ #4
+  \end{quote}
+}
+\newcommand\true{{\bf TRUE}}
+\newcommand\false{{\bf FALSE}}
+
+
+\begin{document}
+
+\maketitle
+
+This is a quick-start guide for Proto, giving a quick tour of commonly
+used features of the language and simulator for people who are already
+comfortable with distributed programming languages.  For installation
+instructions, see the {\bf README}.  For a tutorial on the Proto
+language, see the document {\bf Thinking In Proto}.  For a reference
+to the Proto language, see the {\bf Proto Language Reference}.  For a
+usee manual for the simulator, see the {\bf Proto Simulator User
+  Manual}.  For information on how to extend the functionality of the
+simulator, see the {\bf MIT Proto Developers Guide}.
+
+\credits{}
+
+\section{Smoke Test}
+
+Let us assume you have already successfully built Proto.
+Go to the base directory and type:
+\code{./proto -n 1000 -r 10 -l -c -T -v "(red (gradient (once (< (rnd
+  0 1) 0.01))))"}
+You should see a green network with blue unreadable text at the
+intersections.  Red dots will spread through the screen from
+several starting locations as a magenta number in the lower
+left counts upward.
+
+Drag with your left mouse button to rotate the display.  You will see
+that the red dots form a mountainous landscape.  Drag with your right
+mouse button to zoom and get a better view.
+
+Let's break down this command: \var{-n 1000} means use 1000 devices
+and \var{-r 10} means connect devices within 10 meters of one another.
+The \var{-c} means show the network: it's the green thing; hit 'c' to
+turn it off.  You'll notice the magenta number in the lower right go
+up when you do that: it's displaying how many frames per second the
+simulator is rendering, and the one in the lower left is displaying
+the number of simulated seconds that have elapsed.  The timing display
+was invoked by \var{-T}; hit 'T' (shift-t) to turn them off.
+
+Now you are looking at just the blue numbers and the red dots, and
+it's time to delve into the Proto expression a little: it's the big
+thing inside the quotes.  The expression \var{(rnd 0 1)} means that
+all 1000 devices should pick random floating point numbers between 0
+and 1.  The comparison \var{(< (rnd 0 1) 0.01)} turns these into a
+field of boolean numbers which is true at approximately 10 devices.
+The \var{once} function wrapped around this says to do this once and
+remember the result.  Then we feed this boolean field into the
+\var{gradient} function, which finds the distance from each device to
+the nearest device with a true value---that is, the nearest one that
+picked a random number less than 0.01.  Finally, these distances are
+fed to the \var{red} LED actuator that produces those dots on the
+screen.  If you zoom in one the blue numbers, you'll see that the dots
+float above the number at a height equal to the number.  The blue
+numbers are the output of the Proto expression, and are visible
+because of the \var{-v}: you can hit 'n' to turn them on and off.  The
+LEDs are visible because of the \var{-l} and you can use 'L' to turn
+them on and off.
+
+\section{Proto Language Essentials}
+
+Here are some essentials to the Proto language, along with the
+most frequently used functions.
+
+\paragraph{Evaluation}
+
+Proto is a purely functional language.  Proto is written using
+s-expressions in a manner very similar to Scheme.  Evaluating a Proto
+expression produces a program: a dataflow graph that may be evaluated
+against a space to produce an evolving field of values at every point
+on the space.
+
+\paragraph{Data Types}
+
+All Proto expressions produce fields that map every point in space to
+a value.  The values produced are categorized into four basic types:
+fields, lambdas, tuples, and scalars.  A number is a scalar or vector
+(tuple with scalar values), a local is anything but a field, and a
+boolean is a scalar interpreted as a logical value: false is 0,
+anything else is true.
+
+\paragraph{Namespaces and Bindings}
+
+Proto is a lexically scoped language.  Names are not case sensitive.
+Bindings contain values and are looked up by name.  Lexical bindings
+are visible only within the scope in which they are bound, and shadow
+bindings of the same name from enclosing scopes.
+
+When the Proto compiler encounters an unknown identifier $name$, it
+searches its path for a file named {\tt $name$.proto}.  If it finds
+such a file, then it loads the contents of the file and looks up the
+identifier again.  Definitions in subdirectories can be accessed with
+identifiers of the form {\tt $dir$/$name$}.
+
+\function{(def .name (.arg ...) ,@body)}{Define a function \var{name}
+  in the current scope, with as many arguments as there are \var{arg}
+  identifiers.  The body is evaluated within an extended scope where
+  the \var{arg} identifiers are bound to arguments to the function.
+  \var{fun}, which omits \var{name}, creates anonymous functions.}
+
+\function{(let ((.var ,value) ...) ,@body)}{Extends scope,
+  binding all \var{var} identifiers to their associated \var{value} 
+  in parallel.  The \var{body} is evaluated in the extended scope.
+  \var{let*} is like let, except that identifies are bound sequentially,
+  so later ones can use earlier ones in their definition.}
+
+\paragraph{Control Flow}
+
+\function{(all ,@forms)}{All \var{forms} are evaluated in parallel
+  and the value of the last form returned.}
+
+\function{(mux ,test ,true ,false)}{Evaluates both
+  \var{true} and \var{false} expressions.  When \var{test} is true,
+  returns the result of the \var{true} expression, otherwise returns
+  the result of the \var{false} expression.  The \var{true} and
+  \var{false} expressions must return the same type.}
+
+\function{(if ,test ,true ,false)}{Restricts execution to
+  subspaces based on \var{test}.  Where \var{test} is true, the
+  \var{true} expression is evaluated; where \var{test} is false, the
+  \var{false} expression is evaluated.  The \var{true} and \var{false}
+  expressions must return the same type.}
+
+\paragraph{State}
+
+Because Proto is a purely functional language, we create state using
+feedback loops.  A state variable is initialized at some value, then
+evolves that value forward in time.  In regions where the feedback
+loop is not evaluated, the state variable is reinitialized, resuming
+evolution when the feedback loop begins to be evaluated again.
+
+For example, the expression: \code{(rep t 0 (+ t (dt)))}
+creates a timer that returns how long evaluation has been proceeding
+at each device.
+
+\function{(letfed ((.var ,init ,evolve) ...)  ,@body)}{Creates a state
+  variable for each \var{var}.  \var{var} is initially bound to the
+  value of expression \var{init}, and at each time step the state is
+  evolved forward using expression \var{evolve}.  The body is
+  evaluated within an extended scope including the state variables.
+  
+  In the \var{evolve} expression, each \var{var} is bound to an old
+  value and \var{(dt)} is set to the time since the last step.
+  All \var{init} and \var{evolve} expressions are evaluated in
+  parallel, so no variable can reference another value in its
+  \var{init}, but variables can use one another's old values in their
+  \var{evolve} statements.  \violation{}.}
+
+\function{(rep .var ,init ,evolve)}{Create a single feedback variable
+  and return its value.  Equivalent to \var{(letfed ((.var ,init
+    ,evolve)) .var)}.  \violation{}}
+
+\function{(once ,expr)}{Evaluates \var{expr} once, then always returns
+  that value.}
+
+\paragraph{Logic and Arithmetic}
+
+\begin{itemize}
+\item Logical operators: \var{and}, \var{or}, \var{not}
+\item Constants: \var{(inf)}, \var{(e)}, \var{(pi)}
+\item Arithmetic: \var{+}, \var{-}, \var{*},  \var{/}, \var{neg} (negation)
+\item Comparison: \var{=}, \var{<}, \var{>}, \var{<=}, \var{>=}
+\item Functions: \var{pow}, \var{min}, \var{max}, \var{sqrt}, \var{abs}, 
+  \var{sin}, \var{cos}, \var{atan2}
+\item Random Numbers: \var{(rnd ,min ,max)} gives a floating point
+  random number in the range $[min, max]$.
+\item Vectors: \var{(vdot ,a ,b)}, \var{(normalize ,v)}, 
+  \var{(polar-to-rect ,v)}, \var{(rect-to-polar ,v)}
+\end{itemize}
+
+\paragraph{Tuples}
+
+\function{(tuple ,v ++)}{Creates a tuple with the set of
+  \var{v} arguments as its elements.}
+
+\function{(elt ,tuple ,i)}{Returns the \var{i}th element of
+  \var{tuple}, counting from zero.  \var{1st}, \var{2nd}, and
+  \var{3rd} are functions for getting elements 0, 1, and 2.}
+
+\paragraph{Neighborhoods}
+
+There are two types of neighborhood functions: functions that create
+fields, and functions that summarize fields into local values.  In
+between, any pointwise function can be applied to fields, producing a
+field whose values are the result of applying the pointwise operation
+to the values of the input fields.
+
+\begin{itemize}
+\item \var{(nbr ,expr)}: Returns a field mapping neighbors to their
+  values of \var{expr}.
+\item \var{(nbr-range)}, \var{(nbr-angle)}, \var{(nbr-lag)}, \var{(nbr-vec)}:
+  return a field of distances, bearings, time lags, and vectors to
+  neighbors, respectively.
+\item \var{min-hood}, \var{max-hood}, \var{all-hood}, \var{any-hood},
+  \var{int-hood}: summarize a field into a scalar that is,
+  respectively, minimum, maximum, for-all, existence, and integral
+  over the values of the field.
+\end{itemize}
+
+\function{(fold-hood ,fold ,base ,value)}{Collects \var{value} from
+  each of the neighbors, then folds these into a summary value, using
+  \var{fold} to combine elements into \var{base} one at a
+  time. \violation{}}
+
+\paragraph{Sensor and Actuators}
+
+Actuators reset themselves to a null value whenever they are not
+actively being invoked.  Thus, for example, 
+\code{(if (sense 1) (mov (tup 2)) (red (tup 1)))} 
+will cause devices move to the right only when \var{(sense 1)} is
+true, and to turn on their red LED only when \var{(sense 1)} is false.
+
+\function{(mov ,velocity)}{Attempt to move at \var{velocity}.  The
+  return echoes \var{velocity}.}
+
+\function{(red ,n)}{Set red LED to intensity \var{n}.  Intensity
+  ranges from 0 to 1, but overloading of display can show values outside
+  this range.  The return echoes \var{n}.  \var{green} and \var{blue}
+  are identical, but set the green and blue LEDs instead.}
+
+\function{(probe ,value ,i)}{Posts \var{value} to the \var{i}th probe
+  (valid indices are 0 to 2).}
+
+\function{(sense ,i)}{Returns the \var{i}th user sensor value.}
+
+\function{(coord)}{Returns the device's estimated coordinates.}
+\function{(hood-radius)}{Returns the maximum expected range at which
+  devices can communicate.}
+
+\paragraph{Library Functions}
+
+These are not primitive functions, but are frequently used building
+blocks which have been included in Proto's distribution library, in
+the directory {\tt lib/}.
+
+\function{(distance-to ,source)}{Calculates the shortest-path
+  distance from every device to the set of devices where \var{source}
+  is true.  The function \var{gradient} is an alias.}
+
+\function{(broadcast ,source ,value)}{Flow \var{value} outward from
+  devices in the \var{source} to all other devices.  Each device takes
+  its value from the nearest \var{source} device.}
+
+\function{(dilate ,source ,d)}{Returns true for every device within
+  distance \var{d} of the \var{source}.}
+
+\function{(distance ,region1 ,region2)}{Calculates the distance
+  between \var{region1} and \var{region2} and broadcasts it
+  everywhere.}
+
+\function{(disperse)}{Devices repel from one another using spring
+  forces.}
+
+\function{(dither)}{Devices wander randomly in a 2D plane.}
+
+\function{(elect)}{Devices choose a leader by mutual exclusion
+  and maintain precisely one leader within a given distance.}
+
+\function{(timer)}{Return the length that this device has been
+  evaluating this expression (i.e. not going in different branches of
+  an \var{if})}.
+
+\section{Simulator Essentials}
+
+\simkey{q}{Quit the simulator.}
+\simargkey{-v}{n}{Show value computed at each device.  Toggled by key.}
+\simargkey{-sv}{v}{When device outputs a 2- or 3-tuple, display it as
+  a vector (toggled by key).}
+
+\simargkey{-T}{T}{Display simulator time in lower left corner and
+  frames-per-second in lower right corner. Toggled by key.}
+\simargkey{-step}{s}{Use stepping mode, advancing one step on key
+  \key{s}} 
+\simkey{x}{Execute freely (ending stepping mode).}
+\simarg{-s N}{Set simulated seconds per step, default
+  0.01/\var{ratio}}
+
+\paragraph{Display:}
+\simargkey{-f}{f}{Full screen display (toggled by key)}
+\todo{Need to add GLUT geometry arguments}
+\simkey{z}{Reset display to initial view.}
+\simkey{ARROW KEYS}{Shift simulation display in the direction of the arrow, 
+  in the simulation's coordinate system.}
+\simmouse{LEFT DRAG}{Rotate display.}
+\simmouse{RIGHT DRAG}{Zoom display; toward center zooms out, away zooms in.}
+  
+\paragraph{Selection:}
+\simmouse{LEFT CLICK}{Select the devices clicked on.}
+\simmouse{RIGHT CLICK}{Select, then print the state of the selected
+  device(s) to standard out.}
+\simmouse{SHIFT LEFT DRAG}{Toggle the selection of all devices in a
+  rectangular display region.}
+\simmouse{SHIFT RIGHT DRAG}{Move selected devices.}
+
+\paragraph{Device Distribution}
+Simulations are created with \var{n} devices distributed through a
+bounded 2D or 3D volume according to one of several distribution
+rules.
+
+\simarg{-n N}{Number of devices.}
+\simarg{-3d}{Use a 3D distribution; default is 2D.}
+\simarg{-DD grid}{Distributes devices in a grid, rathen than uniformly
+  randomly.}
+
+\paragraph{Unit Disc Radio Communication}
+The default communication model connects all devices less than
+some fixed distance apart.
+
+\simarg{-r N}{Transmission range for radio, default 15.}
+\simarg{-ns N}{Set transmission range to get an expected neighborhood
+  size of \var{N}.  Overrides \var{-r}.}
+\simargkey{-c}{c}{Display network connections (toggled by key).}
+
+\paragraph{Dynamics}
+The default physics package, ``simple dynamics,'' is a simple
+vector-stepping system that does not handle collisions and allows
+instantaneous shifts in velocity.
+
+\simarg{-rad N}{Radius of a device body, defaults from the initial
+  distribution bounds: $\sqrt{0.087*(width*height/n)}$}
+\simargkey{-w}{w}{Use walls to keep devices inside the initial distribution
+  bounds.}
+\simargkey{-m}{m}{Enable movement (toggled by key).}
+
+\paragraph{Sensors and Actuators}
+\simargkey{-probes N}{p}{Display the first \var{N} of the three probes.  
+  The \var{p} key cycles through how many are shown.}
+\simargkey{-l}{L}{Display LEDs (toggled by key).}
+\simkey{t}{Toggle user sensor 1 on selected devices.}
+\simkey{y}{Toggle user sensor 2 on selected devices.}
+\simkey{u}{Toggle user sensor 3 on selected devices.}
+
+\end{document}

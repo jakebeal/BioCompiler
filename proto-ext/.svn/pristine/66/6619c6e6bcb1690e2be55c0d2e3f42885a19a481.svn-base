@@ -1,0 +1,7 @@
+(def gradient (src)
+  (1st (rep (tup d v) (tup (inf) 0)
+	(mux src (tup 0 0)		; source
+	  (mux (any-hood+
+		(<= (+ (nbr d) (nbr-range) (* v (+ (nbr-lag) (dt)))) d))
+	    (tup (min-hood+ (+ (nbr d) (nbr-range))) 0)
+	    (let ((v0 (if (= (dt) 0) 1 (/ (radio-range) (* (dt) 12))))) (tup (+ d (* v0 (dt))) v0)))))))

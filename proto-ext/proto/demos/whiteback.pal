@@ -1,0 +1,3 @@
+# This palette runs Proto with a white background rather than black
+# to use it, run "proto -palette whiteback.pal [program]"
+BACKGROUND 1 1 1 1

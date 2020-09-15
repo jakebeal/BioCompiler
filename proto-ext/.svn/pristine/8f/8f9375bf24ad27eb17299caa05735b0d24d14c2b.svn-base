@@ -1,0 +1,15 @@
+(def ring ()
+  (let ((t (probe (broadcast (sense 1) (if (sense 1) (timer) 0)) 0))
+        (d (probe (gradient (sense 1)) 1)))
+    (if (< (abs (- (* 5 t) d)) 4)
+      (green 1)
+      (blue 1))))
+
+;; Run this command:
+;;  proto "(ring)" -l -n 500
+;;
+;; then click on one device and hit 't' to initiate a ring.  Green
+;; lights will turn on, then off again, propagating outward from the
+;; device you clicked.  You can initiate more rings by hitting 't'
+;; more: every time you turn the orange light on, another right will
+;; start.

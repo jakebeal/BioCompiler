@@ -1,0 +1,10 @@
+// Simple check to make sure proto is alive with an incredibly simple test
+test: $(PROTO) -n 3 "6" -headless -dump-after 2 -NDall -Dvalue -stop-after 2.5
+= 1 3 6
+
+// Make sure palettes parse and load properly
+// test: $(PROTO) -n 3 -palette test.pal "1" -headless -dump-after 1 -stop-after 1.5
+// is 0 _ WARNING: no color named NOT_A_COLOR, defaulting to red
+// is 1 _ WARNING: bad color at test.pal line 4; should be NAME R G B [A]
+// = 3 1 0
+// Actually, this test is broken, since the online system builds headless

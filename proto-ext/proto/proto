@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Script template to run proto from the build directory, instantiated
+# by configure.
+
+builddir="$(dirname "$0")"
+srcdir="${builddir}/"'.'
+
+plugindir="${builddir}/src/sim/plugins"
+export LD_LIBRARY_PATH="${plugindir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+
+exec "${builddir}/src/proto" -path "${srcdir}/lib" --srcdir "${srcdir}" \
+  ${1+"$@"}

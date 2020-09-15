@@ -1,0 +1,94 @@
+For a long time, one of the barrier to Proto adoption has been its
+lisp-like syntax.  This is somewhat ridiculous, but the fact remains:
+lots of people don't like parentheses and have a hard time thinking in
+prefix notation.  Thus, we would like to offer a "skin" on the
+language that makes it look and feel more like some other popular
+language, but without losing the underlying semantics or changing the
+expressiveness (in either direction).  
+
+It would be ideal if we could implement the "skin" simply as a
+syntactic transformation from the alternate language into Proto.  The
+popular imperative candidates I have been considering as bases for the
+syntax are: C/C++, Java, JavaScript, and Python.  I ended up going
+with Python as a first candidate for two reasons: it has a nicely
+sparse syntax and it's still all new and shiny as a language.
+
+The key insight (surely unoriginal) that will allow our
+transformation, is that assignment can be mapped onto let.  So, for
+example, the assignments:
+
+  a = 3 + x;
+  b = a*(a+1);
+  c = b - sqrt(a);
+
+can be rewritten in Proto as:
+
+  (let ((a (+ 3 x)))
+    (let ((b (* a (+ a 1))))
+      (let ((c (- b (sqrt a))))
+        ...
+        )))
+
+This can work for re-assignment too, using shadowing:
+  a = 3 + x;
+  a = a + 1;
+  
+  can be rewritten as:
+  (let ((a (+ 3 x)))
+    (let ((a (+ a 1)))
+      ...
+      ))
+
+If we allow assignment to happen inside of "if" statements, though, it
+gets ugly.  And of course iteration would make life difficult.  So to
+keep things simple, we'll probably just have it be the case that
+you're only allowed to assign a variable once within a given scope.
+So, no shadowing, but in return no dealing with the "not really an
+assigment" confusion that I think would result otherwise.
+
+On this basis, we can build "Pyto" by doing the following:
+- math operators (e.g. +, *) are done in standard math notation
+- other pointwise ops go: (op arg arg ...) -> op(arg,arg,...)
+- neighborhood operations are trated just like pointwise
+- (def name (arg arg ...) body) --> 
+  function name (arg, arg, ...) {
+    body
+  }
+- (letfed ((var1 init1 update1) (var2 init2 update2) ...) body) -->
+  feedback var1, var2, ... {
+      var1 = init1;
+      var2 = init2;
+  } update {
+      var1 = update1;
+      var2 = update2;
+  };
+- (if test expr1 expr2) -->
+  if(test) { expr1; } else { expr2; }
+  also the ternary: (test ? expr1 : expr2)
+- (mux test expr1 expr2) -->
+  mux { expr1; } and { expr2; } select(test);
+  also a ternary: (expr1 \ expr2 ? test)
+- the last statement in a block is always the return value
+- Tuple elements can be accessed with []
+  (elt mytuple 0) --> 
+  mytuple[0] 
+  also the old way: elt(mytuple,0)
+- Tuples can be constructed with {}
+  let((mytuple (tup 1 2 3))) -->
+  mytuple = {1, 2, 3};
+  also the old way: mytuple = tuple(1,2,3);
+
+
+We also need to change some things about symbols, since lisproto
+allows all sorts of things in symbols, but cpproto needs to
+reserve most of these symbols for infix notation.
+To that end, we will do the following:
+1) In cpproto, only alphanumeric and "_" are allowed in symbols.
+2) If a symbol starts with "$", then everything allowed by lisproto
+   until the next whitespace is taken as part of the symbol.
+3) cpproto symbols with "_" are implicitly converted to "-" when
+   referencing lisproto code.  A warning is emitted for this.
+4) The core library will have "_" as well as "-" versions of core ops.
+5) lisproto will have "." removed from legitimate symbol characters.
+
+The *-hood+ ops (e.g. min-hood+) still need a better name, though.

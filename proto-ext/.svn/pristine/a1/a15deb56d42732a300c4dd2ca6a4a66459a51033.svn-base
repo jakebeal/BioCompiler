@@ -1,0 +1,27 @@
+Responsible Proto development means that every time you change
+something in a release directory you should do the following things
+before checking in the code:
+
+1. Update README files and manuals, as appropriate
+   In manuals, things may be marked with "\bugs{}" "\broken{}"
+   or "\experimental{}" when they aren't working right.
+2. Add regression tests to verify that your changes work
+3. Follow the style of existing code:
+   - Start every file with the standard licensing header
+   - Code should be dense but readable
+     - Keep lines to 80 characters
+     - indent with 2 spaces / indent
+     - Short comment go on the same line as code
+   - Each file should contain a single, whole, thematically coherent
+     module: this isn't Java so lots of little files aren't mandatory
+   - Use Unix-style newlines
+
+Doing these immediately will help prevent version skew and
+accumulation of small tasks into large & painful tasks.
+
+Small upgrades and bug-fixes can be registered through the
+bug-tracker at http://proto.bbn.com/bugzilla/.
+To act as a full developer, you will need access to the subversion
+repository.  Email proto-leadership@csail.mit.edu with a case for
+access if you think you need it, and we'll set you up with access to
+the repository and bug tracker.

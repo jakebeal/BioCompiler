@@ -1,0 +1,1 @@
+(def log10 (x) (/ (log x) (log 10)))

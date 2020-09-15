@@ -1,0 +1,5 @@
+(def hop-broadcast (src val)
+  (let ((d (hop-distance-to src)))
+    (rep v val (mux src val (2nd (min-hood (nbr (tup d v))))))))
+
+;; proto -v "(hop-broadcast (sense 1) (sense 2))"

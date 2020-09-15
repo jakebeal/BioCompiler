@@ -1,0 +1,1 @@
+(def is-orange () (sense 1))

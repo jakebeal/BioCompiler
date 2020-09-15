@@ -1,0 +1,19 @@
+(def connect (src dest)
+  (let* ((d (distance-to dest))
+	 (thepath (spath src dest d)))
+	(probe d 0)
+    (if thepath
+       (let ((min-d (min-hood (nbr d)))) ; compute min-d outside, so that sum-hood and min-hood don't fight in the paleocompiler over who owns "(nbr d)"
+	 (sum-hood 
+	  (mux (= (nbr d) min-d)
+	    (nbr-vec)
+	    (tup 0 0 0))))
+      (tup 0 0 0)))
+  )
+
+
+
+
+
+;; NB: connect.proto depends on the following functions: actualpath or spath
+;; See wire.proto for running instructions
